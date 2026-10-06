@@ -26,7 +26,7 @@ Then say "file my inbox."
 - **It learns the lingo and the people.** New acronyms go to your glossary, and it asks who the new names are.
 - **Your originals stay untouched.** It never edits a drop. Once it's filed, the original moves to the archive, and nothing is deleted.
 
-You don't have to remember to check it. `/briefing` and `/pulse` tell you when something's waiting, and `/debrief` looks in the inbox first, so you never paste a transcript you already saved.
+You don't have to remember to check it. Your intern tells you when something's waiting.
 
 ## Three commands you'll use every day
 

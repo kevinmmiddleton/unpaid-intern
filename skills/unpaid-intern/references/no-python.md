@@ -139,3 +139,7 @@ For companies that allow no skills, plugins, or Python, the no-install kit (in t
 - **A starter `Second Brain` folder,** already built, to unzip into OneDrive, Google Drive, or Documents.
 - **`INSTRUCTIONS.md`,** to paste into a Claude Project (or any assistant with saved instructions and file uploads). It carries the rules, the setup questions, and the core commands, and asks the assistant to hand back updated files at the end of each session.
 - **`QUICK-START-PROMPT.md`,** a single prompt to paste at the start of any chat when that's all the company allows.
+
+## The finishing check by hand
+
+Before handing back a task that wrote files, list every file you wrote or moved this session, from your own steps. In each one, find any weekday next to a date and check it on a short calendar list you write out; if you can't verify it, remove the weekday and leave the plain date. Find any "he", "she", "his", or "her" and keep it only if a source gives that pronoun.

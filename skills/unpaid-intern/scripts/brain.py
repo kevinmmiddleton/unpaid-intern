@@ -58,6 +58,7 @@ MEMORY = "Memory"          # the lists the assistant keeps: follow-ups, decision
 SETUP = "Setup"            # preferences, guardrails, connections, cheat sheet
 PROJECT_TABLE = f"{MEMORY}/project-status.md"
 FOLLOWUPS = f"{MEMORY}/followups.md"
+SESSION_MARK = f"{MEMORY}/.session-start"  # written by `due --open`; `check` lists what changed after it
 
 FOLLOWUP_RE = re.compile(
     r"^\s*-\s*\[(?P<done>[ xX])\]\s*"
@@ -341,8 +342,9 @@ def parse_projects(path: Path):
 def compute_due(items, today: dt.date, days: int, stale: int, confirm_days: int = 10):
     horizon = add_business_days(today, days)
     confirm_horizon = add_business_days(today, confirm_days)
+    next_horizon = add_business_days(horizon, 5)
     out = {k: [] for k in ("overdue", "due_today", "due_soon", "waiting_overdue",
-                           "waiting_stale", "unconfirmed", "guessed", "unknown_owner")}
+                           "waiting_stale", "unconfirmed", "guessed", "unknown_owner", "next_up")}
     for it in items:
         if it["done"]:
             continue
@@ -353,6 +355,8 @@ def compute_due(items, today: dt.date, days: int, stale: int, confirm_days: int 
                 out["due_today"].append(it)
             elif it["date"] <= horizon:
                 out["due_soon"].append(it)
+            elif it["date"] <= next_horizon:
+                out["next_up"].append(it)  # just past the window: printed with its weekday so a brief never works one out
         elif it["waiting_on"]:
             if it["date"] < today:
                 out["waiting_overdue"].append(it)
@@ -658,6 +662,7 @@ DUE_LABELS = [
     ("unconfirmed", "Waiting on others, not yet agreed"),
     ("guessed", "Guessed dates coming up (confirm them)"),
     ("unknown_owner", "Owner not recognized (use @me or @waiting:Name)"),
+    ("next_up", "After the window, yours (not due soon; quote the weekday from here)"),
 ]
 OPEN_KEYS = ["overdue", "due_today", "waiting_overdue", "waiting_stale"]
 
@@ -690,6 +695,10 @@ def cmd_due(args) -> int:
         return 0
     keys = OPEN_KEYS if args.open else [k for k, _ in DUE_LABELS]
     if args.open:
+        try:  # the session mark lets `brain.py check` list what this session wrote; a read-only folder just skips it
+            write_lf(ws / SESSION_MARK, dt.datetime.now().astimezone().isoformat(timespec="seconds") + "\n")
+        except OSError:
+            pass
         print(f"Session open, {fmt_day(today)}: mention only these, in two lines at most. If the list is empty, say nothing about having checked.")
     else:
         print(f"Follow-ups as of {fmt_day(today)} (due soon = by {fmt_day(horizon)}; stale = more than {args.stale} business days)")
@@ -1010,6 +1019,125 @@ def cmd_daylog(args) -> int:
     return 0
 
 
+
+# ---------------------------------------------------------------- check: what this session wrote, verified
+
+WEEKDAY_ABBR = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+WEEKDAY_DATE_RE = re.compile(
+    r"\b(?P<wd>mon|tue|wed|thu|fri|sat|sun)[a-z]*\.?,?\s+"
+    r"(?:(?P<iso>\d{4}-\d{2}-\d{2})|(?P<mon>jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(?P<day>\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(?P<year>\d{4}))?)",
+    re.IGNORECASE)
+PRONOUN_RE = re.compile(r"\b(he|him|his|himself|she|her|hers|herself)\b", re.IGNORECASE)
+CHECK_SUFFIXES = {".md", ".txt", ".html", ".csv"}
+
+
+def _nearest_year(month: int, day: int, today: dt.date):
+    best = None
+    for y in (today.year - 1, today.year, today.year + 1):
+        try:
+            d = dt.date(y, month, day)
+        except ValueError:
+            continue
+        if best is None or abs((d - today).days) < abs((best - today).days):
+            best = d
+    return best
+
+
+def check_weekdays(text: str, today: dt.date):
+    """[(line, phrase, ok, date)] for every 'weekday + date' pair, e.g. 'Thu 2026-10-08' or 'Thursday, Oct 8'."""
+    out = []
+    for n, line in enumerate(text.splitlines(), 1):
+        for m in WEEKDAY_DATE_RE.finditer(line):
+            if m.group("iso"):
+                d = parse_date(m.group("iso"))
+            else:
+                month = MONTHS.index(m.group("mon").lower()[:3]) + 1
+                day = int(m.group("day"))
+                d = None
+                if m.group("year"):
+                    try:
+                        d = dt.date(int(m.group("year")), month, day)
+                    except ValueError:
+                        d = None
+                else:
+                    d = _nearest_year(month, day, today)
+            if d is None:
+                continue
+            out.append((n, m.group(0).strip(), WEEKDAY_ABBR.index(m.group("wd").lower()[:3]) == d.weekday(), d))
+    return out
+
+
+def session_changes(ws: Path, since: dt.datetime):
+    """Files under the workspace changed or moved after `since` (a move keeps the file's modified time but updates its change time)."""
+    cutoff = since.timestamp()
+    found = []
+    for p in sorted(ws.rglob("*")):
+        if p.is_symlink() or not p.is_file():
+            continue
+        rel = p.relative_to(ws)
+        if rel.as_posix() == SESSION_MARK or any(part.startswith(".") and part != ".keep" for part in rel.parts):
+            continue
+        st = p.stat()
+        if max(st.st_mtime, st.st_ctime if os.name != "nt" else st.st_mtime) > cutoff:
+            found.append(rel)
+    return found
+
+
+def cmd_check(args) -> int:
+    ws = find_workspace(args.workspace)
+    today = get_today(ws, args.today)
+    mark = ws / SESSION_MARK
+    since, how = None, ""
+    if args.since:
+        try:
+            since = dt.datetime.fromisoformat(args.since)
+        except ValueError:
+            sys.exit("--since takes an ISO time, like 2026-10-06T09:30 (from `brain.py now`).")
+        if since.tzinfo is None:
+            since = since.astimezone()
+        how = f"since {since.strftime('%H:%M')}"
+    elif mark.is_file():
+        try:
+            since = dt.datetime.fromisoformat(read_text(mark).strip())
+            how = f"since the session started at {since.strftime('%H:%M')}"
+        except ValueError:
+            since = None
+    if since is None:
+        since = dt.datetime.now().astimezone() - dt.timedelta(hours=2)
+        how = "in the last 2 hours (no session mark: `brain.py due --open` sets one at session start)"
+    changed = session_changes(ws, since)
+    if not changed:
+        print(f"Nothing in the workspace changed {how}.")
+        return 0
+    print(f"Changed {how}: {len(changed)} file{'s' if len(changed) != 1 else ''}. List these, exactly, as what you wrote or moved:")
+    for rel in changed:
+        print(f"  {rel.as_posix()}")
+    wrong, right, pronouns = [], 0, []
+    for rel in changed:
+        p = ws / rel
+        if p.suffix.lower() not in CHECK_SUFFIXES or rel.parts[:1] in ((INBOX,), (ARCHIVE,)):
+            continue  # raw drops and archived originals are the sources themselves
+        text = read_text(p)
+        for n, phrase, ok, d in check_weekdays(text, today):
+            if ok:
+                right += 1
+            else:
+                wrong.append(f"  {rel.as_posix()}:{n}  \"{phrase}\" is wrong: {d.isoformat()} is a {d.strftime('%A')}")
+        for n, line in enumerate(text.splitlines(), 1):
+            for m in PRONOUN_RE.finditer(line):
+                a, b = max(0, m.start() - 30), min(len(line), m.end() + 30)
+                pronouns.append(f"  {rel.as_posix()}:{n}  ...{line[a:b].strip()}...")
+    if wrong:
+        print("\nFix before you hand over. These weekdays don't match their dates:")
+        print("\n".join(wrong))
+    elif right:
+        print(f"\nWeekdays: {right} checked against their dates, all correct.")
+    if pronouns:
+        print("\nPronouns to review. Keep one only if a source gives it; otherwise use the name or \"they\":")
+        print("\n".join(pronouns[:12]) + (f"\n  ...and {len(pronouns) - 12} more" if len(pronouns) > 12 else ""))
+    return 1 if wrong else 0
+
+
 def iter_md(ws: Path, skip_dirs=(INBOX, ARCHIVE)):
     for p in sorted(ws.rglob("*.md")):
         rel = p.relative_to(ws)
@@ -1298,6 +1426,8 @@ def cmd_pack(args) -> int:
             if p.is_symlink() or not p.is_file() or p.resolve() == out:
                 continue
             rel = p.relative_to(ws)
+            if rel.as_posix() == SESSION_MARK:
+                continue
             if not args.include_inbox and rel.parts[:1] == (INBOX,) and p.name.lower() != "readme.md":
                 left_out += 1
                 continue
@@ -1444,6 +1574,8 @@ def cmd_selftest(args) -> int:
         check("due today found", len(out["due_today"]) == 1)
         check("due soon includes guessed and trailing-comment items", len(out["due_soon"]) == 2 and any(i["guessed"] for i in out["due_soon"]))
         check("far-off item excluded", all("offsite" not in i["what"] for k in out for i in out[k]))
+        check("items just past the window are listed after it, not as due soon",
+              all(horizon < i["date"] <= add_business_days(horizon, 5) for i in out["next_up"]) and not any(i in out["due_soon"] for i in out["next_up"]))
         check("done item excluded", all("vendor survey" not in i["what"] for k in out for i in out[k]))
         check("waiting past due found", len(out["waiting_overdue"]) == 1)
         check("waiting stale found", len(out["waiting_stale"]) == 1 and out["waiting_stale"][0]["waiting_on"] == "Sam")
@@ -1678,6 +1810,34 @@ def cmd_selftest(args) -> int:
             friendly = "YYYY-MM-DD" in str(exc)
         check("bad --today gives a friendly error", friendly)
 
+
+    with tempfile.TemporaryDirectory() as tmp2:
+        ws2 = Path(tmp2) / "ws"
+        with quiet:
+            cmd_init(argparse.Namespace(folder=str(ws2), dry_run=False, force=False))
+        (ws2 / INBOX / "call.txt").write_text("Ravi: I'll check with our team.\n", encoding="utf-8")
+        import time
+        time.sleep(1.2)
+        old = dt.datetime.now().astimezone()
+        write_lf(ws2 / SESSION_MARK, old.isoformat(timespec="seconds") + "\n")
+        time.sleep(1.2)
+        write_lf(ws2 / REFERENCE / "people.md", "| Ravi | asked by Alex for the report; said he would check | vendor |\n")
+        write_lf(ws2 / MEMORY / "meetings.md", "- Thu 2026-10-08 call (right), Fri 2026-10-08 (wrong), Thursday, Oct 8 (right)\n")
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = cmd_check(argparse.Namespace(workspace=str(ws2), today="2026-10-07", since=None))
+        outp = buf.getvalue()
+        check("check lists files changed after the session mark", "4-Reference/people.md" in outp and "Memory/meetings.md" in outp and "START-HERE.md" not in outp)
+        check("check leaves out the session mark and old files", ".session-start" not in outp and "call.txt" not in outp)
+        check("check catches a wrong weekday and exits 1", rc == 1 and "\"Fri 2026-10-08\" is wrong" in outp)
+        check("check accepts right weekdays in both forms", outp.count("is wrong") == 1)
+        check("check flags a guessed pronoun", "said he would check" in outp)
+        check("weekday parser reads month-name dates", [ok for _, _, ok, _ in check_weekdays("Thursday, Oct 8 and Wed Oct 8", dt.date(2026, 10, 7))] == [True, False])
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_due(argparse.Namespace(workspace=str(ws2), today="2026-10-07", days=3, stale=5, open=True, json=False))
+        check("due --open sets the session mark", dt.datetime.fromisoformat(read_text(ws2 / SESSION_MARK).strip()) > old)
+
     passed = sum(1 for _, ok in checks if ok)
     for name, ok in checks:
         if not ok:
@@ -1761,6 +1921,11 @@ def main(argv=None) -> int:
     p.add_argument("--force", action="store_true", help="archive even with open follow-ups")
     add_common(p)
     p.set_defaults(func=cmd_archive)
+
+    p = sub.add_parser("check", help="before handing over: list what this session changed, verify weekdays, flag pronouns")
+    add_common(p)
+    p.add_argument("--since", help="ISO time to compare against instead of the session mark")
+    p.set_defaults(func=cmd_check)
 
     p = sub.add_parser("lint", help="check the workspace")
     add_common(p)

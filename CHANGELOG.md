@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased
+## 1.3.2
 
 - People stay "they" until a source gives a pronoun. `/debrief` and `/sync-kb` repeat the rule where they write follow-ups, people pages, and source notes.
 - `/debrief` runs every spoken deadline ("by Thursday") through `brain.py when` before writing the follow-up, and notes who asked whom in people.md.
 - `/learn` reads the project's follow-ups and status rows while gathering, and names anything late or waiting in its check-in.
+- `/briefing` keeps only the due script's items under its date-window label, and `/sync-kb` runs `brain.py when` on any date that has no year.
+- `brain.py due` also lists your items just past the due-soon window, with their weekdays, so a brief quotes them instead of working one out.
+- A finishing check, `brain.py check`, ends any task that writes files. It lists every file the session changed or moved, so your intern reports exactly what it wrote, verifies each weekday against its date, and flags pronouns no source gave. Dates are plain dates unless a script printed the weekday, and a commitment never gets a recipient or a date the source didn't state.
+- The date rule covers every date your intern writes: deadlines quoted from notes, placeholder dates, and checkpoints read from records all come from `brain.py when`. `/learn` quotes a status row's fields separately, with the date it was last updated, and writes plain dates unless a script printed the weekday.
 
 ## 1.3.1
 

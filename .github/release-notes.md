@@ -1,6 +1,8 @@
-# Your intern can teach now
+# Your intern checks its work
 
-New in 1.3.1: `/learn`. Hand your intern a topic you need to get up to speed on, and it builds you a 101 lesson from what you already have: your project notes, the docs you dropped in, and what it can read in your connected tools. One file, about 20 minutes, the 30-second version you can say out loud, and a quiz that explains every miss.
+New in 1.3.2: before your intern hands anything back, it runs a finishing check. The check lists every file it wrote or moved, so what it tells you it did is exactly what it did. It also verifies any weekday it wrote against the calendar, and flags any "he" or "she" a source didn't give. Dates stay plain unless a script printed the weekday, people stay "they" until a source says otherwise, and a follow-up never gets a recipient or a date the source didn't state. In the last round of behavior tests, all six runs passed.
+
+New in 1.3.1, if you missed it: `/learn` builds you a 101 lesson on any topic from what you already have, and your intern keeps an eye on your inbox folder.
 
 If you're new here: your intern reads everything you hand it, preps your meetings, keeps your follow-ups, and never asks for a reference letter.
 

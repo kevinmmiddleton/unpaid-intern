@@ -662,6 +662,15 @@ DUE_LABELS = [
 OPEN_KEYS = ["overdue", "due_today", "waiting_overdue", "waiting_stale"]
 
 
+def inbox_waiting(ws: Path) -> list:
+    """Raw drops in 1-Inbox that haven't been filed yet (the folder's README and hidden files don't count)."""
+    raw = ws / INBOX
+    if not raw.is_dir():
+        return []
+    return sorted(p.name for p in raw.iterdir()
+                  if p.is_file() and not p.name.startswith(".") and p.name.lower() != "readme.md")
+
+
 def cmd_due(args) -> int:
     ws = find_workspace(args.workspace)
     today = get_today(ws, args.today)
@@ -675,7 +684,8 @@ def cmd_due(args) -> int:
             return d
         payload = {k: [ser(i) for i in v] for k, v in out.items()}
         payload.update(today=today.isoformat(), horizon=horizon.isoformat(),
-                       malformed_lines=[n for n, _ in bad], unclosed_comment_line=unclosed)
+                       malformed_lines=[n for n, _ in bad], unclosed_comment_line=unclosed,
+                       inbox_waiting=inbox_waiting(ws))
         print(json.dumps(payload, indent=2))
         return 0
     keys = OPEN_KEYS if args.open else [k for k, _ in DUE_LABELS]
@@ -707,6 +717,10 @@ def cmd_due(args) -> int:
             print(f"  {it['date'].strftime('%a')} {it['date'].isoformat()}{'~' if it['guessed'] else ''}{who}  {it['what']}  <{it['source']}>{extra}  (line {it['line']})")
     if not any_hit:
         print("\nNothing to mention." if args.open else "\nNothing due, overdue, or stale.")
+    waiting_files = [] if args.open else inbox_waiting(ws)
+    if waiting_files:
+        shown = ", ".join(waiting_files[:5]) + (f", and {len(waiting_files) - 5} more" if len(waiting_files) > 5 else "")
+        print(f"\nIn {INBOX}: {len(waiting_files)} file{'s' if len(waiting_files) != 1 else ''} waiting to be filed ({shown}). Offer /sync-kb; don't file without a yes.")
     problems = []
     if bad:
         problems.append(f"{len(bad)} line(s) look like follow-ups but do not match the format (lines {', '.join(str(n) for n, _ in bad)})")
@@ -1097,11 +1111,9 @@ def lint_workspace(ws: Path, today: dt.date):
             info.append(f"{disputed} disputed claim(s) in the knowledge base. Resolve them with the source owner.")
         if inferred:
             info.append(f"{inferred} [inferred] claim(s) in the knowledge base. Confirm before anyone sends them.")
-    raw = ws / INBOX
-    if raw.is_dir():
-        pending = [p for p in raw.iterdir() if p.is_file() and not p.name.startswith(".") and p.name.lower() != "readme.md"]
-        if pending:
-            info.append(f"{len(pending)} file(s) waiting in {INBOX}. Run /sync-kb on them.")
+    pending = inbox_waiting(ws)
+    if pending:
+        info.append(f"{len(pending)} file(s) waiting in {INBOX}. Run /sync-kb on them.")
     return errors, warnings, info
 
 
@@ -1488,6 +1500,16 @@ def cmd_selftest(args) -> int:
         leak.write_text("key AKIA" + "ABCDEFGHIJKLMNOP\ncard 4111 1111 1111 1111\nssn 123-45-6789\n"
                         "contact jane.doe@example.com or (555) 123-4567\n", encoding="utf-8")
         (ws / INBOX / "deck.pdf").write_bytes(b"%PDF-1.4 binary")
+        (ws / INBOX / ".DS_Store").write_bytes(b"")
+        check("inbox counts real drops, not the README or hidden files", inbox_waiting(ws) == ["deck.pdf", "export.txt"])
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_due(argparse.Namespace(workspace=str(ws), today=today.isoformat(), days=3, stale=5, open=False, json=False))
+        check("due mentions files waiting in the inbox", "2 files waiting to be filed (deck.pdf, export.txt)" in buf.getvalue())
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_due(argparse.Namespace(workspace=str(ws), today=today.isoformat(), days=3, stale=5, open=True, json=False))
+        check("session-open check leaves the inbox out", "waiting to be filed" not in buf.getvalue())
         found, skipped = scan_paths([ws])
         kinds = {f[1] for f in found}
         check("scan catches access key", "AWS access key" in kinds)

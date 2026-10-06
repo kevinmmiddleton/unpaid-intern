@@ -10,7 +10,7 @@ It makes no network calls.
 |---|---|
 | `init <folder>` | Create the workspace from templates; never overwrites existing files |
 | `now [--tz Area/City]` | Any time the date, weekday, or time matters |
-| `due [--open] [--days 3] [--stale 5]` | `--open` at session open (only what's due today, overdue, or stale); the full list for `/briefing`, `/week`, `/gofer` |
+| `due [--open] [--days 3] [--stale 5]` | `--open` at session open (only what's due today, overdue, or stale); the full list for `/briefing`, `/pulse`, `/week`, `/gofer`, which also names the files waiting in 1-Inbox |
 | `when "<phrase>" ...` | Any spoken deadline: "Thursday", "end of month", "next Tuesday", "soon", "Friday I think". Prints the date and marks guesses with `~`; a hedge makes any date a guess. A phrase it can't read gets its own note; the others still resolve |
 | `status [--all] [--copy]` | `/project-status`; builds the paste-ready table (`--copy` reaches the clipboard only when the script runs on the user's own computer) |
 | `daylog` | `/close`; creates today's day log from the template |

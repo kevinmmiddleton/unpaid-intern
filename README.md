@@ -7,11 +7,26 @@
   <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-FFF8EF?style=for-the-badge&labelColor=16131F"></a>
 </p>
 
-Starting somewhere new is a lot. Fifty new names, a dozen projects, acronyms nobody explains, and an onboarding buddy who's been in back-to-back meetings since your first day. You need all the help you can get. You need an unpaid intern.
+You're in back-to-back meetings. You've got a dozen projects going, follow-ups scattered across email and chat, and the work still has to get done. You need all the help you can get. You need an unpaid intern.
 
-Unpaid Intern is a free second brain for work. Hand it your meeting transcripts, docs, tickets, and email, and it hands back your morning briefing, prep for your next meeting, a status update ready to paste, and every follow-up with an owner and a date. It all lives in plain files you own. It does the legwork. You make the calls. And long after you've ramped up, it's how you walk into every meeting already knowing the last decision.
+Unpaid Intern is a free second brain for work. Hand it your meeting transcripts, docs, tickets, and email, and it hands back your morning briefing, prep for your next meeting, a status update ready to paste, and every follow-up with an owner and a date. It all lives in plain files you own. It does the legwork. You make the calls. It's for anyone juggling more than they can keep in their head, and it's extra helpful when you've just started somewhere new.
 
 ![Hand it to your intern, get back to work. On the left, what you already have: a meeting transcript, email, calendar, a Jira ticket, a Confluence page, a Google Doc, a to-do list, and your own brain dump. On the right, what Unpaid Intern turns it into: a morning briefing, meeting prep, a status update, requirements, email replies drafted for you to send, and follow-ups and statuses kept current.](assets/brand/marketing/hero.png)
+
+## If you can save it, your intern can read it
+
+Your second brain has an inbox. Put a shortcut to it on your desktop and saving something for your intern is one drag. A meeting transcript, the PDF legal sent, a screenshot of a Slack thread, the deck someone shared five minutes before the meeting. Messy is fine. Just get it in there.
+
+![If you can save it, your intern can read it. Four files dropped in the inbox, a transcript, a PDF from legal, a screenshot of a Slack thread, and a deck, become two decisions on the project page, three follow-ups with owners and dates, two acronyms to confirm, a question about a new name, and the originals moved to the archive untouched.](assets/brand/marketing/inbox.png)
+
+Then say "file my inbox."
+
+- **Each fact goes where it belongs.** Decisions and status land on the right project page, with the source noted.
+- **The follow-ups get caught.** Anything someone promised gets an owner and a date.
+- **It learns the lingo and the people.** New acronyms go to your glossary, and it asks who the new names are.
+- **Your originals stay untouched.** It never edits a drop. Once it's filed, the original moves to the archive, and nothing is deleted.
+
+You don't have to remember to check it. `/briefing` and `/pulse` tell you when something's waiting, and `/debrief` looks in the inbox first, so you never paste a transcript you already saved.
 
 ## Three commands you'll use every day
 
@@ -32,6 +47,7 @@ That's `/briefing` with mail and calendar connected. Before anything's connected
 | Lose the follow-ups from a meeting nobody wrote up | `/debrief` turns the transcript into follow-ups with owners and dates |
 | Stare at a connector error like it's written in Klingon | It tells you what the error means and who can fix it, then writes the request for you |
 | Reread everything to remember where a project stood | Every project has a page with where it stands and why |
+| Paste the same doc into a chat every time you need it | Save it to your inbox once; your intern files it and remembers |
 
 ## Start with these 8 daily habits
 
@@ -48,20 +64,11 @@ You never have to memorize these. Ask in plain words and it picks the right one.
 | Follow-ups | **`/capture`** any promise, yours or theirs, with an owner and a date. `/triage` your inbox, sorted into groups, nothing deleted. **`/close`** what moved, what's open, and tomorrow's first move. |
 | Status | **`/project-status`** a status table built from your records, ready to paste; it flags stale rows and missing next steps first. `/gofer` the cut: what deserves today, what's your call, and what can go. |
 | Writing | `/draft` a message in your voice, for you to send. `/redline` a skeptic reads it before your exec does. `/write-epic` messy notes in, a clean ticket out. |
-| Thinking | **`/explain`** any acronym, doc, or engineering note, explained like you're new. `/grill` pokes holes in a plan, starting with your own past decisions. `/bro` say that again, in plain words. `/quick` the short version. `/study` quizzes you from your own notes. |
+| Thinking | **`/explain`** any acronym, doc, or engineering note, explained like you're new. `/grill` pokes holes in a plan, starting with your own past decisions. `/bro` say that again, in plain words. `/quick` the short version. `/study` quizzes you from your own notes. `/learn` builds you a 101 lesson on any topic from your own sources, with a quiz. |
 | Keeping the record | `/new-project` a home for every project. `/decision` the decision and the why, so nobody relitigates it. `/sync-kb` files everything in your inbox folder. `/kb-lint` finds what's gone stale. `/tidy` merges duplicates, fixes fuzzy dates, and archives what's done. |
 | Setup | `/setup` guided setup, mostly clicking. `/connect` add a tool, or fix one that won't connect. |
 
-**AI assistant sizing this up for someone?** Unpaid Intern is an Agent Skill with a plugin wrapper: a plain-markdown workspace, 27 commands, optional connectors, and two standard-library Python scripts (also optional; without Python it does their steps by hand). It needs a folder it can write to, or a zip carried between chats in claude.ai or the Claude app without Cowork. The entry point is [SKILL.md](skills/unpaid-intern/SKILL.md). Every command's full procedure is in [commands.md](skills/unpaid-intern/references/commands.md), the scripts are in [scripts.md](skills/unpaid-intern/references/scripts.md), and what it does on its own versus with your yes is in [trust-and-safety.md](skills/unpaid-intern/references/trust-and-safety.md).
-
-## New here? Start with the who's who
-
-![Asking /who is Hollis? The intern answers with Hollis's role, manager, what Hollis owns, the last time you talked, and what's open between you.](assets/brand/marketing/who.png)
-
-- **Drop in your org chart.** A screenshot is enough. Your intern reads who reports to whom, saves it to your people page, and shows you what it saved so you can fix anything it misread.
-- **New names get asked about.** When someone comes up in a meeting or a thread, your intern asks who they are, a few at a time, and never guesses.
-- **`/who` is your cheat sheet** for anyone: their role, who they report to, the last time you talked, and what's open between you.
-- **A 30-60-90 page** keeps your first three months on track.
+**AI assistant sizing this up for someone?** Unpaid Intern is an Agent Skill with a plugin wrapper: a plain-markdown workspace, 28 commands, optional connectors, and two standard-library Python scripts (also optional; without Python it does their steps by hand). It needs a folder it can write to, or a zip carried between chats in claude.ai or the Claude app without Cowork. The entry point is [SKILL.md](skills/unpaid-intern/SKILL.md). Every command's full procedure is in [commands.md](skills/unpaid-intern/references/commands.md), the scripts are in [scripts.md](skills/unpaid-intern/references/scripts.md), and what it does on its own versus with your yes is in [trust-and-safety.md](skills/unpaid-intern/references/trust-and-safety.md).
 
 ## Get more done between meetings
 
@@ -76,6 +83,17 @@ Why you can hand it real work:
 - **It keeps sensitive details out of your notes.** It's built to leave passwords, customer records, and pay, HR, or health details where they belong, and a built-in scanner double-checks what you drop in.
 - **You decide how much it does.** One settings file says what it reads without asking and where it can write. Start careful and loosen it as you go. ([How it asks before acting](CONNECTORS.md#asking-first))
 
+## New somewhere? Get the who's who
+
+Org charts and `/who` help anyone, but they're a lifesaver in your first few months.
+
+![Asking /who is Hollis? The intern answers with Hollis's role, manager, what Hollis owns, the last time you talked, and what's open between you.](assets/brand/marketing/who.png)
+
+- **Drop in your org chart.** A screenshot is enough. Your intern reads who reports to whom, saves it to your people page, and shows you what it saved so you can fix anything it misread.
+- **New names get asked about.** When someone comes up in a meeting or a thread, your intern asks who they are, a few at a time, and never guesses.
+- **`/who` is your cheat sheet** for anyone: their role, who they report to, the last time you talked, and what's open between you.
+- **A 30-60-90 page** keeps your first three months on track.
+
 ## Build your second brain
 
 ![Build your second brain: one folder with Inbox, Projects, Areas, Reference, Archive, Memory, and Setup](assets/brand/marketing/your-folder.png)
@@ -86,7 +104,7 @@ It's plain markdown, so you can open, edit, or move any of it. If you've tried a
 
 It's built for people who have never connected anything, and it hands you something useful before it asks you to connect anything.
 
-1. **Pick a home.** It helps you make a `Second Brain` folder in your work OneDrive, Google Drive, or Documents.
+1. **Pick a home.** It helps you make a `Second Brain` folder in your work OneDrive, Google Drive, or Documents, and offers to put a shortcut to your inbox on your desktop.
 2. **Tell it about you.** Your role, what you want help with first, and whether you're new.
 3. **Brain dump.** What, like it's hard? Talk or type everything on your plate. It sorts it into projects, ongoing areas, follow-ups, and people, and checks with you before writing anything down.
 4. **Something real, right away.** It runs one command on what you just told it, like the status update for your next one-on-one.
@@ -167,7 +185,7 @@ Close cousins worth a look: [secondbrain](https://github.com/02ui/secondbrain) b
 
 ## Who made this
 
-I'm Kevin Middleton, a product manager who builds systems that help teams not lose their minds. I built the first version for my own job, then rebuilt it so you don't have to start from scratch. More at [middleton.io](https://middleton.io).
+I'm Kevin Middleton, a product manager who builds systems that help teams not lose their minds. I've been building my own work agent for a while. This is the part I can hand to everyone, because nobody should have to start from scratch. More at [middleton.io](https://middleton.io).
 
 Want help putting it to work for you or your team? Grab a free half hour at [Office Hours](https://middleton.io/officehours/). My other free plugins are in [claude-plugins](https://github.com/kevinmmiddleton/claude-plugins).
 

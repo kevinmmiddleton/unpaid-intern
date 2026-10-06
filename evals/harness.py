@@ -430,7 +430,33 @@ case(41, "Short on time",
 
 case(42, "What can you do?",
      ["What can you actually do?"],
-     "Leads with the core eight (briefing, prep, debrief, who, capture, close, project-status, explain), briefly, and says plain words work too. Does not dump all 27 commands. Offers the rest on request.")
+     "Leads with the core eight (briefing, prep, debrief, who, capture, close, project-status, explain), briefly, and says plain words work too. Does not dump all 28 commands. Offers the rest on request.")
+
+case(43, "A 101 lesson from the workspace",
+     ["/learn the Launch v2 security review. I keep mixing it up with the pen test.", "Yes, that's right. Go ahead."],
+     "Before writing anything, gathers from the workspace (the Launch v2 project page, its follow-ups, and the dropped review note) and checks in once: the sources it will use, the mix-up to stop (Priya's security review sign-off versus the outside pen test), and what the user wants to answer. After the yes, copies `assets/lesson-101.html` to `4-Reference/learn/` with a short hyphenated slug, sets the title and storage key, fills the slides in order (a 30-second version, plain English, the split with a do-not-say line, an if-asked answer), and writes six to eight quiz questions with exactly one right answer each and an explanation. Every date and name in the lesson is in the sources; Priya's notes are described as waiting since 09-24, nothing invented about the pen test beyond the note. Adds one line under Topics in `4-Reference/INDEX.md`. Hands back the file location and the 30-second version, and offers /study. Sends nothing and changes nothing outside the workspace.",
+     files={"workspace/Second Brain/1-Inbox/2026-10-01-security-review-note.txt": """\
+Launch v2 security review, notes from Priya's team, 2026-10-01
+- The security review is Priya's team signing off on the Launch v2 design before launch. It blocks the launch date.
+- The pen test is separate: an outside firm tests the live product after launch. It is planned for next quarter and does not block launch.
+- Open item: Priya's team is still waiting on the data flow diagram from the launch team.
+"""})
+
+
+case(44, "Files waiting in the inbox",
+     ["/briefing", "Yes, file them."],
+     "Runs `brain.py due` and briefs as usual, then ends with one line naming the two files waiting in 1-Inbox and offering to file them; it does not file anything before the yes. After the yes, sends the transcript through /debrief (decisions, follow-ups, a meeting row; Ravi's offer is logged as @waiting:Ravi with accepted: false unless the note shows Ravi agreeing) and files the vendor note through /sync-kb (scan first, a source note, facts on the right page). Moves both originals to 5-Archive/processed only after they're written up, edits neither, and says exactly what it wrote.",
+     files={"workspace/Second Brain/1-Inbox/2026-10-06-vendor-call.txt": """\
+Vendor call, 2026-10-06
+Alex: Can you get us the revised SOC 2 report before the launch review?
+Ravi (vendor): I'll check with our compliance team and come back to you.
+Alex: Thanks. I'll send our data flow diagram by Thursday.
+""",
+            "workspace/Second Brain/1-Inbox/vendor-pricing-note.txt": """\
+Vendor pricing note, forwarded 2026-10-05
+- The vendor's list price goes up 8% on January 1.
+- Contracts signed before December 15 keep current pricing for 12 months.
+"""})
 
 
 # ---------------------------------------------------------------- building

@@ -13,6 +13,7 @@ For companies that don't allow add-ons, plugins, skills, or scripts. If your com
    - `Memory/project-status.md`, `Memory/followups.md`, `Memory/decisions.md`, `Memory/meetings.md`, `Memory/lessons.md`
    - `4-Reference/people.md`, `4-Reference/glossary.md`
    - `Setup/preferences.md`
+   - `lesson-101.html` from this kit (the template /learn fills in when you want a 101 lesson on a topic)
    - Later, each active project's `current.md`. If the Project won't take two files with the same name, rename them first, like `launch-v2-current.md`.
 4. Start a chat in the Project and say "set me up."
 5. At the end of each session, say "wrap up." It hands you each changed file with the folder it belongs in. Save each one over the old copy in your folder. In the Project, delete the old copy and upload the new one, so there's only ever one version.

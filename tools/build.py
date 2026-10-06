@@ -255,6 +255,7 @@ def dist() -> int:
         k.mkdir()
         for p in (SKILL / "extras" / "no-install-kit").glob("*.md"):
             shutil.copy(p, k / p.name)
+        shutil.copy(SKILL / "assets" / "lesson-101.html", k / "lesson-101.html")  # the /learn template, for a Project upload
         subprocess.check_call([sys.executable, str(SCRIPTS / "brain.py"), "init", str(k / "Second Brain")],
                               stdout=subprocess.DEVNULL)
         with zipfile.ZipFile(DIST / f"{kit}.zip", "w") as zf:

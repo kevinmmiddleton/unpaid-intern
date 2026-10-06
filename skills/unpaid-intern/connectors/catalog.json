@@ -3170,6 +3170,26 @@
    "core": false
   },
   {
+   "command": "/learn",
+   "group": "Thinking",
+   "what": "A 101 lesson on any topic, built from your own notes and tools, with a quiz.",
+   "uses": [
+    "wiki",
+    "tracker",
+    "mail",
+    "chat",
+    "files",
+    "meetings"
+   ],
+   "helps": [
+    "Yes, still ramping up"
+   ],
+   "try_it": "/learn the billing migration",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
    "command": "/new-project",
    "group": "Keeping the record",
    "what": "Give a new project a home: status, decisions, sources, and a context map.",

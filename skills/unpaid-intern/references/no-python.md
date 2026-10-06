@@ -82,6 +82,8 @@ Report only the groups that have items, soonest first. A line that doesn't match
 
 At session open (`due --open`), mention only groups 1, 2, 4, and 5, in two lines at most, and say nothing if they're empty.
 
+For the full list, also look in 1-Inbox: any file there other than README.md is waiting to be filed. Name them (up to five) and offer to file them.
+
 ## The status table by hand
 
 Read `Memory/project-status.md`. Leave out `watch` rows unless the person asks for them. Order the rest own, then support. The table has these columns:

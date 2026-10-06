@@ -4,7 +4,7 @@ description: "Unpaid Intern runs a portable second brain for knowledge work: a p
 license: MIT
 compatibility: "Claude (claude.ai, Desktop, Cowork), Claude Code, and Codex. Needs a folder it can read and write for memory; connectors are optional. Scripts need Python 3.9+ with the standard library only. Other agents can share the workspace through AGENTS.md."
 metadata:
-  version: "1.3.0"
+  version: "1.3.1"
   author: "Kevin Middleton"
   homepage: "https://middleton.io"
 ---
@@ -133,7 +133,7 @@ When they want more:
 - **Follow-ups:** `/triage` (inbox or chat sorted into numbered groups; never deletes)
 - **Status:** `/gofer` (the legwork on their plate, with finished recommendations)
 - **Writing:** `/draft` (a message in their voice, left as a draft), `/redline` (a skeptical second read before it goes somewhere important), `/write-epic` (a ticket drafted locally, created only after a yes on that exact draft)
-- **Thinking:** `/bro` (re-explain like they got lost), `/quick` (the last answer in N points), `/grill` (stress-test one decision), `/study` (five quiz questions from local sources)
+- **Thinking:** `/bro` (re-explain like they got lost), `/quick` (the last answer in N points), `/grill` (stress-test one decision), `/study` (five quiz questions from local sources), `/learn` (a 101 lesson on any topic, as one file, from their sources)
 - **Keeping the record:** `/new-project`, `/decision`, `/sync-kb` (file a dropped source), `/kb-lint` (health check), `/tidy` (merge, fix dates, retire finished items)
 - **Setup:** `/setup` (guided setup, or change answers later), `/connect` (add a tool, resume the plan, or fix one that will not connect)
 

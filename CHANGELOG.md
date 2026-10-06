@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1
+
+- `/learn` builds a 101 lesson on any topic from your own sources: your project folder, your notes, and read-only searches of connected tools. You get one HTML file with a 30-second version you can say out loud, the mix-up people get wrong, the line to use if someone asks, and a quiz that explains every miss. It checks the sources and the mix-up with you before it writes anything. 28 commands now.
+- The inbox does more of the work. `/briefing` and `/pulse` tell you when files are waiting in 1-Inbox and offer to file them, `/debrief` looks there first instead of asking you to paste, and "file my inbox" files everything waiting. Setup offers a shortcut to the inbox on your desktop, so saving something for your intern is one drag.
+- The README leads with what everyone deals with (too many meetings, too many projects) instead of only new hires, and shows the inbox in action.
+
 ## 1.3.0 (first public release)
 
 - Guided, click-through setup for people who have never connected a tool: a permanent folder, multiple-choice tool pickers, one connection at a time, and a tour of what each connection unlocked.

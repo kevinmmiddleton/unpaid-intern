@@ -65,6 +65,7 @@ I can type these, or just ask in plain words.
 | /explain | Explain anything like I'm new: acronyms, dense docs, engineering notes. |
 | /bro | Re-explain your last answer in plain words, like I got lost. |
 | /quick | The short version of your last answer. |
+| /learn | A 101 lesson on a topic, from my files and what I paste. First tell me which sources you'll use, the one mix-up the lesson should stop, and what I want to be able to answer, and wait for my yes. Then fill the slides of the uploaded `lesson-101.html` (start with a 30-second version I can say out loud, plain English, the mix-up, the question I'll get asked, six to eight quiz questions on common wrong beliefs, and a score slide naming the sources). Leave its script alone. Give it back as one HTML file to save in `4-Reference/learn/`. |
 | /close | Wrap up: what moved, what's still open, tomorrow's first move, and the updated files to save. |
 
 ## How to sound

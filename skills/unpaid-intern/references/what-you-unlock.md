@@ -33,6 +33,7 @@ Use this for the tour when scripts can't run: pick the four commands that match 
 | /quick | The short version of the last answer. | nothing; your own records | Works fully. | `/quick 3` |
 | /grill | Poke holes in a plan before someone else does. | nothing; your own records | Works fully. | `/grill (then paste the plan)` |
 | /study | Five quiz questions from your own notes, with the source for each answer. | team's docs, files | Works from pasted text and dropped files. | `/study our product glossary` |
+| /learn | A 101 lesson on any topic, built from your own notes and tools, with a quiz. | team's docs, tasks and tickets, email, team chat, files, meeting transcripts | Works from pasted text and dropped files. | `/learn the billing migration` |
 | /new-project | Give a new project a home: status, decisions, sources, and a context map. | nothing; your own records | Works fully. | `/new-project` |
 | /decision | Log a decision with the why, so nobody relitigates it in a month. | nothing; your own records | Works fully. | `/decision` |
 | /sync-kb | File everything dropped in the inbox into the right project. | files | Works from pasted text and dropped files. | `/sync-kb` |

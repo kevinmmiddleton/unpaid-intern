@@ -147,7 +147,8 @@ GROUPS = [
         ("/bro", "Say that again, in plain words."),
         ("/quick", "The short version."),
         ("/grill", "Pokes holes in a plan, starting with your own past decisions."),
-        ("/study", "Quizzes you from your own notes.")]),
+        ("/study", "Quizzes you from your own notes."),
+        ("/learn", "A 101 on any topic, from your own sources.")]),
     ("Keeping the record", PINK, [
         ("/new-project", "A home for every project."),
         ("/decision", "The decision and the why, so nobody relitigates it."),
@@ -164,7 +165,7 @@ def commands():
     colw = (W - 2 * margin - (cols - 1) * gap) / cols
     pad, inner = 26, None
     inner = colw - 2 * pad
-    head, y0 = header(W, "Everything your intern can do", "Type the command, or just ask in plain words. All 27 are free.")
+    head, y0 = header(W, "Everything your intern can do", "Type the command, or just ask in plain words. All 28 are free.")
     parts = [head]
     y = y0 + 44
     for ri, row in enumerate((GROUPS[:4], GROUPS[4:])):
@@ -462,5 +463,82 @@ def hero():
     save("hero", W, H, "\n".join(parts),
          "Hand it to your intern, get back to work. On the left, what you already have: a meeting transcript, email, calendar, a Jira ticket, a Confluence page, a Google Doc, a to-do list, and your own brain dump. On the right, what Unpaid Intern turns it into: a morning briefing, meeting prep, a status update, requirements, email replies drafted for you to send, and follow-ups and statuses kept current.")
 
+# ---------------------------------------------------------------- 7. the inbox: if you can save it, your intern can read it
+DROPS = [
+    ("standup-10-06.txt", "The meeting transcript"),
+    ("vendor-terms.pdf", "The PDF legal sent"),
+    ("thread.png", "A screenshot of a Slack thread"),
+    ("q4-plan.pptx", "The deck someone shared five minutes before the meeting"),
+]
+FILED = [
+    ("Launch v2", "Two decisions and the new date, with the source noted."),
+    ("Follow-ups", "Three new ones, each with an owner and a date."),
+    ("Glossary", "Two acronyms it wants you to confirm."),
+    ("People", "Asks who Dana Kim is. Never guesses."),
+    ("5-Archive", "Your originals, untouched. Nothing is deleted."),
+]
+
+def file_icon(x, y, w, h, fill):
+    ear = w * 0.32
+    d = f"M{x} {y + 5} Q{x} {y} {x + 5} {y} L{x + w - ear} {y} L{x + w} {y + ear} L{x + w} {y + h - 5} Q{x + w} {y + h} {x + w - 5} {y + h} L{x + 5} {y + h} Q{x} {y + h} {x} {y + h - 5} Z"
+    fold = f"M{x + w - ear} {y} L{x + w - ear} {y + ear} L{x + w} {y + ear}"
+    return (f'<path d="{d}" fill="{fill}" stroke="{INK}" stroke-width="3" stroke-linejoin="round"/>'
+            f'<path d="{fold}" fill="none" stroke="{INK}" stroke-width="3" stroke-linejoin="round"/>')
+
+def inbox():
+    W, margin = 1200, 64
+    head, y0 = header(W, "If you can save it, your intern can read it", "Put the inbox on your desktop. Drop things in all day. Then say \u201cfile my inbox.\u201d")
+    parts = [head]
+    top = y0 + 44
+    lw, mid = 420, 196
+    rw = W - 2 * margin - lw - mid
+    pad = 34
+    # left: what you dropped in
+    lx = margin
+    left = []
+    c, ch = chip("1-Inbox", lx + pad, top + pad, PINK, size=19)
+    left.append(c)
+    cy = top + pad + ch + 26
+    for name, desc in DROPS:
+        left.append(file_icon(lx + pad, cy, 30, 38, WHITE))
+        t, _ = text_path(name, 21, "bold", lx + pad + 46, cy + 17); left.append(t)
+        lines = wrap(desc, 18, "regular", lw - 2 * pad - 46)
+        ly = cy + 42
+        for ln in lines:
+            t, _ = text_path(ln, 18, "regular", lx + pad + 46, ly, opacity=0.75); left.append(t)
+            ly += 25
+        cy = max(cy + 56, ly) + 14
+    lh = cy - top + pad - 14
+    # right: where it went
+    rx = margin + lw + mid
+    right = []
+    c, ch = chip("Where it went", rx + pad, top + pad, YEL, size=19)
+    right.append(c)
+    cy = top + pad + ch + 26
+    for name, desc in FILED:
+        right.append(f'<circle cx="{rx + pad + 8:.1f}" cy="{cy + 12:.1f}" r="6" fill="{INK}"/>')
+        t, _ = text_path(name, 21, "bold", rx + pad + 28, cy + 19); right.append(t)
+        cy += 30
+        for ln in wrap(desc, 18, "regular", rw - 2 * pad - 28):
+            t, _ = text_path(ln, 18, "regular", rx + pad + 28, cy + 16, opacity=0.78); right.append(t)
+            cy += 25
+        cy += 16
+    rh = cy - top + pad - 16
+    h = max(lh, rh)
+    parts.append(card(lx, top, lw, h)); parts += left
+    parts.append(card(rx, top, rw, h)); parts += right
+    # middle: the ask, and an arrow
+    mx = margin + lw + mid / 2
+    my = top + h / 2
+    q = "file my inbox"
+    qs = 17
+    qw = measure(q, qs, "bold") + 28
+    parts.append(f'<rect x="{mx - qw / 2:.1f}" y="{my - 62:.1f}" width="{qw:.1f}" height="38" rx="19" fill="{PINK}" stroke="{INK}" stroke-width="2.5"/>')
+    t, _ = text_path(q, qs, "bold", mx - qw / 2 + 14, my - 37); parts.append(t)
+    parts.append(f'<path d="M{mx - 30:.1f} {my + 6:.1f} L{mx + 30:.1f} {my + 6:.1f} M{mx + 14:.1f} {my - 10:.1f} L{mx + 32:.1f} {my + 6:.1f} L{mx + 14:.1f} {my + 22:.1f}" fill="none" stroke="{INK}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>')
+    H = int(top + h + 64)
+    save("inbox", W, H, "\n".join(parts),
+         "If you can save it, your intern can read it. Four files dropped in the inbox, a transcript, a PDF from legal, a screenshot of a Slack thread, and a deck, become two decisions on the project page, three follow-ups with owners and dates, two acronyms to confirm, a question about a new name, and the originals moved to the archive untouched.")
+
 if __name__ == "__main__":
-    commands(); brief(); folder(); who(); core(); hero(); print("built")
+    commands(); brief(); folder(); who(); core(); hero(); inbox(); print("built")

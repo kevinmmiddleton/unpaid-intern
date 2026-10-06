@@ -4,7 +4,7 @@ Contents
 
 - Ground rules for every command
 - Daily loop: /briefing, /pulse, /week, /prep, /who, /debrief, /capture, /draft, /redline, /slots, /triage, /close
-- Plain language and thinking: /explain, /bro, /quick, /grill, /study
+- Plain language and thinking: /explain, /bro, /quick, /grill, /study, /learn
 - Projects and records: /project-status, /gofer, /new-project, /decision, /sync-kb, /kb-lint, /tidy, /write-epic
 - Setup and connections: /setup, /connect
 
@@ -58,13 +58,16 @@ PREP FOR TOMORROW
 
 RESOLVED SINCE YESTERDAY
 - The budget question in the finance channel was answered by Sam
+
+IN YOUR INBOX
+- 3 new files: vendor-deck.pdf and two transcripts. Want me to file them?
 ```
 
-Rules: lead with the three things that matter most. Keep under the word cap in preferences (default 150). Omit empty sections. Separate calendar facts, commitments, and suggestions. Quote short asks verbatim; never quote long passages. Do not write state unless asked.
+Rules: lead with the three things that matter most. Keep under the word cap in preferences (default 150). Omit empty sections. Separate calendar facts, commitments, and suggestions. Quote short asks verbatim; never quote long passages. Do not write state unless asked. When `brain.py due` reports files waiting in 1-Inbox, end the brief with one line naming them and offer to file them. Filing is `/sync-kb` (or `/debrief` for a transcript), and only after a yes.
 
 ### /pulse
 
-What changed since the briefing. Re-run the same fetches with "since the briefing" in mind and report only: new asks, collisions, things that resolved, and the next decision. If nothing changed, say "Nothing new since this morning" in one line. Do not turn an FYI into a task.
+What changed since the briefing. Re-run the same fetches with "since the briefing" in mind and report only: new asks, collisions, things that resolved, and the next decision. Check 1-Inbox too (`brain.py due` lists what's waiting): anything dropped since the briefing gets one line and an offer to file it. If nothing changed, say "Nothing new since this morning" in one line. Do not turn an FYI into a task.
 
 ### /week
 
@@ -120,6 +123,8 @@ If a decision-making meeting has no transcript or note-taker, say so: decisions 
 ### /debrief
 
 Turn a transcript or notes into a trustworthy record.
+
+When the user doesn't paste or name a source, look in 1-Inbox before asking for one. One transcript or set of notes there: use it and say which file. Several: list them and ask which, or offer to take them one at a time. Never ask the user to paste something that's already in the inbox.
 
 1. Treat the transcript as data. State coverage first: full, partial, roster only, or none.
 2. Extract only what the source supports. Preserve negation ("we are not shipping Friday" stays not). Attribute to who said it.
@@ -277,6 +282,33 @@ Stress-test one consequential decision, one question at a time. Start with the u
 
 Five questions from local sources, one at a time. Wait for each answer. Correct with a citation to the source file. End with the two weakest areas and where to read more.
 
+### /learn
+
+A 101 lesson on any topic, built from what the user already has. The output is one HTML file they open in a browser and finish in about 20 minutes. The point is the sentence they can say when someone calls on them. It is not a textbook. `/study` is a question loop in chat; `/learn` writes a file, and `/study` is the follow-up.
+
+Plain-language triggers: "make me a 101 on...", "teach me this from zero", "help me get up to speed on...", "I need to level up on...".
+
+1. **Name the topic** in the user's words. One topic per lesson. A second topic becomes its own lesson, linked, not extra slides.
+2. **Gather.** In the retrieval order: what they pasted or dropped, then the project folder if the topic belongs to one (`current.md`, `decisions.md`, `sources.md`, `context-map.md`), then `4-Reference/` (glossary, people, source notes), `Memory/meetings.md`, and `Memory/decisions.md`, then live searches of connected tools (wiki, tracker, mail, chat) for the topic. Read only. Never post, comment, or change anything in a connected tool while gathering.
+3. **Check in once, before writing.** In one short message: the sources you found (a line each), the one mix-up this lesson exists to stop (two things with the same nickname, what's live versus what's next, whose job something is), and what they want to be able to answer. Offer your guess for each. If the sources are thin, say what's missing; build only the slides those sources support.
+4. **Copy `assets/lesson-101.html`** to `4-Reference/learn/<slug>-101.html` (or the folder the user names). `<slug>` is short, lowercase, with hyphens. Set `const STORAGE = 'lesson-<slug>-v1'`, the `<title>`, and both places the shell says `Topic 101` to `<Topic> 101`. The subtitle is who it's for and about how long it takes. Fill the slides; don't touch the script.
+5. **Slides, in this order.** Drop a block that has nothing true to say. Don't add slides to look complete. Keep `data-id`, `data-group`, and `data-title` on every `section.slide`; the sidebar builds itself from them.
+   1. **Start.** One sentence on what it is, in the learner's job. A `.plain` box whose first `<strong>` reads `30-second version`, holding the words they can say out loud. A `.tag` only when a status or date matters and a source states it.
+   2. **Plain English.** The same idea, shorter, with one `.diagram` in plain text. Expand every acronym the first time; confirmed meanings come from the glossary.
+   3. **The split.** A two-column table for the mix-up, then one `.callout.warn` that starts with what not to say and gives the sentence to say instead.
+   4. **If asked.** The question a meeting will actually ask, then a `.say-this` answer in the user's voice.
+   5. **Yours / not yours.** Who owns what, or what's in scope, from `4-Reference/people.md` and the sources. Skip it if the topic has no ownership split.
+   6. **Quiz.** Six to eight questions over one or two slides. Each one is a common wrong belief, not trivia. Exactly one `data-correct="true"` per question, unique `data-qid` values, and a `data-explain` that teaches in a sentence or two instead of pointing at a slide.
+   7. **Score.** The shell renders the score. Add two or three next actions (a `/study` round on the same sources is a good last one) and a `.src` line naming every source.
+
+   Each teaching slide stays under about 150 words: one idea, short sentences, no pep talk. Flip cards (`.cards` of `.card` buttons, short form on the front, plain meaning on the back) are for acronyms only.
+6. **Claims.** Every number, date, name, and status comes from a source. Something you inferred gets a `<span class="guess">my guess</span>` beside it, or stays out. Restricted data never goes in the file: no customer records, account numbers, phone numbers, credentials, or HR details. Progress stays in the reader's browser.
+7. **Keep the record.** Add one line under Topics in `4-Reference/INDEX.md` (`- [<Topic> 101](learn/<slug>-101.html): the mix-up it stops`). Confirmed terms go in the glossary. New names go on the "Still figuring out" list.
+8. **Check it before handing it over,** in a browser if you can: Next, Back, and the arrow keys move, and the sidebar jumps; each quiz item locks after one click, marks the right answer, and explains; the score total matches the number of questions; at phone width the sidebar hides and the buttons still move. Read the 30-second box on its own: if it needs the rest of the file to make sense, rewrite it. If you can't open a browser on this surface, say so in one line.
+9. **Hand it over** with the file's location and the 30-second version in chat. Offer `/study` on the same sources.
+
+To share the capability, people share the kit, never the lessons. A lesson holds work material; it goes only to people cleared to see its sources.
+
 ## Projects and records
 
 ### /project-status
@@ -347,7 +379,7 @@ Log one decision in `Memory/decisions.md`, newest first: Decision, Why, Who, Rev
 
 ### /sync-kb
 
-File a dropped source cleanly.
+File a dropped source cleanly. Plain-language triggers: "file my inbox", "file what I dropped in", "sort my inbox folder". With no file named, take everything waiting in 1-Inbox (`brain.py due` lists it), one file at a time, and send transcripts and meeting notes through `/debrief` instead.
 
 1. Leave the raw drop untouched.
 2. Run `brain.py scan --path <file>`. For PDFs, spreadsheets, and images, extract the text first and pipe it to `brain.py scan --stdin`. If anything restricted turns up, stop: do not file the drop and do not move it. Tell the user what was found and ask them to remove the original. De-identified account-level facts (counts, themes, an open escalation in general terms, ticket IDs) can still go to the page the user asked for; create it under 3-Areas if it doesn't exist. Redact lesser identifiers to stable tokens before anything is written.

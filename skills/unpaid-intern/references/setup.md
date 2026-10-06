@@ -71,6 +71,13 @@ Create the workspace: `python3 "${CLAUDE_SKILL_DIR}/scripts/brain.py" init "<fol
 
 Then one or two lines on what just appeared: 1-Inbox is where they drop things, Projects and Areas are where their work lives, and everything else is the assistant's record, explained in `START-HERE.md`.
 
+Then offer the inbox shortcut, in one line, because it's what turns the inbox into a habit: a shortcut to 1-Inbox on their desktop, so saving a transcript, a PDF, or a screenshot for their intern is one drag. If they want it:
+
+- **Mac:** in Finder, hold Option and Command and drag 1-Inbox onto the desktop. (Or right-click 1-Inbox, choose Make Alias, and drag the alias to the desktop.)
+- **Windows:** in File Explorer, right-click 1-Inbox, then Send to, then Desktop (create shortcut).
+
+If you can run commands on their computer (Claude Code), offer to make it for them, and only after a yes, since it writes outside the workspace. Skippable; never block setup on it.
+
 **The account check** (the second question on the `home` screen): is this the Claude account the company gave them for work?
 
 - **Yes, company account:** continue.

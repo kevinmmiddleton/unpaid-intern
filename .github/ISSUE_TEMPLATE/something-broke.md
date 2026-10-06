@@ -9,7 +9,7 @@ labels: bug
 
 **What happened instead?**
 
-**Where?** Cowork, Claude Desktop, claude.ai, Claude Code, or the no-install kit
+**Where?** Cowork, claude.ai, the Claude app, Claude Code, Codex, another coding agent, or the no-install kit
 
 **If a script was involved,** ask your intern to "run your self-checks and show me the results," then paste what it shows.
 

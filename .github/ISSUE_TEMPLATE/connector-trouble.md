@@ -9,7 +9,7 @@ labels: connectors
 
 **Which tool?** (for example Outlook, Slack, Jira)
 
-**Where are you using Unpaid Intern?** Cowork, Claude Desktop, claude.ai, or Claude Code
+**Where are you using Unpaid Intern?** Cowork, claude.ai, the Claude app, Claude Code, or Codex
 
 **The exact error message** (remove names, emails, and anything secret):
 

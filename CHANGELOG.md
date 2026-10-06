@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- People stay "they" until a source gives a pronoun. `/debrief` and `/sync-kb` repeat the rule where they write follow-ups, people pages, and source notes.
+- `/debrief` runs every spoken deadline ("by Thursday") through `brain.py when` before writing the follow-up, and notes who asked whom in people.md.
+- `/learn` reads the project's follow-ups and status rows while gathering, and names anything late or waiting in its check-in.
+
 ## 1.3.1
 
 - `/learn` builds a 101 lesson on any topic from your own sources: your project folder, your notes, and read-only searches of connected tools. You get one HTML file with a 30-second version you can say out loud, the mix-up people get wrong, the line to use if someone asks, and a quiz that explains every miss. It checks the sources and the mix-up with you before it writes anything. 28 commands now.

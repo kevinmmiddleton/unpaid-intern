@@ -17,7 +17,7 @@ Unpaid Intern is a free second brain for work. Hand it your meeting transcripts,
 
 Most workdays come down to three moments. Your intern has one for each.
 
-- **`/briefing` starts your day.** It reads your follow-ups, calendar, and email, plus anything waiting in your inbox, then tells you what needs you, what you're waiting on, and what can wait.
+- **`/briefing` starts your day.** It reads your follow-ups, calendar, and email, plus any files waiting in your inbox folder, then tells you what needs you, what you're waiting on, and what can wait.
 - **`/prep` gets you ready for the big one.** Name the meeting and it pulls the last decision, the open question, what's owed in both directions, and the doc you'll want open, all from what your intern has been keeping.
 - **`/debrief` follows every meeting.** Hand it the transcript, your notes, or the doc, plus your own take, and it files the decisions and follow-ups so nothing lives only in your head.
 
@@ -32,7 +32,7 @@ That's `/briefing` with mail and calendar connected. Before anything's connected
 | Lose the follow-ups from a meeting nobody wrote up | `/debrief` turns the transcript into follow-ups with owners and dates |
 | Stare at a connector error like it's written in Klingon | It tells you what the error means and who can fix it, then writes the request for you |
 | Reread everything to remember where a project stood | Every project has a page with where it stands and why |
-| Paste the same doc into a chat every time you need it | Save it to your inbox once; your intern files it and remembers |
+| Paste the same doc into a chat every time you need it | Save it to your inbox folder once; your intern files it and remembers |
 
 ## If you can save it, your intern can read it
 
@@ -59,6 +59,7 @@ Org charts and `/who` help anyone, but they're a lifesaver in your first few mon
 - **New names get asked about.** When someone comes up in a meeting or a thread, your intern asks who they are, a few at a time, and never guesses.
 - **`/who` is your cheat sheet** for anyone: their role, who they report to, the last time you talked, and what's open between you.
 - **A 30-60-90 page** keeps your first three months on track.
+- **`/learn` gets you up to speed.** Name a topic and it builds a 101 lesson from your own notes and docs, with a quiz that explains every miss.
 
 ## Get more done between meetings
 

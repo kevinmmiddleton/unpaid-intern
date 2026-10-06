@@ -1,0 +1,5 @@
+# Only needed to rebuild the logo and marketing images. The skill itself needs nothing but Python.
+cairosvg>=2.7
+fonttools>=4.40
+uharfbuzz>=0.37
+shapely>=2.0

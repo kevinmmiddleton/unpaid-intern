@@ -1,0 +1,20 @@
+{
+  "name": "unpaid-intern",
+  "interface": {
+    "displayName": "Unpaid Intern"
+  },
+  "plugins": [
+    {
+      "name": "unpaid-intern",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+# release files are built by tools/build.py --dist and attached to GitHub releases
+dist/
+__pycache__/
+*.pyc
+.DS_Store
+# a workspace someone initialized inside the repo by accident
+Second Brain/
+second-brain-*.zip
+# brand build fonts (download Poppins yourself; see tools/brand/README.md)
+tools/brand/fonts/
+# marketing SVGs are build outputs of tools/brand/marketing.py (outlined text makes them too big for the plugin directory); the PNGs are what the README shows
+assets/brand/marketing/*.svg

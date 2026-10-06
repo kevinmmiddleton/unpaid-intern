@@ -1,0 +1,3252 @@
+{
+ "version": "2026-10-04",
+ "note": "Checked against vendor and Anthropic documentation in October 2026. Prefer Claude's connector directory. Entries with an empty url are matched to Claude's directory by name, the same way Anthropic's own plugins do it.",
+ "routes": {
+  "one-click": "In Claude's connector directory. Find it, click Connect, and sign in with your work login. Some need an admin's approval the first time.",
+  "add-by-url": "Not in the directory. Added by web address as a custom connector. On company Claude plans an Owner usually adds it.",
+  "admin-project": "Your IT or tool admin has to set it up first. Use the fallback until then.",
+  "api-key": "Needs a key from the tool, not just your login. Usually an admin request.",
+  "none": "No connector yet. Use the fallback."
+ },
+ "screens": [
+  {
+   "id": "home",
+   "title": "Where your second brain lives",
+   "when": "always",
+   "questions": [
+    {
+     "question": "Where should your second brain folder live? Pick the place your company lets you keep work files.",
+     "header": "Home",
+     "multiSelect": false,
+     "options": [
+      {
+       "label": "My work OneDrive folder",
+       "description": "A folder inside your company OneDrive on this computer. Backed up and company-approved in most Microsoft shops.",
+       "ids": []
+      },
+      {
+       "label": "My work Google Drive folder",
+       "description": "A folder inside Google Drive for desktop, signed in with your work account.",
+       "ids": []
+      },
+      {
+       "label": "Documents on this computer",
+       "description": "A plain folder on this computer. Simple, but only on this machine.",
+       "ids": []
+      },
+      {
+       "label": "Not sure, help me pick",
+       "description": "I'll explain the trade-offs in two lines and suggest one.",
+       "ids": []
+      }
+     ]
+    },
+    {
+     "question": "Is this Claude account the one your company gave you for work?",
+     "header": "Account",
+     "multiSelect": false,
+     "options": [
+      {
+       "label": "Yes, company account",
+       "description": "Your company set it up (often called Team or Enterprise).",
+       "ids": []
+      },
+      {
+       "label": "No, it's my own",
+       "description": "A personal account. We'll keep sensitive work data out until that changes.",
+       "ids": []
+      },
+      {
+       "label": "Not sure",
+       "description": "We'll treat it as personal for now and I'll show you how to check.",
+       "ids": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "about",
+   "title": "About your work",
+   "when": "always",
+   "questions": [
+    {
+     "question": "Which best describes your work?",
+     "header": "Role",
+     "multiSelect": false,
+     "options": [
+      {
+       "label": "Product, design, or eng",
+       "description": "Product managers, designers, engineers, and their managers.",
+       "ids": []
+      },
+      {
+       "label": "Sales, success, support",
+       "description": "Anyone who works with customers or accounts.",
+       "ids": []
+      },
+      {
+       "label": "Marketing or operations",
+       "description": "Marketing, program management, operations, and executive support.",
+       "ids": []
+      },
+      {
+       "label": "People, finance, legal",
+       "description": "HR, recruiting, finance, legal, and procurement.",
+       "ids": []
+      }
+     ]
+    },
+    {
+     "question": "What do you want help with first? Pick all that apply.",
+     "header": "Help with",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "A morning brief",
+       "description": "What's due, what's on fire, and what changed overnight.",
+       "ids": []
+      },
+      {
+       "label": "Meeting prep and notes",
+       "description": "The right file before a meeting and clean notes after.",
+       "ids": []
+      },
+      {
+       "label": "Tracking follow-ups",
+       "description": "Who owes what, by when, including what you're waiting on.",
+       "ids": []
+      },
+      {
+       "label": "Status updates",
+       "description": "A ready-to-paste status table before your one-on-ones.",
+       "ids": []
+      }
+     ]
+    },
+    {
+     "question": "Are you new to this job?",
+     "header": "New here?",
+     "multiSelect": false,
+     "options": [
+      {
+       "label": "Yes, still ramping up",
+       "description": "I'll help with names, acronyms, who owns what, and a 30-60-90 plan.",
+       "ids": []
+      },
+      {
+       "label": "No, I'm settled in",
+       "description": "We'll skip the ramp-up extras.",
+       "ids": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "everyday",
+   "title": "Your everyday tools",
+   "when": "always",
+   "questions": [
+    {
+     "question": "Which email and calendar do you use for work?",
+     "header": "Email",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Outlook (Microsoft 365)",
+       "description": "Outlook mail and calendar. One Microsoft sign-in also covers Teams, OneDrive, and SharePoint.",
+       "ids": [
+        "microsoft-365"
+       ]
+      },
+      {
+       "label": "Gmail and Google Calendar",
+       "description": "Google Workspace mail and calendar.",
+       "ids": [
+        "gmail",
+        "google-calendar"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Where do you chat with your team?",
+     "header": "Chat",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Microsoft Teams",
+       "description": "Covered by the same Microsoft 365 sign-in.",
+       "ids": [
+        "microsoft-365"
+       ]
+      },
+      {
+       "label": "Slack",
+       "description": "Slack's own connector.",
+       "ids": [
+        "slack"
+       ]
+      },
+      {
+       "label": "Google Chat",
+       "description": "Needs a little IT help today; you can still copy threads in.",
+       "ids": [
+        "google-chat"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Where do your meetings happen, and what records them?",
+     "header": "Meetings",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Zoom",
+       "description": "Zoom's connector reads meeting summaries and transcripts.",
+       "ids": [
+        "zoom"
+       ]
+      },
+      {
+       "label": "Teams meetings",
+       "description": "Transcripts come through the Microsoft 365 sign-in.",
+       "ids": [
+        "microsoft-365"
+       ]
+      },
+      {
+       "label": "Google Meet",
+       "description": "Transcripts are saved as Google Docs, so this uses Google Drive.",
+       "ids": [
+        "google-drive"
+       ]
+      },
+      {
+       "label": "A note-taker app",
+       "description": "Otter, Fireflies, Granola, Fathom, tl;dv, or similar.",
+       "ids": [],
+       "followup": "Which note-taker do you use? Otter, Fireflies, Granola, Fathom, tl;dv, or another?"
+      }
+     ]
+    },
+    {
+     "question": "Where do your work files live?",
+     "header": "Files",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "OneDrive or SharePoint",
+       "description": "Covered by the Microsoft 365 sign-in.",
+       "ids": [
+        "microsoft-365"
+       ]
+      },
+      {
+       "label": "Google Drive",
+       "description": "Google Docs, Sheets, and Slides.",
+       "ids": [
+        "google-drive"
+       ]
+      },
+      {
+       "label": "Box",
+       "description": "Box's connector.",
+       "ids": [
+        "box"
+       ]
+      },
+      {
+       "label": "Dropbox",
+       "description": "Dropbox's connector.",
+       "ids": [
+        "dropbox"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tracked",
+   "title": "Where the work gets tracked",
+   "when": "always",
+   "questions": [
+    {
+     "question": "Where are tasks and tickets tracked? Type any others in Other.",
+     "header": "Tracker",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Jira",
+       "description": "Atlassian's connector, which also covers Confluence.",
+       "ids": [
+        "atlassian"
+       ]
+      },
+      {
+       "label": "Asana",
+       "description": "Asana's connector.",
+       "ids": [
+        "asana"
+       ]
+      },
+      {
+       "label": "Linear",
+       "description": "Linear's connector, with a read-only option.",
+       "ids": [
+        "linear"
+       ]
+      },
+      {
+       "label": "monday.com",
+       "description": "monday's connector.",
+       "ids": [
+        "monday"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Where does your team write things down?",
+     "header": "Wiki",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Confluence",
+       "description": "Atlassian's connector, same sign-in as Jira.",
+       "ids": [
+        "atlassian"
+       ]
+      },
+      {
+       "label": "Notion",
+       "description": "Notion's connector.",
+       "ids": [
+        "notion"
+       ]
+      },
+      {
+       "label": "SharePoint or OneNote",
+       "description": "Covered by the Microsoft 365 sign-in. OneNote pages need exporting.",
+       "ids": [
+        "microsoft-365"
+       ]
+      },
+      {
+       "label": "Google Docs",
+       "description": "Covered by Google Drive.",
+       "ids": [
+        "google-drive"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Any design or whiteboard tools?",
+     "header": "Design",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Figma",
+       "description": "Designs and FigJam boards.",
+       "ids": [
+        "figma"
+       ]
+      },
+      {
+       "label": "Miro",
+       "description": "Whiteboards.",
+       "ids": [
+        "miro"
+       ]
+      },
+      {
+       "label": "Lucid",
+       "description": "Lucidchart and Lucidspark, with a read-only option.",
+       "ids": [
+        "lucid"
+       ]
+      },
+      {
+       "label": "Canva",
+       "description": "Canva designs.",
+       "ids": [
+        "canva"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Any customer tools?",
+     "header": "Customers",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Salesforce",
+       "description": "Needs your Salesforce admin to switch it on first.",
+       "ids": [
+        "salesforce"
+       ]
+      },
+      {
+       "label": "HubSpot",
+       "description": "HubSpot's connector.",
+       "ids": [
+        "hubspot"
+       ]
+      },
+      {
+       "label": "Zendesk",
+       "description": "No official connector yet; we'll use exports.",
+       "ids": [
+        "zendesk"
+       ]
+      },
+      {
+       "label": "Intercom",
+       "description": "Intercom's connector.",
+       "ids": [
+        "intercom"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "role-product",
+   "title": "Tools for product, design, and engineering",
+   "when": "Product, design, or eng",
+   "questions": [
+    {
+     "question": "Any product analytics tools?",
+     "header": "Analytics",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Amplitude",
+       "description": "Charts, dashboards, and experiments.",
+       "ids": [
+        "amplitude"
+       ]
+      },
+      {
+       "label": "Mixpanel",
+       "description": "Reports and boards.",
+       "ids": [
+        "mixpanel"
+       ]
+      },
+      {
+       "label": "Pendo",
+       "description": "Usage and guides.",
+       "ids": [
+        "pendo"
+       ]
+      },
+      {
+       "label": "PostHog",
+       "description": "Product analytics; use read-only mode.",
+       "ids": [
+        "posthog"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Any engineering tools?",
+     "header": "Eng tools",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "GitHub",
+       "description": "Pull requests and issues.",
+       "ids": [
+        "github"
+       ]
+      },
+      {
+       "label": "GitLab",
+       "description": "Merge requests and issues.",
+       "ids": [
+        "gitlab"
+       ]
+      },
+      {
+       "label": "Sentry",
+       "description": "Errors and issues.",
+       "ids": [
+        "sentry"
+       ]
+      },
+      {
+       "label": "PagerDuty or Datadog",
+       "description": "On-call and monitoring.",
+       "ids": [],
+       "followup": "Which one: PagerDuty, Datadog, or both?"
+      }
+     ]
+    },
+    {
+     "question": "Any dashboards or data tools?",
+     "header": "Data",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Looker",
+       "description": "Needs IT setup.",
+       "ids": [
+        "looker"
+       ]
+      },
+      {
+       "label": "Tableau",
+       "description": "Tableau Cloud.",
+       "ids": [
+        "tableau"
+       ]
+      },
+      {
+       "label": "Power BI",
+       "description": "Needs IT setup.",
+       "ids": [
+        "power-bi"
+       ]
+      },
+      {
+       "label": "A data warehouse",
+       "description": "Snowflake, BigQuery, Databricks, or similar. Needs IT setup.",
+       "ids": [],
+       "followup": "Which warehouse: Snowflake, BigQuery, Databricks, or another?"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "role-customers",
+   "title": "Tools for customer-facing work",
+   "when": "Sales, success, support",
+   "questions": [
+    {
+     "question": "Any sales tools?",
+     "header": "Sales",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Gong",
+       "description": "Call briefs and answers.",
+       "ids": [
+        "gong"
+       ]
+      },
+      {
+       "label": "Outreach",
+       "description": "Sequences; keep sends off.",
+       "ids": [
+        "outreach"
+       ]
+      },
+      {
+       "label": "Apollo",
+       "description": "Prospecting; keep sends off.",
+       "ids": [
+        "apollo"
+       ]
+      },
+      {
+       "label": "ZoomInfo",
+       "description": "Company and contact lookups.",
+       "ids": [
+        "zoominfo"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Any support or service desks?",
+     "header": "Support",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "ServiceNow",
+       "description": "Needs IT setup.",
+       "ids": [
+        "servicenow"
+       ]
+      },
+      {
+       "label": "Freshdesk",
+       "description": "Needs an API key from an admin.",
+       "ids": [
+        "freshdesk"
+       ]
+      },
+      {
+       "label": "Freshservice",
+       "description": "Freshservice's connector.",
+       "ids": [
+        "freshservice"
+       ]
+      },
+      {
+       "label": "Guru",
+       "description": "Knowledge cards.",
+       "ids": [
+        "guru"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Any product analytics tools?",
+     "header": "Analytics",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Amplitude",
+       "description": "Charts and dashboards.",
+       "ids": [
+        "amplitude"
+       ]
+      },
+      {
+       "label": "Mixpanel",
+       "description": "Reports and boards.",
+       "ids": [
+        "mixpanel"
+       ]
+      },
+      {
+       "label": "Pendo",
+       "description": "Usage and guides.",
+       "ids": [
+        "pendo"
+       ]
+      },
+      {
+       "label": "Gainsight or similar",
+       "description": "Type the name and I'll check.",
+       "ids": [],
+       "followup": "Which tool? I'll check whether it has a connector."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "role-ops",
+   "title": "Tools for marketing and operations",
+   "when": "Marketing or operations",
+   "questions": [
+    {
+     "question": "Any marketing tools?",
+     "header": "Marketing",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Klaviyo",
+       "description": "Email and SMS; keep sends off.",
+       "ids": [
+        "klaviyo"
+       ]
+      },
+      {
+       "label": "Ahrefs",
+       "description": "SEO research.",
+       "ids": [
+        "ahrefs"
+       ]
+      },
+      {
+       "label": "Supermetrics",
+       "description": "Marketing data.",
+       "ids": [
+        "supermetrics"
+       ]
+      },
+      {
+       "label": "Similarweb",
+       "description": "Traffic research; needs an API key.",
+       "ids": [
+        "similarweb"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Any automation or planning tools?",
+     "header": "Automation",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Zapier",
+       "description": "Bridges to tools with no connector.",
+       "ids": [
+        "zapier"
+       ]
+      },
+      {
+       "label": "Make",
+       "description": "Same idea, through Make scenarios.",
+       "ids": [
+        "make"
+       ]
+      },
+      {
+       "label": "Smartsheet",
+       "description": "Plans and trackers.",
+       "ids": [
+        "smartsheet"
+       ]
+      },
+      {
+       "label": "Airtable",
+       "description": "Bases and views.",
+       "ids": [
+        "airtable"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Any dashboards or data tools?",
+     "header": "Data",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Looker",
+       "description": "Needs IT setup.",
+       "ids": [
+        "looker"
+       ]
+      },
+      {
+       "label": "Tableau",
+       "description": "Tableau Cloud.",
+       "ids": [
+        "tableau"
+       ]
+      },
+      {
+       "label": "Power BI",
+       "description": "Needs IT setup.",
+       "ids": [
+        "power-bi"
+       ]
+      },
+      {
+       "label": "Amplitude or Mixpanel",
+       "description": "Product analytics.",
+       "ids": [],
+       "followup": "Which one: Amplitude, Mixpanel, or both?"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "role-people",
+   "title": "Tools for people, finance, and legal",
+   "when": "People, finance, legal",
+   "questions": [
+    {
+     "question": "Any people or recruiting tools?",
+     "header": "People",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Workday",
+       "description": "Not available yet; we'll use report emails.",
+       "ids": [
+        "workday"
+       ]
+      },
+      {
+       "label": "Greenhouse",
+       "description": "Recruiting, read-only by default.",
+       "ids": [
+        "greenhouse"
+       ]
+      },
+      {
+       "label": "Ashby",
+       "description": "Recruiting.",
+       "ids": [
+        "ashby"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Any finance or contract tools?",
+     "header": "Finance",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "NetSuite",
+       "description": "Needs IT setup.",
+       "ids": [
+        "netsuite"
+       ]
+      },
+      {
+       "label": "QuickBooks",
+       "description": "Keep invoice and payment tools off.",
+       "ids": [
+        "quickbooks"
+       ]
+      },
+      {
+       "label": "Stripe",
+       "description": "Use a read-only key.",
+       "ids": [
+        "stripe"
+       ]
+      },
+      {
+       "label": "Docusign",
+       "description": "Keep send tools off.",
+       "ids": [
+        "docusign"
+       ]
+      }
+     ]
+    },
+    {
+     "question": "Any dashboards or data tools?",
+     "header": "Data",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "Looker",
+       "description": "Needs IT setup.",
+       "ids": [
+        "looker"
+       ]
+      },
+      {
+       "label": "Tableau",
+       "description": "Tableau Cloud.",
+       "ids": [
+        "tableau"
+       ]
+      },
+      {
+       "label": "Power BI",
+       "description": "Needs IT setup.",
+       "ids": [
+        "power-bi"
+       ]
+      },
+      {
+       "label": "Excel or Sheets only",
+       "description": "No connector needed; drop the files in.",
+       "ids": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "yours",
+   "title": "Make it yours",
+   "when": "always",
+   "questions": [
+    {
+     "question": "How long should your morning brief be?",
+     "header": "Brief length",
+     "multiSelect": false,
+     "options": [
+      {
+       "label": "Three lines",
+       "description": "Only what needs you today.",
+       "ids": []
+      },
+      {
+       "label": "Short",
+       "description": "About 150 words. The default.",
+       "ids": []
+      },
+      {
+       "label": "Fuller",
+       "description": "About 300 words, with prep for tomorrow.",
+       "ids": []
+      }
+     ]
+    },
+    {
+     "question": "What should the brief always cover? Pick all that apply.",
+     "header": "Always show",
+     "multiSelect": true,
+     "options": [
+      {
+       "label": "What's due today",
+       "description": "Your follow-ups due or overdue.",
+       "ids": []
+      },
+      {
+       "label": "Today's meetings",
+       "description": "With anything you need to read first.",
+       "ids": []
+      },
+      {
+       "label": "Messages waiting on me",
+       "description": "Direct asks you haven't answered.",
+       "ids": []
+      },
+      {
+       "label": "Changes on my projects",
+       "description": "Tickets, docs, and threads that moved.",
+       "ids": []
+      }
+     ]
+    },
+    {
+     "question": "When does your workday usually start?",
+     "header": "Day starts",
+     "multiSelect": false,
+     "options": [
+      {
+       "label": "Before 8",
+       "description": "Brief ready by 7:30.",
+       "ids": []
+      },
+      {
+       "label": "8 to 9",
+       "description": "Brief ready by 8:00.",
+       "ids": []
+      },
+      {
+       "label": "9 to 10",
+       "description": "Brief ready by 9:00.",
+       "ids": []
+      },
+      {
+       "label": "After 10",
+       "description": "Brief ready by 10:00.",
+       "ids": []
+      }
+     ]
+    },
+    {
+     "question": "Want a brief waiting for you each weekday morning?",
+     "header": "Daily brief",
+     "multiSelect": false,
+     "options": [
+      {
+       "label": "Yes, set it up",
+       "description": "It reads and briefs. It never sends or changes anything.",
+       "ids": []
+      },
+      {
+       "label": "Not yet",
+       "description": "Ask me for a /briefing whenever you like.",
+       "ids": []
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "connectors": [
+  {
+   "id": "microsoft-365",
+   "name": "Microsoft 365 (Outlook, Teams, SharePoint, OneDrive)",
+   "aliases": [
+    "excel",
+    "loop",
+    "m365",
+    "microsoft",
+    "microsoft 365",
+    "microsoft loop",
+    "microsoft outlook",
+    "microsoft planner",
+    "microsoft teams",
+    "microsoft to do",
+    "o365",
+    "office",
+    "office 365",
+    "onedrive",
+    "onenote",
+    "outlook",
+    "outlook calendar",
+    "outlook mail",
+    "powerpoint",
+    "sharepoint",
+    "teams",
+    "teams meetings",
+    "word"
+   ],
+   "category": "suite",
+   "provides": [
+    "mail",
+    "calendar",
+    "chat",
+    "meetings",
+    "files",
+    "wiki"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://microsoft365.mcp.claude.com/mcp"
+   },
+   "signin": "Your Microsoft work or school account (personal outlook.com accounts do not work)",
+   "admin": "A Global Admin grants tenant-wide consent once. On Claude Team and Enterprise an Owner also adds the connector. Write tools need a second consent.",
+   "readonly": "Write tools are off by default; leave them off.",
+   "fallback": "Claude in Chrome on Outlook and Teams on the web; save mail to PDF; download Teams transcripts into the drop folder.",
+   "docs": "https://support.claude.com/en/articles/12542951-set-up-the-microsoft-365-connector",
+   "playbook": "references/stack-microsoft-365.md",
+   "notes": "Claude's own connector, hosted by Anthropic. Covers Outlook, Teams, SharePoint, and OneDrive in one sign-in. Add it from Claude's connector directory; the plugin doesn't pre-list it because each company's Microsoft setup handles the sign-in.",
+   "source": "Anthropic connector docs",
+   "claude_code": "account"
+  },
+  {
+   "id": "gmail",
+   "name": "Gmail",
+   "aliases": [
+    "google mail"
+   ],
+   "category": "suite",
+   "provides": [
+    "mail"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": true,
+   "mcp": {
+    "type": "http",
+    "url": ""
+   },
+   "signin": "Your normal work login",
+   "admin": "On Claude Team and Enterprise an Owner enables it. A Google Workspace admin may need to mark Claude as trusted (the 'Access blocked' error).",
+   "readonly": "Sending asks first by default; drafts stay with the user until they send them.",
+   "fallback": "Claude in Chrome on Gmail; print a thread to PDF and drop it.",
+   "docs": "https://support.claude.com/en/articles/10166901-use-google-workspace-connectors",
+   "playbook": "references/stack-google-workspace.md",
+   "notes": "Claude's own Gmail connector.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "google-calendar",
+   "name": "Google Calendar",
+   "aliases": [
+    "calendar google",
+    "gcal"
+   ],
+   "category": "suite",
+   "provides": [
+    "calendar"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": true,
+   "mcp": {
+    "type": "http",
+    "url": ""
+   },
+   "signin": "Your normal work login",
+   "admin": "Same as Gmail.",
+   "readonly": "The assistant proposes times by default; it doesn't create, accept, or decline events.",
+   "fallback": "Paste the day view.",
+   "docs": "https://support.claude.com/en/articles/10166901-use-google-workspace-connectors",
+   "playbook": "references/stack-google-workspace.md",
+   "notes": "Claude's own Google Calendar connector.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "google-drive",
+   "name": "Google Drive (Docs, Sheets, Slides, Meet transcripts)",
+   "aliases": [
+    "drive",
+    "gdrive",
+    "google docs",
+    "google meet",
+    "google meet transcripts",
+    "google sheets",
+    "google slides",
+    "meet"
+   ],
+   "category": "suite",
+   "provides": [
+    "files",
+    "meetings",
+    "wiki"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": ""
+   },
+   "signin": "Your normal work login",
+   "admin": "Same as Gmail.",
+   "readonly": "Upload, share, move, and trash ask first; the assistant reads only by default.",
+   "fallback": "Download files and drop them.",
+   "docs": "https://support.claude.com/en/articles/10166901-use-google-workspace-connectors",
+   "playbook": "references/stack-google-workspace.md",
+   "notes": "Add Google Drive from Claude's connector directory.",
+   "source": "Claude connector directory"
+  },
+  {
+   "id": "google-chat",
+   "name": "Google Chat",
+   "aliases": [],
+   "category": "chat",
+   "provides": [
+    "chat"
+   ],
+   "route": "admin-project",
+   "in_directory": false,
+   "bundled": false,
+   "url_template": "https://chatmcp.googleapis.com/mcp/v1",
+   "signin": "Sign-in through an app your company sets up in Google Cloud",
+   "admin": "Google's developer preview plus an admin-created OAuth client.",
+   "readonly": "",
+   "fallback": "Claude in Chrome on chat.google.com, or copy the thread.",
+   "docs": "https://developers.google.com/workspace/guides/configure-mcp-servers",
+   "playbook": "references/stack-google-workspace.md",
+   "notes": "",
+   "source": "Google developer docs"
+  },
+  {
+   "id": "slack",
+   "name": "Slack",
+   "aliases": [
+    "slack messages"
+   ],
+   "category": "chat",
+   "provides": [
+    "chat"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": true,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.slack.com/mcp",
+    "oauth": {
+     "clientId": "1601185624273.8899143856786",
+     "callbackPort": 3118
+    }
+   },
+   "signin": "Your normal work login",
+   "admin": "A Slack workspace admin approves the app once. Slack IP allowlists apply.",
+   "readonly": "Set send and post tools to blocked or needs approval.",
+   "fallback": "Claude in Chrome on Slack in the browser, or copy the thread.",
+   "docs": "https://docs.slack.dev/ai/slack-mcp-server/",
+   "playbook": "references/stack-work-management.md",
+   "notes": "The plugin uses the same Slack sign-in Anthropic uses in its own plugins, because Slack doesn't let apps register themselves.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "zoom",
+   "name": "Zoom",
+   "aliases": [],
+   "category": "meetings",
+   "provides": [
+    "meetings"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "signin": "Your Zoom login",
+   "admin": "Paid Zoom plan; an owner or admin with privileges; AI Companion recording and summary turned on.",
+   "readonly": "Keep write tools off.",
+   "fallback": "Download the transcript or summary and drop it.",
+   "docs": "https://developers.zoom.us/docs/mcp/plug-ins-and-connectors/claude-connector/",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "Add Zoom from Claude's connector directory; the connector's web address is not published.",
+   "source": "Zoom developer docs"
+  },
+  {
+   "id": "webex",
+   "name": "Webex Meetings",
+   "aliases": [],
+   "category": "meetings",
+   "provides": [
+    "meetings"
+   ],
+   "route": "add-by-url",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.webexapis.com/mcp/webex-meeting"
+   },
+   "signin": "Your Webex login, through a Webex integration",
+   "admin": "Org admin enables it in Control Hub.",
+   "readonly": "It can create and change meetings; keep writes off.",
+   "fallback": "Download transcripts and drop them.",
+   "docs": "https://developer.webex.com/mcp/docs/meetings-mcp-server",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Cisco developer docs"
+  },
+  {
+   "id": "fireflies",
+   "name": "Fireflies",
+   "aliases": [],
+   "category": "meetings",
+   "provides": [
+    "meetings"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://api.fireflies.ai/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "None documented.",
+   "readonly": "Read tools.",
+   "fallback": "Download the transcript and drop it.",
+   "docs": "https://guide.fireflies.ai/articles/3039542843-learn-about-fireflies-mcp-server-connect-your-ai-tool",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "otter",
+   "name": "Otter",
+   "aliases": [],
+   "category": "meetings",
+   "provides": [
+    "meetings"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.otter.ai/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Enterprise IT controls and audit log.",
+   "readonly": "Read tools.",
+   "fallback": "Export the transcript and drop it.",
+   "docs": "https://otter.ai/blog/otter-for-enterprise-connect-ai-to-ai-with-otters-mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Otter docs"
+  },
+  {
+   "id": "granola",
+   "name": "Granola",
+   "aliases": [],
+   "category": "meetings",
+   "provides": [
+    "meetings"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.granola.ai/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Enterprise: off by default; admins set scopes and can block transcripts.",
+   "readonly": "Read.",
+   "fallback": "Copy notes and drop them.",
+   "docs": "https://docs.granola.ai/help-center/sharing/integrations/mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Granola docs"
+  },
+  {
+   "id": "fathom",
+   "name": "Fathom",
+   "aliases": [],
+   "category": "meetings",
+   "provides": [
+    "meetings"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://api.fathom.ai/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "None documented.",
+   "readonly": "Read-only.",
+   "fallback": "Download the transcript and drop it.",
+   "docs": "https://developers.fathom.ai/mcp-docs",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Fathom docs"
+  },
+  {
+   "id": "tldv",
+   "name": "tl;dv",
+   "aliases": [
+    "tl;dv",
+    "tldv.io"
+   ],
+   "category": "meetings",
+   "provides": [
+    "meetings"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.tldv.io/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Pro plan or higher.",
+   "readonly": "Read.",
+   "fallback": "Download the transcript and drop it.",
+   "docs": "https://tldv.io/blog/tldv-mcp-elevating-meeting-intelligence-with-ai-driven-contextualization/",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "tl;dv"
+  },
+  {
+   "id": "atlassian",
+   "name": "Atlassian (Jira, Confluence, Loom)",
+   "aliases": [
+    "bitbucket",
+    "confluence",
+    "jira",
+    "jira service management",
+    "jira software",
+    "loom"
+   ],
+   "category": "tracker",
+   "provides": [
+    "tracker",
+    "wiki"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": true,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.atlassian.com/v1/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "An Atlassian site admin completes first consent. Domain and IP allowlists apply.",
+   "readonly": "Ask the admin to turn on only the read and search permission groups.",
+   "fallback": "A saved Jira filter emailed daily into the drop folder; Confluence page export to PDF or Word.",
+   "docs": "https://support.atlassian.com/atlassian-ai-gateway/docs/get-started-with-the-atlassian-remote-mcp-server/",
+   "playbook": "references/stack-dev-and-tracking.md",
+   "notes": "Atlassian moves v1 connections to v2 automatically. Data Center (on-premises) sites cannot be reached by cloud connectors.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "trello",
+   "name": "Trello",
+   "aliases": [],
+   "category": "tracker",
+   "provides": [
+    "tracker"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.trello.com/v1"
+   },
+   "signin": "Your normal work login",
+   "admin": "Atlassian administration controls.",
+   "readonly": "Pick workspaces and permissions at sign-in; no permanent delete.",
+   "fallback": "Export the board.",
+   "docs": "https://support.atlassian.com/trello/docs/connect-trello-to-ai-assistants-with-trello-mcp/",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Atlassian docs"
+  },
+  {
+   "id": "linear",
+   "name": "Linear",
+   "aliases": [],
+   "category": "tracker",
+   "provides": [
+    "tracker"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.linear.app/mcp"
+   },
+   "readonly_url": "https://mcp.linear.app/mcp/readonly",
+   "signin": "Your normal work login",
+   "admin": "Optional enterprise sign-in rules.",
+   "readonly": "There's a read-only version; the Claude Code setup uses it by default.",
+   "fallback": "CSV export.",
+   "docs": "https://linear.app/docs/mcp.md",
+   "playbook": "references/stack-dev-and-tracking.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "github",
+   "name": "GitHub",
+   "aliases": [],
+   "category": "dev",
+   "provides": [
+    "code",
+    "tracker"
+   ],
+   "route": "add-by-url",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://api.githubcopilot.com/mcp/readonly",
+    "headers": {
+     "Authorization": "Bearer ${GITHUB_PAT}"
+    }
+   },
+   "readonly_url": "https://api.githubcopilot.com/mcp/readonly",
+   "signin": "In Claude Code, a read-only personal access token, only if your company allows them",
+   "admin": "Your GitHub organization's rules for apps and tokens apply.",
+   "readonly": "The read-only version is used by default.",
+   "fallback": "Notification emails; .diff and .patch links.",
+   "docs": "https://github.com/github/github-mcp-server/blob/main/docs/remote-server.md",
+   "playbook": "references/stack-dev-and-tracking.md",
+   "notes": "If GitHub appears in your connector directory, use that. In Claude Code it works with a read-only token, if your company allows them.",
+   "source": "GitHub docs",
+   "code_only": true
+  },
+  {
+   "id": "gitlab",
+   "name": "GitLab",
+   "aliases": [],
+   "category": "dev",
+   "provides": [
+    "code",
+    "tracker"
+   ],
+   "route": "add-by-url",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://gitlab.com/api/v4/mcp"
+   },
+   "url_template": "https://{gitlab_host}/api/v4/mcp",
+   "signin": "Your normal work login",
+   "admin": "A group owner or instance admin has to allow AI connections.",
+   "readonly": "Your admin can limit which tools it offers.",
+   "fallback": "Issue CSV export.",
+   "docs": "https://docs.gitlab.com/user/model_context_protocol/mcp_server/",
+   "playbook": "references/stack-dev-and-tracking.md",
+   "notes": "Beta. Many people behind one company network can hit the sign-in rate limit; an admin-created shared app fixes it.",
+   "source": "GitLab docs"
+  },
+  {
+   "id": "azure-devops",
+   "name": "Azure DevOps",
+   "aliases": [
+    "ado",
+    "azure boards"
+   ],
+   "category": "dev",
+   "provides": [
+    "code",
+    "tracker"
+   ],
+   "route": "admin-project",
+   "in_directory": false,
+   "bundled": false,
+   "url_template": "https://mcp.dev.azure.com/{organization}",
+   "signin": "Your Microsoft work account",
+   "admin": "Claude Code needs an admin-registered Entra app; Claude Desktop is not supported.",
+   "readonly": "There's a read-only setting.",
+   "fallback": "Query results to Excel.",
+   "docs": "https://learn.microsoft.com/en-us/azure/devops/mcp-server/remote-mcp-server",
+   "playbook": "references/stack-dev-and-tracking.md",
+   "notes": "",
+   "source": "Microsoft docs"
+  },
+  {
+   "id": "sentry",
+   "name": "Sentry",
+   "aliases": [],
+   "category": "dev",
+   "provides": [
+    "code"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.sentry.dev/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Set issue updates to needs approval.",
+   "fallback": "Alert and weekly emails.",
+   "docs": "https://mcp.sentry.dev/",
+   "playbook": "references/stack-dev-and-tracking.md",
+   "notes": "",
+   "source": "Sentry docs"
+  },
+  {
+   "id": "pagerduty",
+   "name": "PagerDuty",
+   "aliases": [],
+   "category": "dev",
+   "provides": [
+    "code"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.pagerduty.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Incident emails.",
+   "docs": "https://www.pagerduty.com/",
+   "playbook": "references/stack-dev-and-tracking.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "datadog",
+   "name": "Datadog",
+   "aliases": [],
+   "category": "dev",
+   "provides": [
+    "code"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.datadoghq.com/api/unstable/mcp-server/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Monitor emails.",
+   "docs": "https://www.datadoghq.com/",
+   "playbook": "references/stack-dev-and-tracking.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "asana",
+   "name": "Asana",
+   "aliases": [],
+   "category": "work-management",
+   "provides": [
+    "tracker"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.asana.com/v2/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Enterprise app management can allow or block each AI client.",
+   "readonly": "",
+   "fallback": "Project CSV export.",
+   "docs": "https://developers.asana.com/docs/using-asanas-mcp-server",
+   "playbook": "references/stack-work-management.md",
+   "notes": "In Claude Code, connect Asana on claude.ai with the same account; it doesn't sign in from a plugin or a hand-added address there.",
+   "source": "Anthropic's knowledge-work plugins",
+   "claude_code": "account"
+  },
+  {
+   "id": "monday",
+   "name": "monday.com",
+   "aliases": [
+    "monday.com"
+   ],
+   "category": "work-management",
+   "provides": [
+    "tracker"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.monday.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Admin, Permissions, AI connectors.",
+   "readonly": "",
+   "fallback": "Excel export, dashboard emails.",
+   "docs": "https://support.monday.com/hc/en-us/articles/28588158981266-Get-started-with-monday-MCP",
+   "playbook": "references/stack-work-management.md",
+   "notes": "Each request counts against your account's daily limit.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "clickup",
+   "name": "ClickUp",
+   "aliases": [],
+   "category": "work-management",
+   "provides": [
+    "tracker"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.clickup.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Has no delete tools at all.",
+   "fallback": "Export a view to CSV.",
+   "docs": "https://developer.clickup.com/docs/connect-an-ai-assistant-to-clickups-mcp-server",
+   "playbook": "references/stack-work-management.md",
+   "notes": "Lower plans have low daily limits.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "notion",
+   "name": "Notion",
+   "aliases": [
+    "notion ai",
+    "notion calendar",
+    "notion mail"
+   ],
+   "category": "docs",
+   "provides": [
+    "wiki",
+    "tracker"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": true,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.notion.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Enterprise can restrict to approved AI apps.",
+   "readonly": "",
+   "fallback": "Markdown or PDF export.",
+   "docs": "https://developers.notion.com/guides/mcp/get-started-with-mcp",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "airtable",
+   "name": "Airtable",
+   "aliases": [],
+   "category": "work-management",
+   "provides": [
+    "tracker"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.airtable.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Admin can require a pre-approved app.",
+   "readonly": "Choose specific bases at sign-in.",
+   "fallback": "Grid view CSV.",
+   "docs": "https://airtable.com/developers/agents/mcp/getting-started",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Airtable docs"
+  },
+  {
+   "id": "smartsheet",
+   "name": "Smartsheet",
+   "aliases": [],
+   "category": "work-management",
+   "provides": [
+    "tracker"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.smartsheet.com"
+   },
+   "signin": "Your normal work login",
+   "admin": "Business plan or higher; a System Admin toggles AI connectors.",
+   "readonly": "",
+   "fallback": "Excel or PDF export; scheduled report emails.",
+   "docs": "https://developers.smartsheet.com/ai-mcp/smartsheet/install-the-smartsheet-mcp-server",
+   "playbook": "references/stack-work-management.md",
+   "notes": "EU and AU have their own addresses.",
+   "source": "Smartsheet docs"
+  },
+  {
+   "id": "wrike",
+   "name": "Wrike",
+   "aliases": [],
+   "category": "work-management",
+   "provides": [
+    "tracker"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.wrike.com/v2"
+   },
+   "signin": "Your normal work login",
+   "admin": "A custom connector needs an admin-created Wrike app.",
+   "readonly": "",
+   "fallback": "Excel export.",
+   "docs": "https://developers.wrike.com/docs/wrike-mcp-server-overview",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Wrike docs"
+  },
+  {
+   "id": "coda",
+   "name": "Coda",
+   "aliases": [],
+   "category": "docs",
+   "provides": [
+    "wiki",
+    "tracker"
+   ],
+   "route": "add-by-url",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://coda.io/apis/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "A Claude Owner may need to add it.",
+   "readonly": "A limited key can be read-only; signing in through the web allows reading and writing.",
+   "fallback": "CSV export.",
+   "docs": "https://help.coda.io/hc/en-us/articles/44722661982989-Connect-to-the-Coda-MCP",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Coda docs"
+  },
+  {
+   "id": "guru",
+   "name": "Guru",
+   "aliases": [],
+   "category": "docs",
+   "provides": [
+    "wiki"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.api.getguru.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Copy cards.",
+   "docs": "https://www.getguru.com/",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "basecamp",
+   "name": "Basecamp",
+   "aliases": [],
+   "category": "work-management",
+   "provides": [
+    "tracker"
+   ],
+   "route": "none",
+   "in_directory": false,
+   "bundled": false,
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Email notifications; the web app.",
+   "docs": "https://github.com/basecamp/basecamp-cli",
+   "playbook": "references/stack-work-management.md",
+   "notes": "Only a tool you install on your own computer exists; nothing to connect in the Claude apps.",
+   "source": "Basecamp"
+  },
+  {
+   "id": "figma",
+   "name": "Figma",
+   "aliases": [],
+   "category": "design",
+   "provides": [
+    "design"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.figma.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Seat limits: view and collaborator seats get very few calls a month.",
+   "readonly": "",
+   "fallback": "Export PNG or PDF.",
+   "docs": "https://developers.figma.com/docs/figma-mcp-server/remote-server-installation/",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "miro",
+   "name": "Miro",
+   "aliases": [],
+   "category": "design",
+   "provides": [
+    "design"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.miro.com/"
+   },
+   "signin": "Your normal work login",
+   "admin": "Enterprise admin must enable it.",
+   "readonly": "One team per connection.",
+   "fallback": "Export PDF, image, or CSV.",
+   "docs": "https://developers.miro.com/docs/connecting-to-miro-mcp",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Miro docs"
+  },
+  {
+   "id": "canva",
+   "name": "Canva",
+   "aliases": [],
+   "category": "design",
+   "provides": [
+    "design"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.canva.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Team admin on/off switch.",
+   "readonly": "",
+   "fallback": "Download PDF or PNG.",
+   "docs": "https://www.canva.dev/docs/mcp/troubleshooting/",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "lucid",
+   "name": "Lucid",
+   "aliases": [],
+   "category": "design",
+   "provides": [
+    "design"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.lucid.app/mcp"
+   },
+   "readonly_url": "https://mcp.lucid.app/mcp/readonly",
+   "signin": "Your normal work login",
+   "admin": "Team and Enterprise admin must enable it.",
+   "readonly": "There's a read-only version.",
+   "fallback": "Export PDF or PNG.",
+   "docs": "https://help.lucid.co/hc/en-us/articles/42578801807508-Integrate-Lucid-with-AI-tools-using-the-Lucid-MCP-server",
+   "playbook": "references/stack-work-management.md",
+   "notes": "",
+   "source": "Lucid docs"
+  },
+  {
+   "id": "salesforce",
+   "name": "Salesforce",
+   "aliases": [],
+   "category": "crm",
+   "provides": [
+    "customers"
+   ],
+   "route": "admin-project",
+   "in_directory": true,
+   "bundled": false,
+   "url_template": "https://api.salesforce.com/platform/mcp/v1/platform/sobject-reads",
+   "signin": "Your normal work login",
+   "admin": "Admin turns on the MCP service and each server and creates the client app.",
+   "readonly": "Ask for the read-only version specifically; the others can change and delete records.",
+   "fallback": "Scheduled report emails.",
+   "docs": "https://developer.salesforce.com/docs/platform/hosted-mcp-servers/references/reference/sobject-reads.html",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "Salesforce docs"
+  },
+  {
+   "id": "hubspot",
+   "name": "HubSpot",
+   "aliases": [
+    "hub spot"
+   ],
+   "category": "crm",
+   "provides": [
+    "customers"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.hubspot.com/anthropic"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "No read-only switch; uses the user's own permissions.",
+   "fallback": "Saved views, report emails.",
+   "docs": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "gong",
+   "name": "Gong",
+   "aliases": [],
+   "category": "crm",
+   "provides": [
+    "customers",
+    "meetings"
+   ],
+   "route": "admin-project",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.gong.io/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Technical admin creates the integration; uses Gong credits.",
+   "readonly": "Read-only by design.",
+   "fallback": "Call brief emails.",
+   "docs": "https://help.gong.io/docs/about-gong-mcp-server",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "Gong docs"
+  },
+  {
+   "id": "intercom",
+   "name": "Intercom",
+   "aliases": [],
+   "category": "support",
+   "provides": [
+    "customers"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.intercom.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Writes limited to internal notes and articles.",
+   "fallback": "Exports.",
+   "docs": "https://developers.intercom.com/docs/guides/mcp",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "EU workspaces use https://mcp.eu.intercom.com/mcp.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "servicenow",
+   "name": "ServiceNow",
+   "aliases": [
+    "service now",
+    "snow"
+   ],
+   "category": "support",
+   "provides": [
+    "customers"
+   ],
+   "route": "admin-project",
+   "in_directory": false,
+   "bundled": false,
+   "url_template": "https://{instance}.service-now.com/<path from your admin>",
+   "signin": "Your normal work login",
+   "admin": "An admin builds the server per instance (plugin, Now Assist, admin role).",
+   "readonly": "",
+   "fallback": "Report emails.",
+   "docs": "https://www.servicenow.com/community/developer-advocate-blog/building-an-mcp-server-on-servicenow-and-connecting-claude-to-it/ba-p/3588171",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "ServiceNow community"
+  },
+  {
+   "id": "freshdesk",
+   "name": "Freshdesk",
+   "aliases": [],
+   "category": "support",
+   "provides": [
+    "customers"
+   ],
+   "route": "api-key",
+   "in_directory": false,
+   "bundled": false,
+   "url_template": "https://{subdomain}.freshdesk.com/mcp",
+   "signin": "A key from Freshdesk, not your normal login",
+   "admin": "Growth plan or higher.",
+   "readonly": "No read-only mode.",
+   "fallback": "Exports.",
+   "docs": "https://support.freshdesk.com/support/solutions/articles/50000012670",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "Freshworks docs"
+  },
+  {
+   "id": "freshservice",
+   "name": "Freshservice",
+   "aliases": [],
+   "category": "support",
+   "provides": [
+    "customers"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "url_template": "https://{subdomain}.freshservice.com/mcp",
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Report emails.",
+   "docs": "https://support.freshservice.com/support/solutions/articles/50000012678",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "Freshworks docs"
+  },
+  {
+   "id": "zendesk",
+   "name": "Zendesk",
+   "aliases": [],
+   "category": "support",
+   "provides": [
+    "customers"
+   ],
+   "route": "none",
+   "in_directory": false,
+   "bundled": false,
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Saved views exported with ID, subject, status, and SLA columns only; browser route.",
+   "docs": "https://support.zendesk.com/",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "No official connector as of October 2026.",
+   "source": "Zendesk"
+  },
+  {
+   "id": "box",
+   "name": "Box",
+   "aliases": [],
+   "category": "files",
+   "provides": [
+    "files"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.box.com"
+   },
+   "signin": "Your normal work login",
+   "admin": "Admin enables it in the Admin Console.",
+   "readonly": "Keep write tools off.",
+   "fallback": "Download and drop.",
+   "docs": "https://developer.box.com/guides/box-mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "In Claude Code, connect Box on claude.ai with the same account; it doesn't sign in from a plugin or a hand-added address there.",
+   "source": "Anthropic's knowledge-work plugins",
+   "claude_code": "account"
+  },
+  {
+   "id": "dropbox",
+   "name": "Dropbox",
+   "aliases": [],
+   "category": "files",
+   "provides": [
+    "files"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.dropbox.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Team app controls.",
+   "readonly": "Set delete to blocked.",
+   "fallback": "Download and drop.",
+   "docs": "https://help.dropbox.com/integrations/connect-dropbox-mcp-server",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Dropbox docs"
+  },
+  {
+   "id": "egnyte",
+   "name": "Egnyte",
+   "aliases": [],
+   "category": "files",
+   "provides": [
+    "files"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp-server.egnyte.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Needs the AI add-on, an admin switch, and approval for Claude.",
+   "readonly": "",
+   "fallback": "Download and drop.",
+   "docs": "https://helpdesk.egnyte.com/hc/en-us/articles/42509258028173",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "amplitude",
+   "name": "Amplitude",
+   "aliases": [],
+   "category": "analytics",
+   "provides": [
+    "data"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.amplitude.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Set content edits to needs approval.",
+   "fallback": "Dashboard emails.",
+   "docs": "https://amplitude.com/docs/amplitude-ai/amplitude-mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "EU: https://mcp.eu.amplitude.com/mcp",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "mixpanel",
+   "name": "Mixpanel",
+   "aliases": [],
+   "category": "analytics",
+   "provides": [
+    "data"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.mixpanel.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Org admin enables it for most accounts.",
+   "readonly": "",
+   "fallback": "Report emails.",
+   "docs": "https://docs.mixpanel.com/docs/mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "Some regions have their own address.",
+   "source": "Mixpanel docs"
+  },
+  {
+   "id": "pendo",
+   "name": "Pendo",
+   "aliases": [],
+   "category": "analytics",
+   "provides": [
+    "data"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://app.pendo.io/mcp/v0/shttp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Subscription admin, then a Claude Owner.",
+   "readonly": "Separate read and write toggles.",
+   "fallback": "Report emails.",
+   "docs": "https://support.pendo.io/hc/en-us/articles/41102236924955",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "posthog",
+   "name": "PostHog",
+   "aliases": [],
+   "category": "analytics",
+   "provides": [
+    "data"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.posthog.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Read-only mode, tool filters, pin to one project; avoid session replays.",
+   "fallback": "Exports.",
+   "docs": "https://posthog.com/docs/model-context-protocol",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "EU: https://mcp-eu.posthog.com/mcp",
+   "source": "PostHog docs"
+  },
+  {
+   "id": "similarweb",
+   "name": "Similarweb",
+   "aliases": [],
+   "category": "analytics",
+   "provides": [
+    "data"
+   ],
+   "route": "api-key",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.similarweb.com"
+   },
+   "signin": "A key from Similarweb, even through the directory",
+   "admin": "API-enabled plan.",
+   "readonly": "",
+   "fallback": "Exports.",
+   "docs": "https://developers.similarweb.com/docs/claude-mcp-integration",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "bigquery",
+   "name": "BigQuery",
+   "aliases": [],
+   "category": "data",
+   "provides": [
+    "data"
+   ],
+   "route": "admin-project",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://bigquery.googleapis.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Admin creates the OAuth client and grants the MCP tool-user role.",
+   "readonly": "Use the read-only SQL tool and deny the full one.",
+   "fallback": "Scheduled query to a Sheet.",
+   "docs": "https://docs.cloud.google.com/bigquery/docs/use-bigquery-mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "snowflake",
+   "name": "Snowflake",
+   "aliases": [],
+   "category": "data",
+   "provides": [
+    "data"
+   ],
+   "route": "admin-project",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": ""
+   },
+   "signin": "Your normal work login",
+   "admin": "Admin builds the managed server; network policies can block cloud clients.",
+   "readonly": "Read-only role.",
+   "fallback": "Scheduled exports.",
+   "docs": "https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents-mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "Set up by your data team.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "databricks",
+   "name": "Databricks",
+   "aliases": [],
+   "category": "data",
+   "provides": [
+    "data"
+   ],
+   "route": "admin-project",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": ""
+   },
+   "signin": "Your normal work login",
+   "admin": "Account admin creates the app.",
+   "readonly": "Unity Catalog grants.",
+   "fallback": "Exports.",
+   "docs": "https://docs.databricks.com/aws/en/generative-ai/mcp/connect-clients",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "Set up by your data team.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "looker",
+   "name": "Looker",
+   "aliases": [],
+   "category": "data",
+   "provides": [
+    "data"
+   ],
+   "route": "admin-project",
+   "in_directory": false,
+   "bundled": false,
+   "url_template": "https://{instance}/mcp",
+   "signin": "Your normal work login",
+   "admin": "Admin enables it and registers the client.",
+   "readonly": "",
+   "fallback": "Scheduled report emails.",
+   "docs": "https://docs.cloud.google.com/looker/docs/mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Google docs"
+  },
+  {
+   "id": "tableau",
+   "name": "Tableau Cloud",
+   "aliases": [],
+   "category": "data",
+   "provides": [
+    "data"
+   ],
+   "route": "add-by-url",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.tableau.com"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Subscriptions to views.",
+   "docs": "https://tableau.github.io/tableau-mcp/docs/hosted-tableau-mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "Tableau Server customers host their own.",
+   "source": "Tableau docs"
+  },
+  {
+   "id": "power-bi",
+   "name": "Power BI",
+   "aliases": [
+    "powerbi"
+   ],
+   "category": "data",
+   "provides": [
+    "data"
+   ],
+   "route": "admin-project",
+   "in_directory": false,
+   "bundled": false,
+   "url_template": "https://api.fabric.microsoft.com/v1/mcp/powerbi",
+   "signin": "Your Microsoft work account",
+   "admin": "Tenant setting; may need an Entra app.",
+   "readonly": "Query only.",
+   "fallback": "Report subscriptions.",
+   "docs": "https://learn.microsoft.com/en-us/power-bi/developer/mcp/remote-mcp-server-get-started",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Microsoft docs"
+  },
+  {
+   "id": "greenhouse",
+   "name": "Greenhouse",
+   "aliases": [],
+   "category": "hr",
+   "provides": [
+    "people"
+   ],
+   "route": "add-by-url",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.greenhouse.io/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "Site admin connects first.",
+   "readonly": "Starts read-only.",
+   "fallback": "Report emails.",
+   "docs": "https://support.greenhouse.io/hc/en-us/articles/52096319906971",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "Claude Code uses https://mcp.us.greenhouse.io/mcp. Candidate data stays out of the workspace.",
+   "source": "Greenhouse docs"
+  },
+  {
+   "id": "ashby",
+   "name": "Ashby",
+   "aliases": [],
+   "category": "hr",
+   "provides": [
+    "people"
+   ],
+   "route": "add-by-url",
+   "in_directory": false,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.ashbyhq.com/mcp/v1"
+   },
+   "signin": "Your normal work login",
+   "admin": "Org admin toggle; elevated-access users only.",
+   "readonly": "",
+   "fallback": "Report emails.",
+   "docs": "https://docs.ashbyhq.com/ashby-mcp-server-beta",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Ashby docs"
+  },
+  {
+   "id": "workday",
+   "name": "Workday",
+   "aliases": [],
+   "category": "hr",
+   "provides": [
+    "people"
+   ],
+   "route": "none",
+   "in_directory": false,
+   "bundled": false,
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Scheduled report emails.",
+   "docs": "https://newsroom.workday.com/",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "Early access only as of October 2026.",
+   "source": "Workday"
+  },
+  {
+   "id": "stripe",
+   "name": "Stripe",
+   "aliases": [],
+   "category": "finance",
+   "provides": [
+    "finance"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.stripe.com"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Use a restricted read-only key and test mode first; write tools can move money.",
+   "fallback": "Report emails.",
+   "docs": "https://docs.stripe.com/mcp",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Stripe docs"
+  },
+  {
+   "id": "quickbooks",
+   "name": "QuickBooks",
+   "aliases": [
+    "intuit",
+    "qbo"
+   ],
+   "category": "finance",
+   "provides": [
+    "finance"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://ai-inc.quickbooks.intuit.com/v1/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Keep invoice and payment tools off.",
+   "fallback": "Report emails.",
+   "docs": "https://quickbooks.intuit.com/",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Claude connector directory"
+  },
+  {
+   "id": "netsuite",
+   "name": "NetSuite",
+   "aliases": [],
+   "category": "finance",
+   "provides": [
+    "finance"
+   ],
+   "route": "admin-project",
+   "in_directory": true,
+   "bundled": false,
+   "url_template": "https://{account}.suitetalk.api.netsuite.com/services/mcp/v1/suiteapp/com.netsuite.mcpstandardtools",
+   "signin": "Your normal work login",
+   "admin": "Needs a custom role (the Administrator role is blocked) and the SuiteApp.",
+   "readonly": "",
+   "fallback": "Saved-search emails.",
+   "docs": "https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_0714082142.html",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Oracle docs"
+  },
+  {
+   "id": "docusign",
+   "name": "Docusign",
+   "aliases": [
+    "docu sign"
+   ],
+   "category": "finance",
+   "provides": [
+    "finance"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.docusign.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Keep send tools off.",
+   "fallback": "Exports.",
+   "docs": "https://developers.docusign.com/platform/mcp-server/",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "zapier",
+   "name": "Zapier",
+   "aliases": [],
+   "category": "automation",
+   "provides": [
+    "bridge"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.zapier.com/api/v1/connect"
+   },
+   "signin": "Your normal work login",
+   "admin": "A workspace admin can turn it off.",
+   "readonly": "Expose only the actions you need.",
+   "fallback": "",
+   "docs": "https://docs.zapier.com/mcp/overview/how-connections-work",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "Data passes through Zapier; needs its own approval.",
+   "source": "Zapier docs"
+  },
+  {
+   "id": "make",
+   "name": "Make",
+   "aliases": [],
+   "category": "automation",
+   "provides": [
+    "bridge"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.make.com"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "",
+   "docs": "https://developers.make.com/mcp-server/connect-using-oauth",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "Data passes through Make.",
+   "source": "Make docs"
+  },
+  {
+   "id": "n8n",
+   "name": "n8n",
+   "aliases": [],
+   "category": "automation",
+   "provides": [
+    "bridge"
+   ],
+   "route": "admin-project",
+   "in_directory": true,
+   "bundled": false,
+   "url_template": "https://{your-n8n-host}/<path from Settings, Instance-level MCP>",
+   "signin": "Your normal work login",
+   "admin": "Owner or admin enables it.",
+   "readonly": "",
+   "fallback": "",
+   "docs": "https://docs.n8n.io/connect/connect-to-n8n-mcp-server",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "n8n docs"
+  },
+  {
+   "id": "apollo",
+   "name": "Apollo",
+   "aliases": [],
+   "category": "sales",
+   "provides": [
+    "customers"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.apollo.io/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Keep sequence and enrollment tools off.",
+   "fallback": "Exports or report emails into the drop folder.",
+   "docs": "https://www.apollo.io/",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "outreach",
+   "name": "Outreach",
+   "aliases": [],
+   "category": "sales",
+   "provides": [
+    "customers"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://api.outreach.io/mcp/"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Keep sequence and send tools off.",
+   "fallback": "Exports or report emails into the drop folder.",
+   "docs": "https://www.outreach.io/",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "zoominfo",
+   "name": "ZoomInfo",
+   "aliases": [],
+   "category": "sales",
+   "provides": [
+    "customers"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.zoominfo.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Exports or report emails into the drop folder.",
+   "docs": "https://www.zoominfo.com/",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "Contact data is personal data; keep it in ZoomInfo.",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "clay",
+   "name": "Clay",
+   "aliases": [],
+   "category": "sales",
+   "provides": [
+    "customers"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://api.clay.com/v3/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Exports or report emails into the drop folder.",
+   "docs": "https://www.clay.com/",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "close",
+   "name": "Close",
+   "aliases": [],
+   "category": "crm",
+   "provides": [
+    "customers"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.close.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Exports or report emails into the drop folder.",
+   "docs": "https://www.close.com/",
+   "playbook": "references/stack-revenue-and-support.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "klaviyo",
+   "name": "Klaviyo",
+   "aliases": [],
+   "category": "marketing",
+   "provides": [
+    "data"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.klaviyo.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "Keep campaign send tools off.",
+   "fallback": "Exports or report emails into the drop folder.",
+   "docs": "https://www.klaviyo.com/",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "ahrefs",
+   "name": "Ahrefs",
+   "aliases": [],
+   "category": "marketing",
+   "provides": [
+    "data"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://api.ahrefs.com/mcp/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "API-enabled plan.",
+   "readonly": "",
+   "fallback": "Exports or report emails into the drop folder.",
+   "docs": "https://ahrefs.com/",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "supermetrics",
+   "name": "Supermetrics",
+   "aliases": [],
+   "category": "marketing",
+   "provides": [
+    "data"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://mcp.supermetrics.com/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Exports or report emails into the drop folder.",
+   "docs": "https://supermetrics.com/",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  },
+  {
+   "id": "hex",
+   "name": "Hex",
+   "aliases": [],
+   "category": "data",
+   "provides": [
+    "data"
+   ],
+   "route": "one-click",
+   "in_directory": true,
+   "bundled": false,
+   "mcp": {
+    "type": "http",
+    "url": "https://app.hex.tech/mcp"
+   },
+   "signin": "Your normal work login",
+   "admin": "",
+   "readonly": "",
+   "fallback": "Exports or report emails into the drop folder.",
+   "docs": "https://hex.tech/",
+   "playbook": "references/stack-meetings-files-data.md",
+   "notes": "",
+   "source": "Anthropic's knowledge-work plugins"
+  }
+ ],
+ "kinds": {
+  "mail": "your email",
+  "calendar": "your calendar",
+  "chat": "your team chat",
+  "meetings": "your meeting transcripts",
+  "files": "your files",
+  "wiki": "your team's docs",
+  "tracker": "your tasks and tickets",
+  "customers": "your customer tools",
+  "design": "your design files",
+  "data": "your dashboards",
+  "code": "your code reviews",
+  "people": "your recruiting tools",
+  "finance": "your finance tools",
+  "bridge": "your automations"
+ },
+ "commands": [
+  {
+   "command": "/briefing",
+   "group": "Every morning",
+   "what": "What's due, what's on fire, and what changed overnight, in one short read.",
+   "uses": [
+    "mail",
+    "calendar",
+    "chat",
+    "tracker"
+   ],
+   "helps": [
+    "A morning brief"
+   ],
+   "try_it": "/briefing",
+   "without": "Works today from your follow-up list and dropped files.",
+   "starter": true,
+   "core": true
+  },
+  {
+   "command": "/pulse",
+   "group": "Every morning",
+   "what": "Only what changed since the last brief. For the middle of a busy day.",
+   "uses": [
+    "mail",
+    "chat",
+    "tracker"
+   ],
+   "helps": [
+    "A morning brief"
+   ],
+   "try_it": "/pulse",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/week",
+   "group": "Every morning",
+   "what": "The week ahead: meetings, deadlines, and the collisions between them.",
+   "uses": [
+    "calendar",
+    "tracker"
+   ],
+   "helps": [
+    "A morning brief",
+    "Status updates"
+   ],
+   "try_it": "/week",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/prep",
+   "group": "Meetings",
+   "what": "Before a meeting: the last decision, the open question, and the right file.",
+   "uses": [
+    "calendar",
+    "mail",
+    "chat",
+    "files",
+    "wiki",
+    "tracker",
+    "customers"
+   ],
+   "helps": [
+    "Meeting prep and notes"
+   ],
+   "try_it": "/prep my next meeting",
+   "without": "Paste the invite or name the meeting.",
+   "starter": true,
+   "core": true
+  },
+  {
+   "command": "/debrief",
+   "group": "Meetings",
+   "what": "Transcript in; notes, decisions, and follow-ups out, filed under the right project.",
+   "uses": [
+    "meetings",
+    "files"
+   ],
+   "helps": [
+    "Meeting prep and notes",
+    "Tracking follow-ups"
+   ],
+   "try_it": "/debrief the last meeting",
+   "without": "Drop or paste the transcript.",
+   "starter": true,
+   "core": true
+  },
+  {
+   "command": "/slots",
+   "group": "Meetings",
+   "what": "Meeting times that respect your calendar and your focus time. It proposes; you send.",
+   "uses": [
+    "calendar"
+   ],
+   "helps": [
+    "Meeting prep and notes"
+   ],
+   "try_it": "/slots 30 minutes with my manager next week",
+   "without": "Paste your free times.",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/who",
+   "group": "Meetings",
+   "what": "Who someone is, what they own, who they report to, and what's open between you.",
+   "uses": [
+    "mail",
+    "chat",
+    "calendar"
+   ],
+   "helps": [
+    "Meeting prep and notes",
+    "Yes, still ramping up"
+   ],
+   "try_it": "/who and a name from your last meeting",
+   "without": "Works from your people page, meeting notes, and follow-ups.",
+   "starter": true,
+   "core": true
+  },
+  {
+   "command": "/capture",
+   "group": "Follow-ups",
+   "what": "Put an owner and a date on a promise, yours or someone else's.",
+   "uses": [],
+   "helps": [
+    "Tracking follow-ups"
+   ],
+   "try_it": "/capture and the promise, like \"I owe my manager the draft by Thursday\"",
+   "without": "",
+   "starter": true,
+   "core": true
+  },
+  {
+   "command": "/triage",
+   "group": "Follow-ups",
+   "what": "Sort an inbox or channel into needs a reply, waiting on others, FYI, and noise. Never deletes.",
+   "uses": [
+    "mail",
+    "chat"
+   ],
+   "helps": [
+    "Tracking follow-ups",
+    "A morning brief"
+   ],
+   "try_it": "/triage my inbox from the last two days",
+   "without": "Paste the messages.",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/close",
+   "group": "Follow-ups",
+   "what": "End the day: what moved, what's still open, and tomorrow's first move.",
+   "uses": [],
+   "helps": [
+    "Tracking follow-ups"
+   ],
+   "try_it": "/close",
+   "without": "",
+   "starter": false,
+   "core": true
+  },
+  {
+   "command": "/project-status",
+   "group": "Status",
+   "what": "A ready-to-paste status table, built from your own records.",
+   "uses": [
+    "tracker"
+   ],
+   "helps": [
+    "Status updates"
+   ],
+   "try_it": "/project-status",
+   "without": "Works today from your own project records.",
+   "starter": true,
+   "core": true
+  },
+  {
+   "command": "/gofer",
+   "group": "Status",
+   "what": "The legwork on your plate, done: what deserves your attention, what needs a decision, and what can go.",
+   "uses": [
+    "tracker",
+    "mail",
+    "calendar"
+   ],
+   "helps": [
+    "Status updates"
+   ],
+   "try_it": "/gofer",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/draft",
+   "group": "Writing",
+   "what": "An email or message in your voice, left as a draft. You send it.",
+   "uses": [
+    "mail",
+    "chat"
+   ],
+   "helps": [],
+   "try_it": "/draft a reply to the last email from my manager",
+   "without": "Paste the thread.",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/redline",
+   "group": "Writing",
+   "what": "A skeptical second read before something goes to an exec.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/redline (then paste the draft)",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/write-epic",
+   "group": "Writing",
+   "what": "A clean ticket or epic from messy notes. It drafts; you file it.",
+   "uses": [
+    "tracker"
+   ],
+   "helps": [],
+   "try_it": "/write-epic from these notes",
+   "without": "Drafts from your notes today; filing it live needs a tracker.",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/explain",
+   "group": "Thinking",
+   "what": "Any acronym, doc, or engineering note, explained like you're new.",
+   "uses": [],
+   "helps": [
+    "Yes, still ramping up"
+   ],
+   "try_it": "/explain (then paste the thing)",
+   "without": "",
+   "starter": true,
+   "core": true
+  },
+  {
+   "command": "/bro",
+   "group": "Thinking",
+   "what": "Re-explain the last answer in plain words, like you got lost. No shame.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/bro",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/quick",
+   "group": "Thinking",
+   "what": "The short version of the last answer.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/quick 3",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/grill",
+   "group": "Thinking",
+   "what": "Poke holes in a plan before someone else does.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/grill (then paste the plan)",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/study",
+   "group": "Thinking",
+   "what": "Five quiz questions from your own notes, with the source for each answer.",
+   "uses": [
+    "wiki",
+    "files"
+   ],
+   "helps": [],
+   "try_it": "/study our product glossary",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/new-project",
+   "group": "Keeping the record",
+   "what": "Give a new project a home: status, decisions, sources, and a context map.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/new-project",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/decision",
+   "group": "Keeping the record",
+   "what": "Log a decision with the why, so nobody relitigates it in a month.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/decision",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/sync-kb",
+   "group": "Keeping the record",
+   "what": "File everything dropped in the inbox into the right project.",
+   "uses": [
+    "files"
+   ],
+   "helps": [],
+   "try_it": "/sync-kb",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/kb-lint",
+   "group": "Keeping the record",
+   "what": "Find stale pages, broken links, and notes pretending to be current.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/kb-lint",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/tidy",
+   "group": "Keeping the record",
+   "what": "Merge duplicate follow-ups, fix fuzzy dates, and move finished projects to the archive. Never erases.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/tidy",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/connect",
+   "group": "Setup",
+   "what": "Connect another tool, or fix one that won't connect.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/connect",
+   "without": "",
+   "starter": false,
+   "core": false
+  },
+  {
+   "command": "/setup",
+   "group": "Setup",
+   "what": "Change your answers: voice, partners, and what the agent is allowed to do.",
+   "uses": [],
+   "helps": [],
+   "try_it": "/setup",
+   "without": "",
+   "starter": false,
+   "core": false
+  }
+ ]
+}

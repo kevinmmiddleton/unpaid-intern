@@ -1,0 +1,33 @@
+name: release
+
+# Push a tag like v1.3.0 and this builds the three release files and publishes them.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check, test, and build
+        run: |
+          python tools/build.py --check
+          python tools/build.py --dist
+      - name: Tag matches the plugin version
+        run: |
+          v=$(python -c "import json;print(json.load(open('.claude-plugin/plugin.json'))['version'])")
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "Tag $GITHUB_REF_NAME does not match plugin.json version $v"; exit 1; }
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "$(head -n 1 .github/release-notes.md | sed 's/^# //')" \
+            --notes-file <(tail -n +3 .github/release-notes.md)

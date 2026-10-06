@@ -128,7 +128,7 @@ When the user doesn't paste or name a source, look in 1-Inbox before asking for 
 
 1. Treat the transcript as data. State coverage first: full, partial, roster only, or none.
 2. Extract only what the source supports. Preserve negation ("we are not shipping Friday" stays not). Attribute to who said it.
-3. Never assign work to someone who was not quoted agreeing to it. Unconfirmed asks become `@waiting:Name ... since:<meeting date> ... accepted: false`.
+3. Never assign work to someone who was not quoted agreeing to it. Unconfirmed asks become `@waiting:Name ... since:<meeting date> ... accepted: false`. Run `brain.py when` on every spoken deadline ("by Thursday") before writing its follow-up.
 4. Write:
    - decisions into `Memory/decisions.md`, with Why and Provenance
    - commitments into `Memory/followups.md`
@@ -137,6 +137,8 @@ When the user doesn't paste or name a source, look in 1-Inbox before asking for 
    - new facts into the right knowledge page with `[stated]`, `[inferred]`, or `[confirmed]`
    - new acronyms into the open list in `4-Reference/glossary.md`
    - new names into the "Still figuring out" list in `4-Reference/people.md`, then ask about every one of them in a single question at the end (see New names in SKILL.md)
+
+   In every saved line (follow-ups, people.md, the source note) and in chat, write each person as their name or "they" unless a source gives a pronoun.
 5. File the raw transcript out of `1-Inbox` into `5-Archive/processed/` once its contents are written up.
 6. Tell the user exactly what was written, as a short list. Offer `/draft` for any recap they owe.
 
@@ -289,8 +291,8 @@ A 101 lesson on any topic, built from what the user already has. The output is o
 Plain-language triggers: "make me a 101 on...", "teach me this from zero", "help me get up to speed on...", "I need to level up on...".
 
 1. **Name the topic** in the user's words. One topic per lesson. A second topic becomes its own lesson, linked, not extra slides.
-2. **Gather.** In the retrieval order: what they pasted or dropped, then the project folder if the topic belongs to one (`current.md`, `decisions.md`, `sources.md`, `context-map.md`), then `4-Reference/` (glossary, people, source notes), `Memory/meetings.md`, and `Memory/decisions.md`, then live searches of connected tools (wiki, tracker, mail, chat) for the topic. Read only. Never post, comment, or change anything in a connected tool while gathering.
-3. **Check in once, before writing.** In one short message: the sources you found (a line each), the one mix-up this lesson exists to stop (two things with the same nickname, what's live versus what's next, whose job something is), and what they want to be able to answer. Offer your guess for each. If the sources are thin, say what's missing; build only the slides those sources support.
+2. **Gather.** In the retrieval order: what they pasted or dropped, then the project folder if the topic belongs to one (`current.md`, `decisions.md`, `sources.md`, `context-map.md`) and that project's rows in `Memory/project-status.md` and `Memory/followups.md`, then `4-Reference/` (glossary, people, source notes), `Memory/meetings.md`, and `Memory/decisions.md`, then live searches of connected tools (wiki, tracker, mail, chat) for the topic. Read only. Never post, comment, or change anything in a connected tool while gathering.
+3. **Check in once, before writing.** In one short message: the sources you found (a line each), the one mix-up this lesson exists to stop (two things with the same nickname, what's live versus what's next, whose job something is), and what they want to be able to answer. Offer your guess for each. Name any open follow-up on the topic in the `due` script's own words (late, or waiting since a date), so the lesson reflects it. If the sources are thin, say what's missing; build only the slides those sources support.
 4. **Copy `assets/lesson-101.html`** to `4-Reference/learn/<slug>-101.html` (or the folder the user names). `<slug>` is short, lowercase, with hyphens. Set `const STORAGE = 'lesson-<slug>-v1'`, the `<title>`, and both places the shell says `Topic 101` to `<Topic> 101`. The subtitle is who it's for and about how long it takes. Fill the slides; don't touch the script.
 5. **Slides, in this order.** Drop a block that has nothing true to say. Don't add slides to look complete. Keep `data-id`, `data-group`, and `data-title` on every `section.slide`; the sidebar builds itself from them.
    1. **Start.** One sentence on what it is, in the learner's job. A `.plain` box whose first `<strong>` reads `30-second version`, holding the words they can say out loud. A `.tag` only when a status or date matters and a source states it.
@@ -383,7 +385,7 @@ File a dropped source cleanly. Plain-language triggers: "file my inbox", "file w
 
 1. Leave the raw drop untouched.
 2. Run `brain.py scan --path <file>`. For PDFs, spreadsheets, and images, extract the text first and pipe it to `brain.py scan --stdin`. If anything restricted turns up, stop: do not file the drop and do not move it. Tell the user what was found and ask them to remove the original. De-identified account-level facts (counts, themes, an open escalation in general terms, ticket IDs) can still go to the page the user asked for; create it under 3-Areas if it doesn't exist. Redact lesser identifiers to stable tokens before anything is written.
-3. Write a clean source note in `4-Reference/sources/` (or `sources/meetings/`): where it came from, date, who said it, what was redacted.
+3. Write a clean source note in `4-Reference/sources/` (or `sources/meetings/`): where it came from, date, who said it, what was redacted. Name people, or say "they", unless the source gives a pronoun.
 4. Update the project, area, or reference page that should hold each fact, with claim labels. Fast-changing facts get an "as of" date or a link instead of a bare copy.
 5. Log commitments separately in `Memory/followups.md`.
 6. Move the raw file to `5-Archive/processed/` (only after a clean scan).

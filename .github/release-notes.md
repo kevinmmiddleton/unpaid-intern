@@ -9,7 +9,7 @@ If you're new here: your intern reads everything you hand it, preps your meeting
 - **Cowork:** download `unpaid-intern.plugin`, open it, and click Install. Then say "set me up."
 - **Claude Code:** no download needed. Run `/plugin marketplace add kevinmmiddleton/unpaid-intern`, then `/plugin install unpaid-intern@unpaid-intern`.
 - **Codex:** run `codex plugin marketplace add kevinmmiddleton/unpaid-intern`, then `codex plugin add unpaid-intern@unpaid-intern`.
-- **claude.ai or Claude Desktop:** download `unpaid-intern.zip` and upload it under Customize, then Skills. Code execution has to be on.
+- **claude.ai or the Claude app:** download `unpaid-intern.zip` and upload it under Customize, then Skills. Code execution has to be on.
 - **Microsoft Copilot, ChatGPT, Gemini, or no installs allowed:** download `unpaid-intern-no-install-kit.zip` and follow the README inside.
 - **Cursor, GitHub Copilot, Gemini CLI, and other coding agents:** run `npx skills add kevinmmiddleton/unpaid-intern`.
 

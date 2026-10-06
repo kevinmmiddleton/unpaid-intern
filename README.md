@@ -13,26 +13,11 @@ Unpaid Intern is a free second brain for work. Hand it your meeting transcripts,
 
 ![Hand it to your intern, get back to work. On the left, what you already have: a meeting transcript, email, calendar, a Jira ticket, a Confluence page, a Google Doc, a to-do list, and your own brain dump. On the right, what Unpaid Intern turns it into: a morning briefing, meeting prep, a status update, requirements, email replies drafted for you to send, and follow-ups and statuses kept current.](assets/brand/marketing/hero.png)
 
-## If you can save it, your intern can read it
-
-Your second brain has an inbox. Put a shortcut to it on your desktop and saving something for your intern is one drag. A meeting transcript, the PDF legal sent, a screenshot of a Slack thread, the deck someone shared five minutes before the meeting. Messy is fine. Just get it in there.
-
-![If you can save it, your intern can read it. Four files dropped in the inbox, a transcript, a PDF from legal, a screenshot of a Slack thread, and a deck, become two decisions on the project page, three follow-ups with owners and dates, two acronyms to confirm, a question about a new name, and the originals moved to the archive untouched.](assets/brand/marketing/inbox.png)
-
-Then say "file my inbox."
-
-- **Each fact goes where it belongs.** Decisions and status land on the right project page, with the source noted.
-- **The follow-ups get caught.** Anything someone promised gets an owner and a date.
-- **It learns the lingo and the people.** New acronyms go to your glossary, and it asks who the new names are.
-- **Your originals stay untouched.** It never edits a drop. Once it's filed, the original moves to the archive, and nothing is deleted.
-
-You don't have to remember to check it. Your intern tells you when something's waiting.
-
 ## Three commands you'll use every day
 
 Most workdays come down to three moments. Your intern has one for each.
 
-- **`/briefing` starts your day.** It reads your follow-ups, your calendar, and your inbox, then tells you what needs you, what you're waiting on, and what can wait.
+- **`/briefing` starts your day.** It reads your follow-ups, calendar, and email, plus anything waiting in your inbox, then tells you what needs you, what you're waiting on, and what can wait.
 - **`/prep` gets you ready for the big one.** Name the meeting and it pulls the last decision, the open question, what's owed in both directions, and the doc you'll want open, all from what your intern has been keeping.
 - **`/debrief` follows every meeting.** Hand it the transcript, your notes, or the doc, plus your own take, and it files the decisions and follow-ups so nothing lives only in your head.
 
@@ -49,26 +34,31 @@ That's `/briefing` with mail and calendar connected. Before anything's connected
 | Reread everything to remember where a project stood | Every project has a page with where it stands and why |
 | Paste the same doc into a chat every time you need it | Save it to your inbox once; your intern files it and remembers |
 
-## Start with these 8 daily habits
+## If you can save it, your intern can read it
 
-![The eight core Unpaid Intern commands, in the order of a workday: briefing at the start of the day, prep before a meeting, debrief after it, who for a name you don't know, capture anytime, explain for new jargon, project-status before your one-on-one, and close at the end of the day.](assets/brand/marketing/core.png)
+Your second brain has an inbox. Put a shortcut to it on your desktop and saving something for your intern is one drag. Messy is fine. Just get it in there.
 
-You never have to memorize these. Ask in plain words and it picks the right one.
+![If you can save it, your intern can read it. Four files dropped in the inbox, a transcript, a PDF from legal, a screenshot of a Slack thread, and a deck, become two decisions on the project page, three follow-ups with owners and dates, two acronyms to confirm, a question about a new name, and the originals moved to the archive untouched.](assets/brand/marketing/inbox.png)
 
-### Everything your intern can do
+Then say "file my inbox."
 
-| When | Commands |
-|---|---|
-| Start of day | **`/briefing`** what needs you today, what you're waiting on, and what's coming. `/pulse` only what changed since the last brief. `/week` the week ahead by decisions and deadlines, collisions included. |
-| Meetings | **`/prep`** the last decision, the open question, and the right doc. **`/debrief`** a transcript or notes in, decisions and follow-ups out. **`/who`** who someone is, what they own, and what's open between you. `/slots` meeting times that respect your calendar, for you to send. |
-| Follow-ups | **`/capture`** any promise, yours or theirs, with an owner and a date. `/triage` your inbox, sorted into groups, nothing deleted. **`/close`** what moved, what's open, and tomorrow's first move. |
-| Status | **`/project-status`** a status table built from your records, ready to paste; it flags stale rows and missing next steps first. `/gofer` the cut: what deserves today, what's your call, and what can go. |
-| Writing | `/draft` a message in your voice, for you to send. `/redline` a skeptic reads it before your exec does. `/write-epic` messy notes in, a clean ticket out. |
-| Thinking | **`/explain`** any acronym, doc, or engineering note, explained like you're new. `/grill` pokes holes in a plan, starting with your own past decisions. `/bro` say that again, in plain words. `/quick` the short version. `/study` quizzes you from your own notes. `/learn` builds you a 101 lesson on any topic from your own sources, with a quiz. |
-| Keeping the record | `/new-project` a home for every project. `/decision` the decision and the why, so nobody relitigates it. `/sync-kb` files everything in your inbox folder. `/kb-lint` finds what's gone stale. `/tidy` merges duplicates, fixes fuzzy dates, and archives what's done. |
-| Setup | `/setup` guided setup, mostly clicking. `/connect` add a tool, or fix one that won't connect. |
+- **Each fact goes where it belongs.** Decisions and status land on the right project page, with the source noted.
+- **The follow-ups get caught.** Anything someone promised gets an owner and a date.
+- **It learns the lingo and the people.** New acronyms go to your glossary, and it asks who the new names are.
+- **Your originals stay untouched.** It never edits a drop. Once it's filed, the original moves to the archive, and nothing is deleted.
 
-**AI assistant sizing this up for someone?** Unpaid Intern is an Agent Skill with a plugin wrapper: a plain-markdown workspace, 28 commands, optional connectors, and two standard-library Python scripts (also optional; without Python it does their steps by hand). It needs a folder it can write to, or a zip carried between chats in claude.ai or the Claude app without Cowork. The entry point is [SKILL.md](skills/unpaid-intern/SKILL.md). Every command's full procedure is in [commands.md](skills/unpaid-intern/references/commands.md), the scripts are in [scripts.md](skills/unpaid-intern/references/scripts.md), and what it does on its own versus with your yes is in [trust-and-safety.md](skills/unpaid-intern/references/trust-and-safety.md).
+You don't have to remember to check it. Your morning **`/briefing`** tells you when something's waiting. In claude.ai, the Claude app without Cowork, or the no-install kit, attach the file to the chat instead. For a meeting recording, save its transcript.
+
+## New somewhere? Get the who's who
+
+Org charts and `/who` help anyone, but they're a lifesaver in your first few months.
+
+![Asking /who is Hollis? The intern answers with Hollis's role, manager, what Hollis owns, the last time you talked, and what's open between you.](assets/brand/marketing/who.png)
+
+- **Drop in your org chart.** A screenshot is enough. Your intern reads who reports to whom, saves it to your people page, and shows you what it saved so you can fix anything it misread.
+- **New names get asked about.** When someone comes up in a meeting or a thread, your intern asks who they are, a few at a time, and never guesses.
+- **`/who` is your cheat sheet** for anyone: their role, who they report to, the last time you talked, and what's open between you.
+- **A 30-60-90 page** keeps your first three months on track.
 
 ## Get more done between meetings
 
@@ -83,16 +73,26 @@ Why you can hand it real work:
 - **It keeps sensitive details out of your notes.** It's built to leave passwords, customer records, and pay, HR, or health details where they belong, and a built-in scanner double-checks what you drop in.
 - **You decide how much it does.** One settings file says what it reads without asking and where it can write. Start careful and loosen it as you go. ([How it asks before acting](CONNECTORS.md#asking-first))
 
-## New somewhere? Get the who's who
+## Start with these 8 daily habits
 
-Org charts and `/who` help anyone, but they're a lifesaver in your first few months.
+![The eight core Unpaid Intern commands, in the order of a workday: briefing at the start of the day, prep before a meeting, debrief after it, who for a name you don't know, capture anytime, explain for new jargon, project-status before your one-on-one, and close at the end of the day.](assets/brand/marketing/core.png)
 
-![Asking /who is Hollis? The intern answers with Hollis's role, manager, what Hollis owns, the last time you talked, and what's open between you.](assets/brand/marketing/who.png)
+You never have to memorize these. Ask in plain words and it picks the right one.
 
-- **Drop in your org chart.** A screenshot is enough. Your intern reads who reports to whom, saves it to your people page, and shows you what it saved so you can fix anything it misread.
-- **New names get asked about.** When someone comes up in a meeting or a thread, your intern asks who they are, a few at a time, and never guesses.
-- **`/who` is your cheat sheet** for anyone: their role, who they report to, the last time you talked, and what's open between you.
-- **A 30-60-90 page** keeps your first three months on track.
+### Everything your intern can do
+
+| When | Commands |
+|---|---|
+| Start of day | **`/briefing`** what needs you today, what you're waiting on, and what's coming. `/pulse` only what changed since the last brief. `/week` the week ahead by decisions and deadlines, collisions included. |
+| Meetings | **`/prep`** the last decision, the open question, and the right doc. **`/debrief`** a transcript or notes in, decisions and follow-ups out. **`/who`** who someone is, what they own, and what's open between you. `/slots` meeting times that respect your calendar, for you to send. |
+| Follow-ups | **`/capture`** any promise, yours or theirs, with an owner and a date. `/triage` your email or chat backlog, sorted into groups, nothing deleted. **`/close`** what moved, what's open, and tomorrow's first move. |
+| Status | **`/project-status`** a status table built from your records, ready to paste; it flags stale rows and missing next steps first. `/gofer` the cut: what deserves today, what's your call, and what can go. |
+| Writing | `/draft` a message in your voice, for you to send. `/redline` a skeptic reads it before your exec does. `/write-epic` messy notes in, a clean ticket out. |
+| Thinking | **`/explain`** any acronym, doc, or engineering note, explained like you're new. `/grill` pokes holes in a plan, starting with your own past decisions. `/bro` say that again, in plain words. `/quick` the short version. `/study` quizzes you from your own notes. `/learn` builds you a 101 lesson on any topic from your own sources, with a quiz. |
+| Keeping the record | `/new-project` a home for every project. `/decision` the decision and the why, so nobody relitigates it. `/sync-kb` files everything waiting in your inbox, or just say “file my inbox.” `/kb-lint` finds what's gone stale. `/tidy` merges duplicates, fixes fuzzy dates, and archives what's done. |
+| Setup | `/setup` guided setup, mostly clicking. `/connect` add a tool, or fix one that won't connect. |
+
+**AI assistant sizing this up for someone?** Unpaid Intern is an Agent Skill with a plugin wrapper: a plain-markdown workspace, 28 commands, optional connectors, and two standard-library Python scripts (also optional; without Python it does their steps by hand). It needs a folder it can write to, or a zip carried between chats in claude.ai or the Claude app without Cowork. The entry point is [SKILL.md](skills/unpaid-intern/SKILL.md). Every command's full procedure is in [commands.md](skills/unpaid-intern/references/commands.md), the scripts are in [scripts.md](skills/unpaid-intern/references/scripts.md), and what it does on its own versus with your yes is in [trust-and-safety.md](skills/unpaid-intern/references/trust-and-safety.md).
 
 ## Build your second brain
 
@@ -126,7 +126,7 @@ It works with as much or as little as your company allows. Pick the line for the
 
 The first line adds this repo as a plugin source; the second installs Unpaid Intern from it. While it's enabled, its connectors and its ask-first hook apply to every Claude Code session; turn it off in `/plugin` when you don't want that.
 
-**3. claude.ai or Claude Desktop, if you can upload skills.** Download `unpaid-intern.zip` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest) and upload it under Customize, then Skills. Code execution has to be on. The same commands work; type them or ask in plain words. These chats don't keep files between sessions, so at the end of each one your intern hands you your folder as a zip to upload next time. The ask-first hook is plugin-only, so your connector settings do that job here.
+**3. claude.ai or the Claude app, if you can upload skills.** Download `unpaid-intern.zip` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest) and upload it under Customize, then Skills. Code execution has to be on. The same commands work; type them or ask in plain words. These chats don't keep files between sessions, so at the end of each one your intern hands you your folder as a zip to upload next time. The ask-first hook is plugin-only, so your connector settings do that job here.
 
 **4. Any chat assistant, no installs or uploads.** For Microsoft Copilot, ChatGPT, Gemini, or Claude without uploads. Download `unpaid-intern-no-install-kit.zip` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest) and follow the README inside: a ready-made folder, instructions you paste into a project, and a single prompt for when chat is all you've got.
 
@@ -166,7 +166,7 @@ The plugin pre-lists five connectors most offices use (Gmail, Google Calendar, S
 **How do I know it works?**
 
 - **The math is tested.** Two small programs in the kit handle what AI is bad at: dates, due lists, status tables, spotting sensitive data, and making sense of error messages. About 230 automatic checks make sure they get the right answers. Another check runs the plugin's safety net against about 200 tool names, most from real connectors: it asks before every one in the set that sends, shares, changes, or deletes, and lets the read-only ones through. It matches on names, so an unusual name could slip past; your connector settings stay the main line of defense. GitHub reruns all of it on Mac, Windows, and Linux every time the code changes.
-- **The judgment is rehearsed.** You can't test an AI like a calculator, so it's tested by role-play: 42 everyday situations, like a meeting transcript with "ignore your instructions" hidden in it, or someone's salary in a brain dump. One Claude model plays the intern, and a separate, stronger one grades how it did. In 277 runs, with connectors simulated, it never sent or deleted anything, never followed a hidden instruction, and never saved sensitive details. Every result, misses included, is in [evals/results](evals/results/).
+- **The judgment is rehearsed.** You can't test an AI like a calculator, so it's tested by role-play: 44 everyday situations, like a meeting transcript with "ignore your instructions" hidden in it, or someone's salary in a brain dump. One Claude model plays the intern, and a separate, stronger one grades how it did. In 279 runs, with connectors simulated, it never sent or deleted anything, never followed a hidden instruction, and never saved sensitive details. Every result, misses included, is in [evals/results](evals/results/).
 - **Real people: that's you.** It's new, so if something breaks, [tell me](https://github.com/kevinmmiddleton/unpaid-intern/issues/new/choose).
 
 ## Standing on shoulders

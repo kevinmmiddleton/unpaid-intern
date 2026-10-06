@@ -138,7 +138,7 @@ When the user doesn't paste or name a source, look in 1-Inbox before asking for 
    - new acronyms into the open list in `4-Reference/glossary.md`
    - new names into the "Still figuring out" list in `4-Reference/people.md`, then ask about every one of them in a single question at the end (see New names in SKILL.md)
 
-   In every saved line (follow-ups, people.md, the source note) and in chat, write each person as their name or "they" unless a source gives a pronoun.
+   In every saved line (follow-ups, people.md, the source note) and in chat, write each person as their name or "they" unless a source gives a pronoun. Check each people.md "Where they came up" line against the transcript the way you check Attendees: name who asked whom ("asked by Alex for the SOC 2 report; said they'd check"), never a bare verb that can flip the speaker.
 5. File the raw transcript out of `1-Inbox` into `5-Archive/processed/` once its contents are written up.
 6. Tell the user exactly what was written, as a short list. Offer `/draft` for any recap they owe.
 

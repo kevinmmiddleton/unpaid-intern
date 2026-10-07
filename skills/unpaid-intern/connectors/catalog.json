@@ -42,7 +42,7 @@
      ]
     },
     {
-     "question": "Is this Claude account the one your company gave you for work?",
+     "question": "Is the account you're using here the one your company gave you for work?",
      "header": "Account",
      "multiSelect": false,
      "options": [

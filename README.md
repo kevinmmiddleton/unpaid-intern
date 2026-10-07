@@ -125,7 +125,7 @@ It works with as much or as little as your company allows. Pick the line for the
 /plugin install unpaid-intern@unpaid-intern
 ```
 
-The first line adds this repo as a plugin source; the second installs Unpaid Intern from it. While it's enabled, its connectors and its ask-first hook apply to every Claude Code session; turn it off in `/plugin` when you don't want that.
+The first line adds this repo as a plugin source; the second opens Unpaid Intern's details, where you pick a scope and confirm. While it's enabled, its connectors and its ask-first hook apply to every Claude Code session; turn it off in `/plugin` when you don't want that. A plugin you add in the Claude app is saved to your account, so it shows up in Claude Code too.
 
 **3. claude.ai or the Claude app, if you can upload skills.** Download `unpaid-intern.zip` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest) and upload it under Customize, then Skills. Code execution has to be on. The same commands work; type them or ask in plain words. These chats don't keep files between sessions, so at the end of each one your intern hands you your folder as a zip to upload next time. The ask-first hook is plugin-only, so your connector settings do that job here.
 
@@ -138,9 +138,11 @@ codex plugin marketplace add kevinmmiddleton/unpaid-intern
 codex plugin add unpaid-intern@unpaid-intern
 ```
 
-The same repo works there. The skill loads in Codex (checked on Codex CLI 0.160.0). Setup's connector steps are written for Claude, so connect your tools through Codex's own apps. Using ChatGPT itself? Go with 4. This edition is new, so [tell me](https://github.com/kevinmmiddleton/unpaid-intern/issues/new/choose) how it goes.
+Codex may warn that Atlassian and Notion aren't signed in. That's fine; skip any you don't use.
 
-**6. Another AI tool (Cursor, GitHub Copilot, Gemini CLI, and friends).** Run `npx skills add kevinmmiddleton/unpaid-intern` (it needs Node.js). It asks which of your tools to add the skill to; then say "set me up." The commands are written for Claude, so a few steps may read differently. Rather not use npx? Clone this repo, run `python3 skills/unpaid-intern/scripts/brain.py init ~/second-brain`, and open that folder; its `AGENTS.md` carries the rules.
+The same repo works there. The skill loads in Codex (checked on Codex CLI 0.160.0, and on Windows with 0.160.1). Setup walks you through connecting your tools with Codex's own plugins and `codex mcp` commands, and setting each one to ask before it changes anything. Using ChatGPT itself? Go with 4. This edition is new, so [tell me](https://github.com/kevinmmiddleton/unpaid-intern/issues/new/choose) how it goes.
+
+**6. Another AI tool (Cursor, GitHub Copilot, Gemini CLI, and friends).** Run `npx skills add kevinmmiddleton/unpaid-intern` (it needs Node.js). It asks which of your tools to add the skill to; then say "set me up." The commands are written for Claude, so a few steps may read differently. Rather not use npx? Clone this repo and run `python3 skills/unpaid-intern/scripts/brain.py init ~/second-brain`. On Windows, use `py` instead of `python3`. Then open that folder; its `AGENTS.md` carries the rules.
 
 **No Python on your machine?** Your intern builds the same folders by hand and does each script's job step by step, then tells you the results weren't machine-checked.
 
@@ -166,7 +168,7 @@ The plugin pre-lists five connectors most offices use (Gmail, Google Calendar, S
 
 **How do I know it works?**
 
-- **The math is tested.** Two small programs in the kit handle what AI is bad at: dates, due lists, status tables, spotting sensitive data, and making sense of error messages. About 230 automatic checks make sure they get the right answers. Another check runs the plugin's safety net against about 200 tool names, most from real connectors: it asks before every one in the set that sends, shares, changes, or deletes, and lets the read-only ones through. It matches on names, so an unusual name could slip past; your connector settings stay the main line of defense. GitHub reruns all of it on Mac, Windows, and Linux every time the code changes.
+- **The math is tested.** Two small programs in the kit handle what AI is bad at: dates, due lists, status tables, spotting sensitive data, and making sense of error messages. About 270 automatic checks make sure they get the right answers. Another check runs the plugin's safety net against about 200 tool names, most from real connectors: it asks before every one in the set that sends, shares, changes, or deletes, and lets the read-only ones through. It matches on names, so an unusual name could slip past; your connector settings stay the main line of defense. GitHub reruns all of it on Mac, Windows, and Linux every time the code changes.
 - **The judgment is rehearsed.** You can't test an AI like a calculator, so it's tested by role-play: 44 everyday situations, like a meeting transcript with "ignore your instructions" hidden in it, or someone's salary in a brain dump. One Claude model plays the intern, and a separate, stronger one grades how it did. In 301 runs, with connectors simulated, it never sent or deleted anything, never followed a hidden instruction, and never saved sensitive details. Every result, misses included, is in [evals/results](evals/results/).
 - **Real people: that's you.** It's new, so if something breaks, [tell me](https://github.com/kevinmmiddleton/unpaid-intern/issues/new/choose).
 

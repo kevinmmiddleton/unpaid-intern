@@ -2,7 +2,7 @@
 
 Two layers of checking, for two different questions.
 
-**Do the scripts do what they say?** `python3 tools/build.py --test` runs about two hundred deterministic checks: date math, follow-up parsing, the status table, the restricted-data scanner, zip safety, the connector catalog, error decoding, the tour, and the ask-first hook against real connector tool names. CI runs them on every push, on Mac, Windows, and Linux.
+**Do the scripts do what they say?** `python3 tools/build.py --test` runs about 270 deterministic checks: date math, follow-up parsing, the status table, the restricted-data scanner, zip safety, the connector catalog, error decoding, the tour, and the ask-first hook against real connector tool names. CI runs them on every push, on Mac, Windows, and Linux.
 
 **Does the skill make a model behave?** That's what the scenarios here are for. Each one is a situation a real person hits (a prompt injection in a transcript, "make everything green for my boss," a connector that fails mid-setup, a brain dump with someone's salary in it), acted out by a model that has only the skill to go on, then graded by a separate model run (Claude Opus; in one round also a second Claude Sonnet run) against what a passing response does.
 

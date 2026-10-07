@@ -45,6 +45,16 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+
+def utf8_console(streams=None) -> None:
+    """Windows consoles and pipes default to a narrow code page. Print UTF-8 so text never garbles or crashes there."""
+    for s in ((sys.stdout, sys.stderr) if streams is None else streams):
+        try: s.reconfigure(encoding="utf-8", errors="replace")
+        except Exception: pass
+
+
+utf8_console()
+
 HERE = Path(__file__).resolve().parent
 CATALOG_PATH = HERE.parent / "connectors" / "catalog.json"
 SETUP = "Setup"
@@ -410,7 +420,7 @@ def parse_plan(path: Path):
     if not path.exists():
         return statuses, log
     in_log = False
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in path.read_text(encoding="utf-8-sig", errors="replace").splitlines():
         if line.strip().lower() == "## log":
             in_log = True
             continue
@@ -474,7 +484,7 @@ def render_plan(cat: dict, ids: list[str], surface: str, statuses: dict, log: li
 def plan_surface(path: Path) -> str | None:
     if not path.exists():
         return None
-    m = re.search(r"for (Cowork|Claude Desktop|claude\.ai|Claude Code)\.", path.read_text(encoding="utf-8"))
+    m = re.search(r"for (Cowork|Claude Desktop|claude\.ai|Claude Code)\.", path.read_text(encoding="utf-8-sig", errors="replace"))
     return {v: k for k, v in SURFACE_NAME.items()}[m.group(1)] if m else None
 
 
@@ -557,7 +567,7 @@ def cmd_mark(args) -> int:
     note = f": {clean}" if clean else ""
     log.append(f"- {day} {tid} {status}{note}")
     surface = plan_surface(path) or "cowork"
-    made = re.search(r"^Made on (\d{4}-\d{2}-\d{2})", path.read_text(encoding="utf-8"), flags=re.M)
+    made = re.search(r"^Made on (\d{4}-\d{2}-\d{2})", path.read_text(encoding="utf-8-sig", errors="replace"), flags=re.M)
     write_lf(path, render_plan(cat, list(statuses.keys()), surface, statuses, log, made.group(1) if made else day))
     done = sum(1 for s in statuses.values() if s in ("connected", "using-fallback", "skipped"))
     print(f"{tid}: {status}. {done} of {len(statuses)} settled.")
@@ -578,7 +588,7 @@ def read_help_first(ws: Path | None) -> list[str]:
     p = ws / SETUP / "preferences.md"
     if not p.exists():
         return []
-    m = re.search(r"^- help first:\s*(.+)$", p.read_text(encoding="utf-8"), flags=re.M)
+    m = re.search(r"^- help first:\s*(.+)$", p.read_text(encoding="utf-8-sig", errors="replace"), flags=re.M)
     if not m or m.group(1).strip().startswith("<"):
         return []
     return split_help(m.group(1), load_catalog())
@@ -622,9 +632,12 @@ def build_tour(cat: dict, connected: list[str], pending: list[str], help_first: 
         wanted = bool(hf & {norm(h) for h in cmd["helps"]})
         score = (0 if wanted else 1, 0 if cmd.get("core") else 1, 0 if cmd.get("starter") else 1, -len(live))
         rows.append(dict(cmd=cmd, live=live, soon=soon, wanted=wanted, score=score))
-    start = sorted([r for r in rows if r["wanted"] or (not hf and r["cmd"].get("starter"))], key=lambda r: r["score"])[:4]
+    # "Start with these" draws only from the core eight, so it and "the rest of the core eight" add up to
+    # exactly SKILL.md's core table. A wanted extra (say /slots for meeting help) waits with the others.
+    core = [r for r in rows if r["cmd"].get("core")]
+    start = sorted([r for r in core if r["wanted"] or (not hf and r["cmd"].get("starter"))], key=lambda r: r["score"])[:4]
     if len(start) < 4:
-        extra = sorted([r for r in rows if r not in start and r["cmd"].get("starter")], key=lambda r: r["score"])
+        extra = sorted([r for r in core if r not in start and r["cmd"].get("starter")], key=lambda r: r["score"])
         start += extra[: 4 - len(start)]
 
     def reads(r):
@@ -700,7 +713,7 @@ def cmd_tour(args) -> int:
         if not ws:
             sys.exit("--write needs --workspace pointing at a workspace.")
         dest = ws / SETUP / "my-commands.md"
-        if dest.exists() and not dest.read_text(encoding="utf-8").startswith(TOUR_MARK):
+        if dest.exists() and not dest.read_text(encoding="utf-8-sig", errors="replace").startswith(TOUR_MARK):
             dest = ws / SETUP / "my-commands-new.md"
         write_lf(dest, text)
         print(f"Wrote {dest.relative_to(ws)}.")
@@ -762,10 +775,10 @@ DIAGNOSES = [
          means="Either your account doesn't have permission for this, or the tool only accepts traffic from your office network or VPN. Connectors in claude.ai, Claude Desktop, and Cowork come from Anthropic's cloud, not your computer, so being on VPN does not help them.",
          fix="Ask the admin to allow Claude's connector, or use the fallback. In Claude Code the connection comes from your own computer, so turning on VPN can fix it there.",
          who="The admin for that tool, or your network team", it=True),
-    dict(id="tls-inspection", pats=[r"self[- ]signed", r"SELF_SIGNED_CERT_IN_CHAIN", r"UNABLE_TO_GET_ISSUER_CERT", r"unable to verify the first certificate", r"CERTIFICATE_VERIFY_FAILED", r"certificate verify failed", r"unable to get local issuer", r"\bx509\b", r"ERR_TLS"],
-         title="Your company inspects secure traffic, and Claude Code doesn't trust it yet",
-         means="Many companies check encrypted traffic with their own certificate. This only affects tools running on your computer, like Claude Code.",
-         fix="Ask IT: \"Claude Code fails certificate checks behind our traffic inspection. Which root certificate file should I point NODE_EXTRA_CA_CERTS at?\" Then set that before starting Claude Code.",
+    dict(id="tls-inspection", pats=[r"self[- ]signed", r"SELF_SIGNED_CERT_IN_CHAIN", r"UNABLE_TO_GET_ISSUER_CERT", r"unable to verify the first certificate", r"CERTIFICATE_VERIFY_FAILED", r"certificate verify failed", r"unable to get local issuer", r"\bx509\b", r"ERR_TLS", r"UnknownIssuer", r"invalid peer certificate"],
+         title="Your company inspects secure traffic, and Claude Code or Codex doesn't trust it yet",
+         means="Many companies check encrypted traffic with their own certificate. This only affects tools running on your computer, like Claude Code and Codex.",
+         fix="Ask IT: \"My AI tool fails certificate checks behind our traffic inspection. Which root certificate file should I use?\" Then point NODE_EXTRA_CA_CERTS (Claude Code) or CODEX_CA_CERTIFICATE (Codex) at that file before starting it.",
          who="Your IT or network team", it=True),
     dict(id="proxy", pats=[r"\b407\b", r"proxy authentication", r"proxy error", r"tunneling socket", r"HTTPS?_PROXY"],
          title="Your company network needs a proxy setting",
@@ -790,7 +803,7 @@ DIAGNOSES = [
     dict(id="oauth-client", strong=[r"redirect_uri", r"dynamic client registration", r"invalid_client", r"AADSTS50011"], pats=[r"unauthorized_client", r"client registration", r"registration (is )?not supported", r"client[_ ]id"],
          title="This tool won't let Claude register itself",
          means="Some tools (Slack, Asana, and Box among them) do not let apps sign up automatically, so adding them by web address, or from a plugin inside Claude Code, fails.",
-         fix="Use the tool from Claude's connector directory instead of adding the address by hand. In Claude Code, connect it on claude.ai with the same account and it shows up in /mcp. If neither works, an admin creates an app and shares a client ID.",
+         fix="Use the tool from Claude's connector directory instead of adding the address by hand. In Claude Code, connect it on claude.ai with the same account and it shows up in /mcp. In Codex, install the tool's plugin from Codex's own directory (/plugins) if it has one, otherwise use the fallback. If none of these works, an admin creates an app and shares a client ID (in Codex, pass it with `--oauth-client-id`, and give the admin the callback URL Codex prints).",
          who="Nobody if the directory has it; otherwise the tool's admin", it=False),
     dict(id="callback-port", pats=[r"EADDRINUSE", r"address already in use", r"port \d+ (is )?(in use|already)", r"callback (server|port)"],
          title="Another sign-in is already in progress",
@@ -807,11 +820,11 @@ DIAGNOSES = [
          means="Some tools only offer connectors on higher plans.",
          fix="Use the fallback. If it matters, ask the tool's owner whether the company plan includes it.",
          who="Whoever owns that tool's subscription", it=False),
-    dict(id="no-python", pats=[r"code execution", r"python3?: command not found", r"command not found: python", r"no module named", r"python (is )?not (available|found|installed)"],
+    dict(id="no-python", pats=[r"code execution", r"python3?: command not found", r"command not found: python", r"no module named", r"python (is )?not (available|found|installed)", r"python was not found", r"\bpy(thon3?)?'? is not recognized as"],
          title="Scripts can't run here",
-         means="Code execution is off, or Python isn't installed. The second brain still works; the scripts just do the date math and checks.",
-         fix="Turn on code execution in Claude's settings (an Owner does this on company plans), or carry on by hand.",
-         who="Your Claude Owner, if it's off for everyone", it=False),
+         means="Code execution is off, or Python isn't installed under that name. The second brain still works; the scripts just do the date math and checks.",
+         fix="Try `python`, then `py -3`, in place of `python3` (on Windows, `python3` is often a Microsoft Store shortcut). If none runs on your own computer, Python isn't installed there: carry on by hand, or ask IT for Python 3. In a web chat, turn on code execution in Claude's settings (an Owner does this on company plans).",
+         who="IT, if Python isn't on your work computer; your Claude Owner, if code execution is off for everyone", it=False),
     dict(id="empty", pats=[r"no results", r"returned nothing", r"\b0 results", r"can'?t find (any|my)", r"cannot see", r"is empty"],
          title="It connected, but found nothing",
          means="Usually not an error: the connector sees only what you can see, in the region and workspace you signed in to.",
@@ -854,6 +867,7 @@ DIAGNOSIS_EXAMPLES = [
     ("claude-owner", "This connector is greyed out. Contact your owner to enable it."),
     ("blocked-network", "HTTP 403 Forbidden: IP address is not allowed"),
     ("tls-inspection", "Error: SELF_SIGNED_CERT_IN_CHAIN self signed certificate in certificate chain"),
+    ("tls-inspection", "client error (Connect): invalid peer certificate: UnknownIssuer"),
     ("proxy", "407 Proxy Authentication Required"),
     ("unreachable", "getaddrinfo ENOTFOUND mcp.example.com"),
     ("expired", "401 Unauthorized: invalid_token, the access token has expired"),
@@ -865,6 +879,9 @@ DIAGNOSIS_EXAMPLES = [
     ("plan-gate", "This feature is not available on your plan. Upgrade to Business."),
     ("plan-gate", "This feature isn't available on your current Smartsheet plan."),
     ("no-python", "bash: python3: command not found"),
+    ("no-python", "Python was not found; run without arguments to install from the Microsoft Store"),
+    ("no-python", "python3 : The term 'python3' is not recognized as the name of a cmdlet, function, script file, or operable program."),
+    ("no-python", "'py' is not recognized as an internal or external command, operable program or batch file."),
     ("empty", "The search returned nothing, 0 results"),
     ("wrong-address", "Unexpected token < in JSON at position 0"),
     ("not-assigned", "AADSTS50105: The signed in user is not assigned to a role for the application"),
@@ -973,32 +990,46 @@ def cmd_it_request(args) -> int:
     names = [c["name"].split(" (")[0] for c in chosen + unclear_tools]
     listing = ("work tools" if not names else names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1])
     who = args.name or "<your name>"
+    ai = (getattr(args, "assistant", None) or "Claude").strip() or "Claude"
+    plan_example = ("Claude Team or Enterprise workspace" if ai == "Claude" else
+                    "ChatGPT Business or Enterprise workspace, which includes Codex" if ai.lower() == "codex" else
+                    f"{ai} business or enterprise workspace")
     if args.personal:
         out = [f"Subject: Request for an approved AI account, and read-only connectors for {listing}", "",
                "Hi <IT team or app owner>,", "",
-               "I'd like to use an AI assistant to prepare for meetings and keep track of follow-ups. I'm currently on a personal Claude account, so I haven't connected any work tools. First question: is there a company-approved AI account I should use, or can we set one up (for example a Claude Team or Enterprise workspace)?", "",
+               f"I'd like to use an AI assistant to prepare for meetings and keep track of follow-ups. I'm currently on a personal {ai} account, so I haven't connected any work tools. First question: is there a company-approved AI account I should use, or can we set one up (for example a {plan_example})?", "",
                "Once that's settled, I'd like to connect these tools read-only. Each person signs in with their own account, so it only sees what I can already see.", "",
                "What I'm asking for", ""]
     else:
         out = [f"Subject: Request to approve read-only AI connectors for {listing}", "",
                "Hi <IT team or app owner>,", "",
-               "I'd like to connect a few work tools to our company's Claude account so my AI assistant can read my own mail, meetings, and work items, help me prepare for meetings, and keep track of follow-ups. Each person signs in with their own account, so it only sees what I can already see.", "",
+               f"I'd like to connect a few work tools to our company's {ai} account so my AI assistant can read my own mail, meetings, and work items, help me prepare for meetings, and keep track of follow-ups. Each person signs in with their own account, so it only sees what I can already see.", "",
                "What I'm asking for", ""]
+    def claude_only(text):
+        return ai != "Claude" and any(w in (text or "").lower() for w in ("claude", "anthropic"))
+    chosen_ids = {x["id"] for x in chosen}
     def what_needed(c):
+        if (c.get("admin") or "").startswith("Same as Gmail") and "gmail" not in chosen_ids:
+            c = dict(c, admin=by_id(cat)["gmail"]["admin"])
         if c["id"].startswith("other:"):
-            return "Is there an approved way to connect it to our AI assistant (a connector in Claude's directory, or a read-only export)?"
+            return ("Is there an approved way to connect it to our AI assistant (a connector in Claude's directory, or a read-only export)?" if ai == "Claude" else
+                    f"Is there an approved way to connect it to our AI assistant (a connector that works with {ai}, or a read-only export)?")
+        if claude_only(c.get("admin")):
+            short = c["name"].split(" (")[0]
+            where = "our ChatGPT workspace's settings (Workspace apps)" if ai.lower() == "codex" else f"our {ai} workspace's settings"
+            return f"An admin makes {short} available for {ai} in {where}. If {short}'s own admin approves new apps, they approve it there once."
         return c.get("admin") or "Approval to connect it with my own login."
     if not chosen:
         out = out[:-2]
     for n, c in enumerate(chosen, 1):
         out.append(f"{n}. {c['name']}")
         out.append(f"   What's needed: {what_needed(c)}")
-        if c.get("readonly"):
+        if c.get("readonly") and not claude_only(c["readonly"]):
             out.append(f"   Read-only: {c['readonly']}")
         url = mcp_url(c)
-        if url:
+        if url and not claude_only(url):
             out.append(f"   Connector address: {url}")
-        if c.get("docs"):
+        if c.get("docs") and not claude_only(c["docs"]):
             out.append(f"   Setup guide: {c['docs']}")
         for note in notes.get(c["id"], []):
             out.append(f"   Error I saw: {note}")
@@ -1014,8 +1045,8 @@ def cmd_it_request(args) -> int:
             "- Send, post, delete, or share anything on its own. Those tools stay off or need my approval every time.",
             "- Store customer records, credentials, or HR, legal, or health information.", "",
             ("Account: <the company-approved account, once we have one>" if args.personal else
-             "Account: <our company's Claude Team or Enterprise workspace, or 'I need to confirm which account is approved'>"),
-            "How to undo it: revoke the app in each tool's admin console. I can also disconnect it myself in Claude's settings.", "",
+             f"Account: <our company's {plan_example}, or 'I need to confirm which account is approved'>"),
+            f"How to undo it: revoke the app in each tool's admin console. I can also disconnect it myself in {ai}'s settings.", "",
             "Happy to start as a small pilot and report back on what it saves.", "", "Thanks,", who, ""]
     text = "\n".join(out)
     if args.write:
@@ -1074,7 +1105,7 @@ def cmd_mcp_json(args) -> int:
     existing = {}
     if out_path.exists():
         try:
-            existing = json.loads(out_path.read_text(encoding="utf-8"))
+            existing = json.loads(out_path.read_text(encoding="utf-8-sig"))
         except json.JSONDecodeError:
             sys.exit(f"{out_path} is not valid JSON. Fix or move it first; nothing was changed.")
         if not isinstance(existing, dict) or not isinstance(existing.get("mcpServers", {}), dict):
@@ -1122,9 +1153,9 @@ def cmd_mcp_json(args) -> int:
 # ---------------------------------------------------------------- network check (opt-in)
 
 CHECK_BANNER = """This tests the network from the computer this script runs on.
-- That is what Claude Code uses, so the results apply to Claude Code.
+- That is what Claude Code and Codex use, so the results apply to them.
 - Connectors in claude.ai, Claude Desktop, and Cowork connect from Anthropic's cloud, not your computer. A failure here does not mean they will fail.
-- If this ran inside a Claude sandbox (Cowork or claude.ai), it tested the sandbox, not your laptop. The real test runs from Claude Code on your own computer.
+- If this ran inside a sandbox (Cowork, claude.ai, or Codex's, which blocks the network unless you allow it), it tested the sandbox, not your laptop. The real test runs from Claude Code, or from Codex with network access allowed, on your own computer.
 - Nothing is signed in and no account data is sent."""
 
 
@@ -1184,7 +1215,7 @@ def probe(url: str, timeout: float):
         reason = e.reason
         text = str(reason)
         if isinstance(reason, ssl.SSLCertVerificationError) or "CERTIFICATE_VERIFY_FAILED" in text:
-            return "tls", "Certificate check failed. Likely company traffic inspection; Claude Code needs NODE_EXTRA_CA_CERTS. (Python's certificate store can differ from Claude Code's, so treat this as a strong hint.)"
+            return "tls", "Certificate check failed. Likely company traffic inspection; Claude Code needs NODE_EXTRA_CA_CERTS, and Codex needs CODEX_CA_CERTIFICATE. (Python's certificate store can differ from theirs, so treat this as a strong hint.)"
         if isinstance(reason, socket.gaierror):
             return "dns", "Could not look up the address. A VPN, a proxy, or a DNS rule is in the way."
         if isinstance(reason, (socket.timeout, TimeoutError)) or "timed out" in text:
@@ -1212,8 +1243,10 @@ def cmd_check(args) -> int:
     print()
     proxy = any(os.environ.get(k) for k in ("HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy"))
     ca = os.environ.get("NODE_EXTRA_CA_CERTS")
+    codex_ca = os.environ.get("CODEX_CA_CERTIFICATE")
     print(f"Proxy setting (HTTPS_PROXY): {'set' if proxy else 'not set'}")
-    print(f"Extra certificates (NODE_EXTRA_CA_CERTS): {'set, file found' if ca and Path(ca).exists() else ('set, but the file is missing' if ca else 'not set')}")
+    print(f"Extra certificates for Claude Code (NODE_EXTRA_CA_CERTS): {'set, file found' if ca and Path(ca).exists() else ('set, but the file is missing' if ca else 'not set')}")
+    print(f"Extra certificates for Codex (CODEX_CA_CERTIFICATE): {'set, file found' if codex_ca and Path(codex_ca).exists() else ('set, but the file is missing' if codex_ca else 'not set')}")
     print()
     bad = 0
     for i in ids:
@@ -1294,7 +1327,7 @@ def markdown_copies(cat: dict) -> dict:
     out["references/setup-questions.md"] = "\n".join(lines)
 
     lines = ["# What each command unlocks", "", GEN_NOTE, "",
-             "Use this for the tour when scripts can't run: pick the four commands that match what the person asked for help with, say what each one reads for them, and have them try one. Lead with the core eight; mention the rest only when asked.", ""]
+             "Use this for the tour when scripts can't run: pick four of the core eight that match what the person asked for help with, say what each one reads for them, and have them try one. List the other four core commands after them; mention the rest only when asked.", ""]
     for title, rows_ in (("The core eight", [c for c in cat["commands"] if c.get("core")]),
                          ("When you want more", [c for c in cat["commands"] if not c.get("core")])):
         lines += [f"## {title}", "", "| Command | What it does | Reads (when connected) | With nothing connected | Try it |", "|---|---|---|---|---|"]
@@ -1465,6 +1498,39 @@ def cmd_selftest(args) -> int:
             cmd_it_request(argparse.Namespace(workspace=str(ws), tools=None, name="Pat", write=False, personal=False, today="2026-10-06"))
         mail = buf.getvalue()
         check("IT email asks about tools the catalog doesn't know", "SAP Concur" in mail and "approved way to connect" in mail)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_it_request(argparse.Namespace(workspace=str(ws), tools=None, name="Pat", write=False, personal=True, today="2026-10-06", assistant="Codex"))
+        codex_mail = buf.getvalue()
+        check("IT email names Claude by default, and another product with --assistant",
+              "company's Claude account" in mail and "Claude's settings" in mail
+              and "Claude" not in codex_mail and "personal Codex account" in codex_mail and "Codex's settings" in codex_mail)
+        codex_both = ""
+        for personal in (False, True):
+            buf = io.StringIO()
+            with contextlib.redirect_stdout(buf):
+                cmd_it_request(argparse.Namespace(workspace=str(ws), tools="gmail,microsoft-365,slack", name="Pat", write=False, personal=personal, today="2026-10-06", assistant="Codex"))
+            codex_both += buf.getvalue()
+        check("IT email for Codex never asks IT to set up Claude, personal version too",
+              "claude" not in codex_both.lower() and codex_both.count("Gmail available for Codex in our ChatGPT workspace's settings (Workspace apps)") == 2)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_it_request(argparse.Namespace(workspace=None, tools="gmail, microsoft 365, linear, box", name="Pat", write=False, personal=False, today="2026-10-06", assistant="Codex"))
+        codex_admin = buf.getvalue()
+        check("IT email for Codex leaves out Claude-only steps, addresses, and guides",
+              "Claude" not in codex_admin and "claude.com" not in codex_admin and "https://mcp.box.com" in codex_admin)
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_it_request(argparse.Namespace(workspace=None, tools="google calendar, hubspot", name="Pat", write=False, personal=False, today="2026-10-06", assistant=None))
+        cal_claude = buf.getvalue()
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_it_request(argparse.Namespace(workspace=None, tools="google calendar, hubspot", name="Pat", write=False, personal=False, today="2026-10-06", assistant="Codex"))
+        cal_codex = buf.getvalue()
+        check("IT email spells out Google Calendar's steps when Gmail isn't in it, and Codex's leaves out Anthropic-only addresses",
+              "Same as Gmail" not in cal_claude + cal_codex and "Google Workspace admin" in cal_claude
+              and "Google Calendar available for Codex" in cal_codex and "anthropic" not in cal_codex.lower() and "mcp.hubspot.com/anthropic" in cal_claude)
+        check("IT email for Codex asks about a plan OpenAI sells", "a ChatGPT Business or Enterprise workspace, which includes Codex" in codex_mail)
         check("IT email keeps unclear failures apart from approvals", "Also not working yet" in mail and mail.index("Salesforce", mail.index("What I")) > mail.index("Also not working yet"))
         m2 = match_answers(cat, ["sales force", "nothing really"])
         check("match joins split names and skips 'nothing really'", m2["ids"] == ["salesforce"] and not m2["unknown"])
@@ -1517,6 +1583,22 @@ def cmd_selftest(args) -> int:
             sys.stdout = old
             sys.stderr = olderr
         check("mcp-json refuses an odd file instead of crashing", ok_bad and bad.read_text(encoding="utf-8") == '{"mcpServers": null}')
+        # Windows PowerShell can save a byte-order mark, or the ANSI code page without -Encoding utf8
+        bom_mj = Path(tmp) / "bom.json"
+        bom_mj.write_bytes(b"\xef\xbb\xbf" + json.dumps({"mcpServers": {}}).encode("utf-8"))
+        (ws / SETUP / "preferences.md").write_bytes(b"\xef\xbb\xbf# Preferences\n- note: caf\xe9 \x93quotes\x94\n- help first: Status updates\n")
+        try:
+            sys.stdout = quiet
+            sys.stderr = quiet
+            cmd_mcp_json(argparse.Namespace(tools="linear", output=str(bom_mj), write=True, full_access=False, plugin=False))
+            bom_ok = "linear" in json.loads(bom_mj.read_text(encoding="utf-8"))["mcpServers"]
+        except SystemExit:
+            bom_ok = False
+        finally:
+            sys.stdout = old
+            sys.stderr = olderr
+        check("files saved by Windows PowerShell (byte-order mark, ANSI bytes) still read",
+              bom_ok and read_help_first(ws) == ["Status updates"])
         quiet.close()
 
     # commands and tour
@@ -1547,6 +1629,29 @@ def cmd_selftest(args) -> int:
     check("someone new starts with /who and /explain", [r["cmd"]["command"] for r in ramp[:2]] == ["/who", "/explain"])
     start2, *_ = build_tour(cat, [], [], [])
     check("tour with nothing connected still has starters", len(start2) == 4 and all(r["cmd"].get("starter") for r in start2))
+    core_cmds = {c["command"] for c in cat["commands"] if c.get("core")}
+    every_pick = [split_help(x, cat) for x in ("", "Meeting prep and notes", "Tracking follow-ups", "A morning brief",
+                                               "Status updates", "Yes, still ramping up", "Meeting prep and notes, A morning brief")]
+    check("tour's starters come only from the core eight, for every help-with answer",
+          all({r["cmd"]["command"] for r in build_tour(cat, [], [], hf)[0]} <= core_cmds for hf in every_pick))
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        cmd_tour(argparse.Namespace(workspace=str(Path(tempfile.gettempdir()) / "no-such-workspace"), connected=None,
+                                    help_first="Meeting prep and notes", write=False, json=False))
+    page = buf.getvalue().split("There are ", 1)[0]
+    shown = set(re.findall(r"\*\*(/[a-z-]+)\*\*", page))
+    check("tour's core sections show exactly the core eight (meeting help no longer adds /slots)", shown == core_cmds and "/slots" not in page)
+
+    class Stubborn:
+        def reconfigure(self, **kw):
+            raise ValueError("no")
+    wrapped = io.TextIOWrapper(io.BytesIO(), encoding="cp1252")
+    try:
+        utf8_console([io.StringIO(), None, Stubborn(), wrapped])
+        survived = True
+    except Exception:
+        survived = False
+    check("the UTF-8 console switch never crashes, and switches what it can", survived and wrapped.encoding.lower() == "utf-8")
 
     copies = markdown_copies(cat)
     check("markdown copies are current (run export-md)", all((HERE.parent / rel).exists() and (HERE.parent / rel).read_text(encoding="utf-8") == text for rel, text in copies.items()))
@@ -1576,12 +1681,6 @@ def cmd_selftest(args) -> int:
 # ---------------------------------------------------------------- main
 
 def main(argv=None) -> int:
-    for stream in (sys.stdout, sys.stderr):  # Windows consoles and pipes default to a narrow code page
-        if hasattr(stream, "reconfigure"):
-            try:
-                stream.reconfigure(encoding="utf-8", errors="replace")
-            except Exception:
-                pass
     parser = argparse.ArgumentParser(description="Connect work tools to the second brain, and fix them when they don't connect.")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
@@ -1630,6 +1729,7 @@ def main(argv=None) -> int:
     p.add_argument("--workspace", default=".")
     p.add_argument("--name")
     p.add_argument("--personal", action="store_true", help="lead with asking for an approved AI account")
+    p.add_argument("--assistant", default="Claude", help="the AI product the email names (default: Claude), for example Codex")
     p.add_argument("--write", action="store_true")
     p.add_argument("--today", help="override today's date, YYYY-MM-DD")
     p.set_defaults(func=cmd_it_request)

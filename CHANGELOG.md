@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.3.3
+
+Windows and Codex fixes from the first outside field test.
+
+- Scripts run on any host. The skill says where its scripts live outside Claude (the folder next to SKILL.md), and finds Python by trying `python3`, then `python`, then `py -3`, since on Windows `python3` is often a Microsoft Store shortcut.
+- The folder tree in the skill's instructions and the arrows in `brain.py check` are plain text now, so Windows PowerShell shows them cleanly.
+- On Windows PowerShell, the skill reads and writes workspace files as UTF-8, and the scripts read files saved with a byte-order mark.
+- No more timezone warning on every command. Without the timezone data, times come from the computer's clock, and `brain.py now` says so once per workspace.
+- Setup's account question asks about "the account you're using here", so it reads right in Codex too. When the first win is meeting prep and there's no invite, your intern preps the recurring meeting from your brain dump and lists what to paste, or offers a /briefing instead.
+- The tour's "Start with these" draws only from the core eight, so it and the rest of the core eight add up to exactly eight.
+- `brain.py due` lists everything you're waiting on, with who, what, and when, not just a count.
+- `brain.py when` turns vague spans ("next quarter", "next month", "later this year") into a labeled range, such as Q1 2027 (estimate), with its first and last dates. "By Thursday" stays a day.
+- `brain.py check` shows moves as `source -> destination` and labels the files setup created apart from what the session wrote.
+- `/learn` lessons take up to about 20 minutes, depending on how much your sources cover.
+- The README's Codex steps mention the sign-in warning for Atlassian and Notion, and the Windows `py` command.
+- Setup has a Codex branch: where to make the folder, connecting tools through Codex's plugin directory or with `codex mcp add` and `codex mcp login`, and setting each one to ask before writes in Codex's config, since the plugin's ask-first hook doesn't run there. The IT email can name the product you use (`connect.py it-request --assistant Codex`), and then asks for that product's admin steps instead of Claude's. `connect.py check` and the error decoder name Codex's certificate setting, `CODEX_CA_CERTIFICATE`.
+- A `/briefing` over its word cap keeps every waiting item that's late, stale, not yet agreed, or due inside the window, and sums up the rest in one line.
+- Setup says a scheduled brief that reads your folder works only while the computer is awake and the Claude desktop app is open, and to set it up from the desktop app.
+- `brain.py when` reads "end of year" and "EOY". The error decoder recognizes Windows' "is not recognized" message for a missing Python.
+
 ## 1.3.2
 
 - People stay "they" until a source gives a pronoun. `/debrief` and `/sync-kb` repeat the rule where they write follow-ups, people pages, and source notes.

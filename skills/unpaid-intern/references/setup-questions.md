@@ -25,7 +25,7 @@ Ask one screen at a time. With a picker, use these exact labels; without one, sh
 3. Documents on this computer: A plain folder on this computer. Simple, but only on this machine.
 4. Not sure, help me pick: I'll explain the trade-offs in two lines and suggest one.
 
-**Is this Claude account the one your company gave you for work?** (pick one)
+**Is the account you're using here the one your company gave you for work?** (pick one)
 
 1. Yes, company account: Your company set it up (often called Team or Enterprise).
 2. No, it's my own: A personal account. We'll keep sensitive work data out until that changes.

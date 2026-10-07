@@ -178,7 +178,7 @@ def test() -> int:
 
 
 def check_frontmatter() -> int:
-    """Skill and command frontmatter: required fields, limits, and no em dashes in user-facing copy."""
+    """Skill and command frontmatter: required fields, limits, no em dashes in user-facing copy, and no tree or arrow glyphs."""
     problems = []
     text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
     m = re.match(r"^---\n(.*?)\n---\n", text, re.S)
@@ -200,6 +200,13 @@ def check_frontmatter() -> int:
               *sorted((ROOT / "commands").glob("*.md"))]:
         if "—" in p.read_text(encoding="utf-8"):
             problems.append(f"{p.relative_to(ROOT)} has an em dash")
+    # Windows PowerShell 5.1 reads BOM-less UTF-8 as the ANSI code page, so tree lines and arrows garble for an
+    # agent reading the skill there. Keep them out of what agents read. Curly quotes and other text are fine.
+    for p in [SKILL / "SKILL.md", *sorted((SKILL / "references").glob("*.md")), *sorted((ROOT / "commands").glob("*.md"))]:
+        for n, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+            bad = sorted({f"U+{ord(ch):04X}" for ch in line if 0x2500 <= ord(ch) <= 0x257F or 0x2190 <= ord(ch) <= 0x21FF})
+            if bad:
+                problems.append(f"{p.relative_to(ROOT).as_posix()}:{n} has box-drawing or arrow characters ({', '.join(bad)}); use plain indents and ->")
     for msg in problems:
         print("  FAIL ", msg)
     print(f"frontmatter and copy checks: {'ok' if not problems else str(len(problems)) + ' problem(s)'}")

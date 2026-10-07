@@ -101,6 +101,8 @@ What to look for in the tools most offices connect (names change, so read the li
 
 **In Claude Code:** the per-tool settings on claude.ai do not carry over to Claude Code sessions, so write tools can run without a prompt there. The Unpaid Intern plugin closes that gap with its ask-first hook (see `references/trust-and-safety.md`). Without the plugin, add `permissions.ask` rules for each write tool to `.claude/settings.local.json`, for example `"ask": ["mcp__slack__slack_send_message"]`.
 
+**In Codex:** the plugin's ask-first hook doesn't run there (Codex reports its "ask" as unsupported and lets the tool run). Set each connected tool to ask before writes with `default_tools_approval_mode = "writes"` in Codex's config; the exact lines are in step 3 of 5c in `references/setup.md`.
+
 Then add the row to the Connected tools table in `Setup/guardrail-profile.md`, with scope "read, ask first".
 
 ## What happens behind the scenes
@@ -108,7 +110,7 @@ Then add the row to the Connected tools table in `Setup/guardrail-profile.md`, w
 - **Connector traffic comes from Anthropic's cloud,** not the user's computer. That is why servers behind a VPN fail, why vendor IP allowlists can block a connection without a clear error, and why some Microsoft tenants need Conditional Access adjusted for Anthropic's published IP range.
 - **Sign-in is per person.** After an admin approves the app, each person signs in and sees only what their own account can see.
 - **Some vendors meter it.** MCP calls can count against API limits, AI credits, or seat-based quotas (for example design tools with tight limits on viewer seats). If a connector stops partway through the day, check limits before debugging.
-- **Claude Code is the exception.** It connects from the user's own computer, so VPNs, company proxies, and traffic inspection matter there and not in the Claude apps. `connect.py check` tests the network from that computer. The usual fixes come from IT: a proxy address for `HTTPS_PROXY`, and the company root certificate for `NODE_EXTRA_CA_CERTS`.
+- **Claude Code and Codex are the exception.** They connect from the user's own computer, so VPNs, company proxies, and traffic inspection matter there and not in the Claude apps. `connect.py check` tests the network from that computer. The usual fixes come from IT: a proxy address for `HTTPS_PROXY`, and the company root certificate for `NODE_EXTRA_CA_CERTS` (Claude Code) or `CODEX_CA_CERTIFICATE` (Codex).
 - **Writes are a separate decision.** Several connectors ship with write tools off until an admin turns them on. Leave them off unless the guardrail profile says otherwise.
 
 ## Claude plan and admin rules

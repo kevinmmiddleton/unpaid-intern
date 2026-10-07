@@ -51,7 +51,7 @@ CALENDAR
 - 13:00 to 14:00 collides with the vendor call; both are yours
 
 WAITING ON OTHERS
-- Security review notes from Priya, 2 business days late (email 10/01)
+- Security review notes from Priya, 2 business days late (email, waiting since 2026-10-01)
 
 PREP FOR TOMORROW
 - Pricing review at 9:00: skim the margin sheet; you will be asked whether tier 2 stays
@@ -63,7 +63,7 @@ IN YOUR INBOX
 - 3 new files: vendor-deck.pdf and two transcripts. Want me to file them?
 ```
 
-Rules: lead with the three things that matter most. Keep under the word cap in preferences (default 150). Omit empty sections. Separate calendar facts, commitments, and suggestions. Quote short asks verbatim; never quote long passages. Do not write state unless asked. Only items the `due` output prints go under its window label ("Due by Thu Oct 8"); an item outside that window goes on its own line, quoted from the `due` output's "After the window" list, weekday included. When `brain.py due` reports files waiting in 1-Inbox, end the brief with one line naming them and offer to file them. Filing is `/sync-kb` (or `/debrief` for a transcript), and only after a yes.
+Rules: lead with the three things that matter most. Keep under the word cap in preferences (default 150). Omit empty sections. Separate calendar facts, commitments, and suggestions. Quote short asks verbatim; never quote long passages. Do not write state unless asked. Under WAITING ON OTHERS, cover every item the `due` output lists under a "Waiting on others" heading, with who, what, and when as it prints them. If that would go over the word cap, keep in full every one that's past due, stale, not yet agreed, or due by the window date in the `due` header, and sum up the rest in one line: how many, and the soonest, as the script prints it. Only items the `due` output prints go under its window label ("Due by Thu Oct 8"); an item outside that window goes on its own line, quoted from the `due` output's "After the window" list, weekday included. When `brain.py due` reports files waiting in 1-Inbox, end the brief with one line naming them and offer to file them. Filing is `/sync-kb` (or `/debrief` for a transcript), and only after a yes.
 
 ### /pulse
 
@@ -286,21 +286,21 @@ Five questions from local sources, one at a time. Wait for each answer. Correct 
 
 ### /learn
 
-A 101 lesson on any topic, built from what the user already has. The output is one HTML file they open in a browser and finish in about 20 minutes. The point is the sentence they can say when someone calls on them. It is not a textbook. `/study` is a question loop in chat; `/learn` writes a file, and `/study` is the follow-up.
+A 101 lesson on any topic, built from what the user already has. The output is one HTML file they open in a browser and finish in up to about 20 minutes, depending on how much their sources cover. The point is the sentence they can say when someone calls on them. It is not a textbook. `/study` is a question loop in chat; `/learn` writes a file, and `/study` is the follow-up.
 
 Plain-language triggers: "make me a 101 on...", "teach me this from zero", "help me get up to speed on...", "I need to level up on...".
 
 1. **Name the topic** in the user's words. One topic per lesson. A second topic becomes its own lesson, linked, not extra slides.
 2. **Gather.** In the retrieval order: what they pasted or dropped, then the project folder if the topic belongs to one (`current.md`, `decisions.md`, `sources.md`, `context-map.md`) and that project's rows in `Memory/project-status.md` and `Memory/followups.md`, then `4-Reference/` (glossary, people, source notes), `Memory/meetings.md`, and `Memory/decisions.md`, then live searches of connected tools (wiki, tracker, mail, chat) for the topic. Read only. Never post, comment, or change anything in a connected tool while gathering.
 3. **Check in once, before writing.** In one short message: the sources you found (a line each), the one mix-up this lesson exists to stop (two things with the same nickname, what's live versus what's next, whose job something is), and what they want to be able to answer. Offer your guess for each. Name any open follow-up on the topic in the `due` script's own words (late, or waiting since a date), so the lesson reflects it. If the sources are thin, say what's missing; build only the slides those sources support.
-4. **Copy `assets/lesson-101.html`** to `4-Reference/learn/<slug>-101.html` (or the folder the user names). `<slug>` is short, lowercase, with hyphens. Set `const STORAGE = 'lesson-<slug>-v1'`, the `<title>`, and both places the shell says `Topic 101` to `<Topic> 101`. The subtitle is who it's for and about how long it takes. Fill the slides; don't touch the script.
+4. **Copy `assets/lesson-101.html`** to `4-Reference/learn/<slug>-101.html` (or the folder the user names). `<slug>` is short, lowercase, with hyphens. Set `const STORAGE = 'lesson-<slug>-v1'`, the `<title>`, and both places the shell says `Topic 101` to `<Topic> 101`. The subtitle is who it's for and about how long it takes (up to about 20 minutes; a lesson from thin sources is shorter). Fill the slides; don't touch the script.
 5. **Slides, in this order.** Drop a block that has nothing true to say. Don't add slides to look complete. Keep `data-id`, `data-group`, and `data-title` on every `section.slide`; the sidebar builds itself from them.
    1. **Start.** One sentence on what it is, in the learner's job. A `.plain` box whose first `<strong>` reads `30-second version`, holding the words they can say out loud. A `.tag` only when a status or date matters and a source states it.
    2. **Plain English.** The same idea, shorter, with one `.diagram` in plain text. Expand every acronym the first time; confirmed meanings come from the glossary.
    3. **The split.** A two-column table for the mix-up, then one `.callout.warn` that starts with what not to say and gives the sentence to say instead.
    4. **If asked.** The question a meeting will actually ask, then a `.say-this` answer in the user's voice.
    5. **Yours / not yours.** Who owns what, or what's in scope, from `4-Reference/people.md` and the sources. Skip it if the topic has no ownership split.
-   6. **Quiz.** Six to eight questions over one or two slides. Each one is a common wrong belief, not trivia. Exactly one `data-correct="true"` per question, unique `data-qid` values, and a `data-explain` that teaches in a sentence or two instead of pointing at a slide.
+   6. **Quiz.** Up to eight questions over one or two slides, as many as the sources support. Each one is a common wrong belief, not trivia. Exactly one `data-correct="true"` per question, unique `data-qid` values, and a `data-explain` that teaches in a sentence or two instead of pointing at a slide.
    7. **Score.** The shell renders the score. Add two or three next actions (a `/study` round on the same sources is a good last one) and a `.src` line naming every source.
 
    Each teaching slide stays under about 150 words: one idea, short sentences, no pep talk. Flip cards (`.cards` of `.card` buttons, short form on the front, plain meaning on the back) are for acronyms only.
@@ -452,5 +452,6 @@ Connect another tool, pick up the plan, or fix a tool that will not connect. Nev
 5. Anything blocked goes into one email: `connect.py it-request --write`. The person sends it.
 6. When something new connects, re-run `connect.py tour --write` and say in one line what it just unlocked ("`/prep` now reads your Jira tickets too").
 7. Claude Code users: `connect.py mcp-json --tools ... --write` writes a merge-safe `.mcp.json` using read-only addresses where they exist. If they hit network or certificate errors, offer `connect.py check`, which tests the network from their own computer.
+8. Codex users: follow the "In Codex" paragraph at the top of setup Step 5 in `references/setup.md`: connect through Codex's plugin directory first, otherwise with `codex mcp add` and `codex mcp login`, lock each tool down in Codex's config, and add `--assistant "Codex"` to the IT email.
 
 Full detail: `references/connectors.md` and the stack playbooks.

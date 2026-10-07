@@ -17,7 +17,7 @@ Some companies block Python, or the machine simply doesn't have it. The second b
 
 ## First, try the other names
 
-On Windows, `python3` is often missing while Python is installed under another name. Before falling back, try once each: `python3 --version`, `python --version`, `py -3 --version`. Use whichever answers, in place of `python3`, for the whole session. If none answers, or code execution is turned off, use this page.
+On Windows, `python3` is often missing while Python is installed under another name, or it's a Microsoft Store shortcut that prints "Python was not found" instead of running. Before falling back, try once each, in order: `python3 --version`, `python --version`, `py -3 --version`. Use the first that prints a Python 3 version, in place of `python3`, for the whole session (`references/scripts.md` also says where the scripts are on each host). If none does, or code execution is turned off, use this page.
 
 ## Build the folders by hand
 
@@ -63,7 +63,7 @@ If the file tools can't write either (a plain chat), give the person the no-inst
 - Take today's date from the conversation or the system, and say it with the weekday: "Today is Tuesday, October 6."
 - For any date math, write the steps out: "Due Friday the 9th. Today is Tuesday the 6th. That's 3 days away." Count business days on a short calendar list, never in your head, and show the list for every count you report. For example, waiting since Thu Sep 24, today Mon Oct 5: Fri 25, Mon 28, Tue 29, Wed 30, Thu Oct 1, Fri 2, Mon 5 = 7 business days.
 - A date that falls on a weekend is "past due over the weekend," not "0 days late."
-- Spoken deadlines (`brain.py when` by hand): "Thursday" is the coming Thursday; "next Tuesday" is the one in the following week, written with `~` and the other reading named; "end of week" is Friday; "end of month" is the month's last weekday, with `~`; "soon" or "ASAP" has no date, so write a placeholder with `~` and say it's a guess. A hedge ("I think", "maybe", "-ish", a question mark) makes any of these a guess too. Show the calendar line you used.
+- Spoken deadlines (`brain.py when` by hand): "Thursday" is the coming Thursday; "next Tuesday" is the one in the following week, written with `~` and the other reading named; "end of week" is Friday; "end of month" is the month's last weekday, with `~`; "soon" or "ASAP" has no date, so write a placeholder with `~` and say it's a guess; a vague span ("next quarter", "next month", "later this year") is a range, not a day, so name it with its first and last dates ("Q1 2027, an estimate: 2027-01-01 to 2027-03-31") and, if a follow-up needs one date, use its last weekday with `~`. A hedge ("I think", "maybe", "-ish", a question mark) makes any of these a guess too. Show the calendar line you used.
 
 ## The due list by hand
 
@@ -75,8 +75,9 @@ Read `Memory/followups.md`. Ignore lines inside `<!-- -->` comments and code fen
 4. **Waiting on others, past due:** owner `@waiting:Name` and the date has passed.
 5. **Waiting on others, stale:** not past due, but `since:` is more than five business days ago.
 6. **Waiting on others, not yet agreed:** `accepted: false` and due within the next ten business days.
-7. **Guessed dates coming up:** the date starts with `~` and falls within the next three business days. Ask the person to confirm it.
-8. **Owner not recognized:** the owner is neither `@me` nor `@waiting:Name`.
+7. **Waiting on others, due today or later:** every other open `@waiting` line. List each one with who, what, and when.
+8. **Guessed dates coming up:** the date starts with `~` and falls within the next three business days. Ask the person to confirm it.
+9. **Owner not recognized:** the owner is neither `@me` nor `@waiting:Name`.
 
 Report only the groups that have items, soonest first. A line that doesn't match the format gets mentioned, not guessed at.
 

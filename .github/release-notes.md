@@ -1,8 +1,8 @@
-# Your intern checks its work
+# Windows and Codex fixes
 
-New in 1.3.2: before your intern hands anything back, it runs a finishing check. The check lists every file it wrote or moved, so what it tells you it did is exactly what it did. It also verifies any weekday it wrote against the calendar, and flags any "he" or "she" a source didn't give. Dates stay plain unless a script printed the weekday, people stay "they" until a source says otherwise, and a follow-up never gets a recipient or a date the source didn't state. In the last round of behavior tests, all six runs passed.
+New in 1.3.3: Windows and Codex fixes from the first outside field test. Your intern finds Python under whatever name Windows gave it, and the scripts stop repeating a timezone warning. In Codex, setup now connects your tools with Codex's own plugins and commands and sets each one to ask before it changes anything. Your briefing lists everything you're waiting on, with who and when; vague deadlines like "next quarter" come back as a labeled range; and the finishing check shows each move as where it came from and where it went.
 
-New in 1.3.1, if you missed it: `/learn` builds you a 101 lesson on any topic from what you already have, and your intern keeps an eye on your inbox folder.
+New in 1.3.2, if you missed it: before your intern hands anything back, it runs a finishing check that lists every file it wrote or moved and verifies any weekday it wrote.
 
 If you're new here: your intern reads everything you hand it, preps your meetings, keeps your follow-ups, and never asks for a reference letter.
 

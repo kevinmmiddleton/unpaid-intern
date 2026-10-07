@@ -26,7 +26,7 @@ Assume the person has never set up a connector, never opened a settings page the
 
 - One step per message, and keep each one short: a few lines, not a page. Say where to click in plain words. Never show raw script output; translate it into a line or two.
 - Run every script yourself. Never ask the person to type a command.
-- Never use jargon without a plain gloss: say "connector (the link between Claude and a tool)", not "MCP server".
+- Never use jargon without a plain gloss: say "connector (the link between me and one of your tools)", not "MCP server".
 - When something fails, it is the setup's fault, not theirs. Say what it means, say who can fix it, and move on.
 - They can stop at any step. Progress lives in their folder, and `/setup` or `/connect` picks it up later.
 - Set expectations without a stopwatch: "A few questions, a brain dump, and one real result before we connect anything. Connecting your tools comes after, and you can skip it. If your company has to approve a tool, that part can take a few days."
@@ -37,7 +37,7 @@ Assume the person has never set up a connector, never opened a settings page the
 
 Use multiple-choice pickers wherever the surface has them, because clicking is easier than typing and nobody has to remember tool names.
 
-- **Get the questions from the script** so they stay consistent: `python3 "${CLAUDE_SKILL_DIR}/scripts/connect.py" screens --screen <id> --json`. Screen ids, in the order setup uses them: `home`, `about`, `everyday`, `tracked`, `role` (add `--role "<their Role answer>"`), and `yours`.
+- **Get the questions from the script** so they stay consistent: `connect.py screens --screen <id> --json`. (Finding the scripts and the right Python command on any host, Windows and Codex included: `references/scripts.md`.) Screen ids, in the order setup uses them: `home`, `about`, `everyday`, `tracked`, `role` (add `--role "<their Role answer>"`), and `yours`.
 - **With a picker** (the multiple-choice question tool in Cowork and Claude Code): send one screen per call. Each screen has at most four questions with at most four options, and every question gets an automatic Other box for typing. Keep the labels and descriptions exactly as the script gives them.
 - **Without a picker** (for example a web chat): show the same questions as numbered lists (`connect.py screens --screen <id>` prints them that way), keeping the script's wording exactly, and accept replies like "1, 3" or plain words.
 - **Turn answers into tools** with `connect.py match "<answer>" "<answer>" ...`. Pass the picked labels exactly, plus anything typed into Other. If it returns a follow-up (for example "Which note-taker?"), ask it next. If it returns something not in the catalog, say you will check Claude's connector directory for it, and fall back to exports if it is not there.
@@ -65,9 +65,10 @@ Then connect it, by surface:
 
 - **Cowork (in the Claude desktop app):** if no folder is connected, ask them to choose the folder. When the surface offers a folder-access request, use it so they get a folder picker instead of instructions. Otherwise walk them through it: open Finder (Mac) or File Explorer (Windows), go to the place they picked, make a folder called `Second Brain`, then select it in Claude.
 - **Claude Code:** the folder Claude Code is running in, if it is a dedicated, empty folder. If it is a code repository or already holds other files, suggest `~/Documents/Second Brain` and starting Claude Code there.
+- **Codex and other coding agents:** same as Claude Code: the folder Codex started in, if it is a dedicated, empty folder; otherwise suggest `~/Documents/Second Brain` and starting Codex there. Codex writes only inside the folder it started in unless they approve each write, so make the workspace there.
 - **Web chat:** files do not persist between chats. Explain the carry-forward routine in "Where the workspace lives", or suggest the desktop app if their company allows it.
 
-Create the workspace: `python3 "${CLAUDE_SKILL_DIR}/scripts/brain.py" init "<folder>"`. It never overwrites anything. If Python can't run, build the same folders by hand (`references/no-python.md`).
+Create the workspace: `brain.py init "<folder>"`. It never overwrites anything. If Python can't run, build the same folders by hand (`references/no-python.md`).
 
 Then one or two lines on what just appeared: 1-Inbox is where they drop things, Projects and Areas are where their work lives, and everything else is the assistant's record, explained in `START-HERE.md`.
 
@@ -78,7 +79,7 @@ Then offer the inbox shortcut, in one line, because it's what turns the inbox in
 
 If you can run commands on their computer (Claude Code), offer to make it for them, and only after a yes, since it writes outside the workspace. Skippable; never block setup on it.
 
-**The account check** (the second question on the `home` screen): is this the Claude account the company gave them for work?
+**The account check** (the second question on the `home` screen): is the account they're using here the one the company gave them for work?
 
 - **Yes, company account:** continue.
 - **No, it's my own, or Not sure:** keep going, but treat it as personal. Plan the tools, write the IT request, and hold off on connecting work systems until they confirm the company allows it. Connecting work mail or chat to a personal AI account is exactly the line most AI policies draw. Keep customer, confidential, and regulated data out. See "Policy check".
@@ -99,7 +100,7 @@ Ask the `about` screen: their role, what they want help with first, and whether 
 
 The fastest way to make the folders useful, and easier than a form.
 
-1. Run `brain.py now`. On a desktop surface (Cowork, Claude Code), write the timezone it reports to `Setup/preferences.md` and say so in one line ("I've set your timezone to New York; tell me if that's wrong"). On the web, the sandbox's clock isn't theirs, so ask once which city's time they work in; if they skip it, note that in the day log and don't ask again this session. Leave the other preferences on their defaults until Step 6.
+1. Run `brain.py now`. On a desktop surface (Cowork, Claude Code, Codex), write the timezone it reports to `Setup/preferences.md` and say so in one line ("I've set your timezone to New York; tell me if that's wrong"). On the web, the sandbox's clock isn't theirs, so ask once which city's time they work in; if they skip it, note that in the day log and don't ask again this session. Leave the other preferences on their defaults until Step 6.
 2. Say: "Tell me everything on your plate at work. Projects, things you owe people, things you're waiting on, the parts of your job that never end, people I should know. Talk or type, messy is fine. Ten minutes is plenty." Suggest dictation if they prefer to talk. If they're new, add: "Who have you met so far, and what do they do? Which acronyms have you been nodding along to?"
 3. Turn the deadlines they actually said into dates in one call before you show anything, passing only their words, hedges included (for example `brain.py when "Thursday I think" "end of month"`); a hedge like "I think" or "maybe" comes back as a guess. For a waiting item with no date at all, pass "soon" and call the result a placeholder. Use exactly what it prints; anything it marks as a guess keeps its `~`.
 4. Sort what they said into four piles and show the piles back in one short list before writing anything:
@@ -127,7 +128,7 @@ Don't spend a turn asking which command to try. In the same message that confirm
 - Status updates, or nothing specific: `/project-status` on the projects from the brain dump.
 - Tracking follow-ups: what's due this week, from `brain.py due`.
 - Ramping up: `/who` on someone they named.
-- Meeting prep and notes: `/prep` for their next meeting (ask them to paste the invite), or `/debrief` if they have a transcript handy.
+- Meeting prep and notes: `/prep` for their next meeting (ask them to paste the invite), or `/debrief` if they have a transcript handy. If there's no invite to paste, don't stall: prep the recurring meeting from the brain dump with what's known (who's in it, open items both ways, the outcome to seek), then list the two or three things to paste that would fill it in, like the invite, the last notes, or the agenda. Or offer `/briefing` as the first win instead.
 - A morning brief: a first `/briefing` from the brain dump.
 
 Then one line on what it adds once their tools are connected ("With your calendar connected, /prep finds the invite on its own"), and one line naming one other command they could try.
@@ -135,6 +136,14 @@ Then one line on what it adds once their tools are connected ("With your calenda
 ### Step 5: Their tools
 
 Ask first: "Want to connect your work tools now, or later? Most take a minute or two. Anything your company has to approve, I'll put in one email to IT." Later is a fine answer: mark nothing, and `/connect` picks it up.
+
+**In Codex,** there's no Claude settings page, so 5a to 5d change like this. Ask the same screens, fill "Tools I actually use", and run the plan with `--surface code`, but use it only for the order and the status column; skip its Claude steps. Then go down the plan one tool at a time:
+
+- **Codex's own plugin first.** Codex has its own plugin directory (`/plugins` in the Codex terminal app, or Plugins in the ChatGPT desktop app), with plugins for tools such as Gmail, Google Drive, and Slack. If it lists the tool, walk them through installing it and signing in; a company ChatGPT workspace may need its admin to turn the plugin on first. Use it for every tool it lists, GitHub included (it signs in without a token), except Atlassian and Notion when the Unpaid Intern plugin is installed: those come with it, so use the login in the next bullet instead of installing a second copy. It's the only route for Slack and for every tool `mcp-json` skips.
+- **Otherwise, by address.** `connect.py mcp-json --tools <ids>` prints each tool's connector address (read-only first) without writing anything; skip its Claude lines ("restart Claude Code", "connect it on claude.ai"). Connect with `codex mcp add <name> --url <address>`, then `codex mcp login <name>` if the add didn't already open a sign-in. If the plugin is installed, Atlassian and Notion come with it: skip the add and run only the login. An entry with a `headers` token (GitHub) needs `--bearer-token-env-var GITHUB_PAT` on the add and no login, plus the token steps `mcp-json` prints, with the token set before starting Codex. Never add an entry with an `oauth` block (Slack); that sign-in is registered to Claude.
+- **When neither works.** No plugin and no address, or a sign-in that fails with "invalid_client" or a registration error: mark it `needs-admin` with the note "no Codex plugin or sign-in worked for <tool>; it needs the plugin turned on, or a client ID", and give its fallback. If an admin shares a client ID, add it with `--oauth-client-id <id>`. Codex then prints an "OAuth callback URL"; the admin adds it to the app's allowed redirect addresses before the login. If the admin's app also has a client secret (HubSpot's does), the person adds `--oauth-client-secret <secret>` and runs that command in their own terminal; never ask for the secret in chat.
+
+Installs, adds, and logins change Codex's own settings, outside the folder, so start each one only after a yes. Codex shows a newly installed plugin only in a new session, and a newly added server may need one too, so do the installs and adds first (still one tool per message) and lock them down as step 3 of 5c says for Codex. Before asking for the new session, run `codex mcp list` to confirm Codex still reads its config (a table written twice stops it from starting). Then ask them to start a new Codex session in the same folder, and save the test question for after it. Back in setup, a tool still `to-do` in the plan that already has a row in the Connected tools table was installed before the restart: go straight to its test (step 4 of 5c), then record it. For the IT email, add `--assistant "Codex"`. On other hosts outside Claude, do the same with that product's own connection and approval settings.
 
 **5a. Pick.** Say: "Pick everything you use, even if you think IT won't allow it. I'll sort out what works." Then ask, one screen at a time:
 
@@ -150,7 +159,7 @@ If they name their tools in their own words instead, run `connect.py match` on t
 
 1. **Show the way in.** In Cowork, if a connector suggestion tool is available, search the connector directory for the tool and suggest it, so the person gets a Connect button instead of instructions. If the Unpaid Intern plugin is installed, the common tools are already listed under its connectors; tell them to ignore the ones they do not use. Otherwise give the plan's steps for that tool, numbered and short.
 2. **Wait for "done".** Do not stack the next tool on top.
-3. **Lock it down, by surface.** In Claude Code, the connector settings from claude.ai don't apply, so skip the settings walk: the plugin's ask-first hook (a `hooks/hooks.json` two folders above this skill's folder) is what asks there; if it's missing, offer to add `permissions.ask` rules ("Locking it down" in `references/connectors.md`). In Cowork, claude.ai, and Claude Desktop, walk them through every tool that sends, posts, deletes, shares, creates, or changes, using the steps under "Locking it down"; whether Cowork runs the plugin's hook hasn't been verified, so these settings are the guarantee there. Add a row to the Connected tools table in `Setup/guardrail-profile.md`: the tool, how it connected, scope "read, ask first" (the shipped default), and today's date.
+3. **Lock it down, by surface.** In Claude Code, the connector settings from claude.ai don't apply, so skip the settings walk: the plugin's ask-first hook (a `hooks/hooks.json` two folders above this skill's folder) is what asks there; if it's missing, offer to add `permissions.ask` rules ("Locking it down" in `references/connectors.md`). In Cowork, claude.ai, and Claude Desktop, walk them through every tool that sends, posts, deletes, shares, creates, or changes, using the steps under "Locking it down"; Anthropic's docs say plugin hooks load in Cowork, but that hasn't been tested here, so these settings stay the guarantee there. In Codex, the plugin's hook can't ask (Codex reports its "ask" as unsupported and lets the tool run), so after a yes, set each connected tool to ask before writes in Codex's config (`~/.codex/config.toml`): add `default_tools_approval_mode = "writes"` under `[plugins."unpaid-intern@unpaid-intern".mcp_servers.<name>]` for the plugin's own connectors (`atlassian`, `notion`), or under `[mcp_servers.<name>]` for one added with `codex mcp add`. For a tool connected through a plugin from Codex's directory, put the same line under `[apps._default]` (Codex's setting for every connector from its directory; say so when you ask). If they sign in to Codex with an API key instead of ChatGPT, those plugins connect directly, so the line goes under the plugin's own server table, `[plugins."<plugin>@<marketplace>".mcp_servers.<name>]` (the marketplace is `openai-curated` or `openai-api-curated`). `writes` asks before any tool the server doesn't mark read-only. Add a row to the Connected tools table in `Setup/guardrail-profile.md`: the tool, how it connected, scope "read, ask first" (the shipped default), and today's date.
 4. **Test it gently.** Every tool gets a test, including the last one. End the lock-down message with the question ("Okay if I do one small test read?") and wait for their "done" on the lock-down and a yes to the test, even if they okayed the test earlier, then do one harmless read that proves access without pulling much content: calendar, the titles of the next three meetings; mail, how many unread messages arrived today; chat, the names of three channels they are in; tracker, how many open items are assigned to them; wiki or files, the name of one recently edited page or file. Say what you found in one line.
 5. **Record it.** `connect.py mark <id> connected --workspace "<folder>"`.
 
@@ -162,7 +171,7 @@ When a tool will not connect:
 - Tell them the fallback for that tool, then move on: "Let's not let this one hold up the rest."
 - A greyed-out connector or a Request button means the company's Claude Owner has to turn it on. Mark `needs-admin`.
 
-**5d. One email to IT.** If anything is `needs-admin` or `failed`, run `connect.py it-request --workspace "<folder>" --name "<their name>" --write`. It asks for approval on the `needs-admin` tools and, separately, asks IT to look at the `failed` ones whose cause was unclear. Show them the email, point out the bracketed parts to fill in, and remind them they send it themselves. Never send it for them. Say plainly that approvals can take a few days, and that everything keeps working from files in the meantime.
+**5d. One email to IT.** If anything is `needs-admin` or `failed`, run `connect.py it-request --workspace "<folder>" --name "<their name>" --write`. It asks for approval on the `needs-admin` tools and, separately, asks IT to look at the `failed` ones whose cause was unclear. Show them the email, point out the bracketed parts to fill in, and remind them they send it themselves. Never send it for them. Outside Claude, add `--assistant "<this product>"` so the email names the product they use. Say plainly that approvals can take a few days, and that everything keeps working from files in the meantime.
 
 If the person is on a personal account (Step 1), skip connecting work systems: mark those tools `skipped` with the note "waiting on account approval", then run `connect.py it-request --tools <those ids> --personal --workspace "<folder>" --write`. That version leads with asking for a company-approved AI account.
 
@@ -175,7 +184,7 @@ This is the payoff, and it teaches them what they now have.
 3. End that same message by asking which one to try now, with the picker from `connect.py tour --workspace "<folder>" --json`, and run it for real.
 4. Right after that first try, ask the `yours` screen: brief length, what the brief always covers, when the day starts, and whether they want it every weekday morning. If a reply leaves one of the four unanswered, ask that one before writing. Write `Setup/preferences.md` (brief length as the word cap: Three lines is 60, Short is 150, Fuller is 300; always include; working hours from the day-start answer). Never skip this screen.
 5. Close with two lines: plain words work as well as commands, and the cheat sheet lives at `Setup/my-commands.md`.
-6. If they said yes to a daily brief and the surface supports scheduled tasks, set up a weekday `/briefing` just before their day starts. First make sure send, delete, and share tools are blocked or need approval in each connector. Then ask which connected tools the brief may read without asking, and mark only those as yes in the guardrail profile. A scheduled brief reads and briefs. It never sends or changes anything.
+6. If they said yes to a daily brief and the surface supports scheduled tasks, set up a weekday `/briefing` just before their day starts. Tell them in one line that a brief that reads their folder works only while the computer is awake and the Claude desktop app is open; pick a time it's usually on. Set it up from the desktop app, since a task made in Cowork on the web or phone can't use local folders. First make sure send, delete, and share tools are blocked or need approval in each connector. Then ask which connected tools the brief may read without asking, and mark only those as yes in the guardrail profile. A scheduled brief reads and briefs. It never sends or changes anything.
 7. Offer a weekly reset: Friday afternoon, `/week` for the week ahead, plus a short list of what's waiting in 1-Inbox and which projects look finished. It only proposes. Filing (`/sync-kb`) and archiving (`/tidy`) happen when the person says yes.
 8. Hand them the first week (below) as one short list, and offer the deeper setup next week: voice, partners, and exactly what the agent is allowed to do. Keep every guardrail on its default for now; don't invite them to loosen reads or writes on day one.
 
@@ -234,7 +243,7 @@ Record the date and answer in `Setup/setup-profile.md`. If the user does not kno
 
 | Surface | How | Notes |
 |---|---|---|
-| Cowork, in the Claude desktop app | Connect a folder the agent can read and write | Best experience. Scheduled tasks can run `/briefing` |
+| Cowork, in the Claude desktop app | Connect a folder the agent can read and write | Best experience. Scheduled tasks can run `/briefing` while the computer is awake and the desktop app is open (a task needs the app open to read local files) |
 | Claude Desktop chat (not Cowork) | Same as claude.ai on the web: a skill upload and a code sandbox | Files don't persist between chats; carry the workspace as a zip |
 | Claude Code | Run Claude Code in the workspace folder | Keep the workspace out of code repositories. `CLAUDE.md` imports `AGENTS.md` |
 | claude.ai on the web | Keep the workspace in a Project's files or in a packed zip. Each session, rebuild a working copy with `brain.py unpack` (or `init` plus the project files). At `/close`, run `brain.py pack --output` into the folder the user downloads from, or copy changed files back into the Project | The code sandbox does not keep files between chats. This is the route for people whose company blocks desktop apps |
@@ -263,6 +272,6 @@ A ramp so nobody stares at an empty folder.
 
 ## Making it a habit
 
-- If the surface supports scheduled tasks, offer a weekday `/briefing` at the start of the user's working hours. Scheduled runs read and brief; they never send or change external systems. Before scheduling, make sure send, delete, and share tools are set to blocked in the connector settings, because an unattended run reads mail nobody has checked. Ask which systems the scheduled brief may read, and mark only those as yes in the guardrail profile; it skips the rest and says so.
+- If the surface supports scheduled tasks, offer a weekday `/briefing` at the start of the user's working hours. A scheduled task that reads files on their computer works only while the computer is awake and the Claude desktop app is open (Anthropic's help, updated 2026-10-06). Pick a time it's usually on, and create the task in the desktop app; one created in the cloud can't use local folders. Scheduled runs read and brief; they never send or change external systems. Before scheduling, make sure send, delete, and share tools are set to blocked in the connector settings, because an unattended run reads mail nobody has checked. Ask which systems the scheduled brief may read, and mark only those as yes in the guardrail profile; it skips the rest and says so.
 - Offer one command per week, not all of them. Each one should replace a prompt the user already types.
 - Once a month, suggest `/kb-lint` and a review of `Setup/guardrail-profile.md`.

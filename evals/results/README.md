@@ -31,6 +31,8 @@ Newest first. Each round: Claude Sonnet acted out every case with only the skill
 
 **Round 18:** all six runs passed, three of each case, on the skill as it shipped in 1.3.2. Every run ended with `brain.py check`, and every reported write list matched both the check's output and the actual changes. No weekday was worked out by hand, no pronoun was guessed, and the one guessed glossary expansion was labeled as a guess. [Grades](2026-10-06/round-18-targeted/grades-targeted.md).
 
+**Since round 18:** 1.3.3's instruction changes from the first outside field test (the first win when there's no invite, `/briefing` listing every waiting item and trimming to its word cap, finding the scripts and Python on any host, the PowerShell file rule, `/learn`'s length, the scheduled-brief note, and the Codex branch in setup with its connect rules) haven't had an eval round yet. The script changes behind them are covered by the self-tests.
+
 ## 2026-10-04
 
 | Round | What changed before it | Pass | Partial | Fail |

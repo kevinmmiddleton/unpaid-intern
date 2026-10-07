@@ -23,41 +23,41 @@ The layout borrows the folders most second-brain systems use (projects, areas, r
 
 ```
 Second Brain/
-├── START-HERE.md            owner, purpose, what's in each folder, next-session intent
-├── AGENTS.md                standing rules for any agent
-├── CLAUDE.md                one line: @AGENTS.md
-├── 1-Inbox/                 raw drops, never edited; README.md explains it
-├── 2-Projects/
-│   ├── README.md
-│   ├── _template/           current.md, decisions.md, sources.md, context-map.md
-│   └── <slug>/              one folder per project (brain.py project)
-├── 3-Areas/
-│   ├── README.md
-│   ├── _template.md
-│   └── <slug>.md            one page per ongoing responsibility (brain.py area)
-├── 4-Reference/
-│   ├── INDEX.md             one line per page, the map of everything
-│   ├── glossary.md          confirmed meanings only
-│   ├── people.md            partners and what they own or decide
-│   └── sources/             clean source notes; meetings/ for meeting notes
-├── 5-Archive/
-│   ├── processed/           raw drops after /sync-kb
-│   └── projects/            finished projects (brain.py archive); nothing is deleted
-├── Memory/
-│   ├── project-status.md    one row per project
-│   ├── followups.md         commitments, one per line
-│   ├── meetings.md          short meeting ledger
-│   ├── decisions.md         decisions with reasoning, newest first
-│   ├── lessons.md           corrections and their fixes
-│   ├── scratch-today.md     today's threads, not commitments
-│   └── day-log/             one file per working day, plus _template.md
-└── Setup/
-    ├── preferences.md       voice, briefing, scheduling, notifications, tools
-    ├── guardrail-profile.md what the assistant may read, write, and send
-    ├── setup-profile.md     setup answers
-    ├── connection-plan.md   tools picked in setup, easiest first, with a status each (connect.py)
-    ├── my-commands.md       personal cheat sheet from the tour (connect.py tour)
-    └── it-request.md        blank template; connect.py it-request writes filled-in copies
+  START-HERE.md            owner, purpose, what's in each folder, next-session intent
+  AGENTS.md                standing rules for any agent
+  CLAUDE.md                one line: @AGENTS.md
+  1-Inbox/                 raw drops, never edited; README.md explains it
+  2-Projects/
+    README.md
+    _template/             current.md, decisions.md, sources.md, context-map.md
+    <slug>/                one folder per project (brain.py project)
+  3-Areas/
+    README.md
+    _template.md
+    <slug>.md              one page per ongoing responsibility (brain.py area)
+  4-Reference/
+    INDEX.md               one line per page, the map of everything
+    glossary.md            confirmed meanings only
+    people.md              partners and what they own or decide
+    sources/               clean source notes; meetings/ for meeting notes
+  5-Archive/
+    processed/             raw drops after /sync-kb
+    projects/              finished projects (brain.py archive); nothing is deleted
+  Memory/
+    project-status.md      one row per project
+    followups.md           commitments, one per line
+    meetings.md            short meeting ledger
+    decisions.md           decisions with reasoning, newest first
+    lessons.md             corrections and their fixes
+    scratch-today.md       today's threads, not commitments
+    day-log/               one file per working day, plus _template.md
+  Setup/
+    preferences.md         voice, briefing, scheduling, notifications, tools
+    guardrail-profile.md   what the assistant may read, write, and send
+    setup-profile.md       setup answers
+    connection-plan.md     tools picked in setup, easiest first, with a status each (connect.py)
+    my-commands.md         personal cheat sheet from the tour (connect.py tour)
+    it-request.md          blank template; connect.py it-request writes filled-in copies
 ```
 
 Rules for the layout:

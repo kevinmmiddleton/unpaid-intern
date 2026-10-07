@@ -14,10 +14,10 @@ Vendor details checked in October 2026. Find the symptom, try the fix, and if it
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `brain.py` not found | `${CLAUDE_SKILL_DIR}` is empty on this surface | Find `scripts/brain.py` inside the skill's own folder and run it by full path |
+| `brain.py` not found | `${CLAUDE_SKILL_DIR}` is empty on this surface (always, in Codex and other hosts) | Use the `scripts/` folder next to the SKILL.md that loaded, by full path (`references/scripts.md`) |
 | "No workspace found" | Running from the wrong folder | Pass `--workspace <folder>`, or run `init` first |
-| Scripts cannot run at all | Code execution is off, or no Python | Try `python`, then `py -3`, before giving up (Windows often has Python under another name). Otherwise follow `references/no-python.md`, which builds the folders and does each script's job by hand. On the web, code execution has to be on for skills to load at all; if it can't be, use the no-install kit |
-| Timezone warning from `now` | Zone name typo, or the system lacks timezone data | Use an IANA name like `America/Chicago`; on Windows, `pip install tzdata` if allowed; otherwise it falls back to system time |
+| Scripts cannot run at all | Code execution is off, or no Python under that name | Try `python3 --version`, then `python --version`, then `py -3 --version`, and use the first that prints a Python 3 version (on Windows, `python3` is often a Microsoft Store shortcut). Otherwise follow `references/no-python.md`, which builds the folders and does each script's job by hand. On the web, code execution has to be on for skills to load at all; if it can't be, use the no-install kit |
+| `now` says it's using this computer's clock | The timezone in preferences isn't one this computer knows: a typo, or Windows, which has no timezone database | Nothing to fix if they work in this computer's time zone; it says so once per workspace. Otherwise check the name is an Area/City one like `America/Chicago` |
 | Claude Code ignores the workspace rules | An existing `CLAUDE.md` does not import `AGENTS.md` | Add the line `@AGENTS.md` to `CLAUDE.md` |
 | Another tool overwrote `CLAUDE.md` or created `memory/` or `TASKS.md` | A plugin's start command ran in this folder. On Mac and Windows, folder names ignore capitals, so another tool's `memory/` lands inside this workspace's `Memory/` | Restore the import line, move the other tool's files out of `Memory/`, and run that plugin in a different folder |
 | `selftest` fails | The skill folder is incomplete or was edited | Reinstall the skill; if edited on purpose, read the failing check |
@@ -33,7 +33,7 @@ Vendor details checked in October 2026. Find the symptom, try the fix, and if it
 | "Need admin approval" on Microsoft | Tenant-wide consent not granted yet | Ask for the IT email and send it to a Microsoft Global Admin |
 | Connector appears but is greyed out, or shows Request | On Team or Enterprise, only Owners add it | Click Request, or ask the Claude Owner |
 | Works in the browser but the connector cannot reach the tool | The tool sits behind a VPN or an IP allowlist; connectors run from Anthropic's cloud | Ask IT to allow the connector, or use exports and the drop folder |
-| Claude Code: certificate errors such as `SELF_SIGNED_CERT_IN_CHAIN` | The company inspects secure traffic | Ask IT for the root certificate and set `NODE_EXTRA_CA_CERTS` to its path before starting Claude Code; `connect.py check` confirms |
+| Claude Code or Codex: certificate errors such as `SELF_SIGNED_CERT_IN_CHAIN` | The company inspects secure traffic | Ask IT for the root certificate and set `NODE_EXTRA_CA_CERTS` (Claude Code) or `CODEX_CA_CERTIFICATE` (Codex) to its path before starting it; `connect.py check` confirms |
 | Claude Code: timeouts or `407` | A company proxy is required | Ask IT for the proxy address and set `HTTPS_PROXY`; `connect.py check` confirms |
 | Adding Slack by web address fails with `invalid_client` | Slack does not allow automatic app registration | Use Slack from the connector directory or the plugin, not a hand-added address |
 | Claude Code: Asana or Box says it "does not support dynamic client registration" | These tools do not let apps register themselves | Connect it on claude.ai with the same Claude account; it then shows up in `/mcp` |

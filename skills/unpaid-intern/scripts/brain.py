@@ -9,12 +9,14 @@ Standard library only. Python 3.9 or newer. No network calls.
 Usage:
   brain.py init <folder> [--dry-run] [--force]   create a workspace (never overwrites)
   brain.py now [--tz Area/City]                  current date and time
-  brain.py due [--days 3] [--stale 5]            follow-ups due, overdue, and waiting
+  brain.py due [--days 3] [--stale 5]            follow-ups due, overdue, and waiting (who, what, when)
+  brain.py when "<phrase>" ...                   spoken deadlines as dates; vague spans as labeled ranges
   brain.py status [--all] [--copy]               paste-ready project table
   brain.py daylog                                create today's day log
   brain.py project "<Name>" [--slug s] [--role own]   new project folder plus its status row
   brain.py area "<Name>" [--ramp-up]             new page for an ongoing responsibility (or a 30-60-90 ramp-up page)
   brain.py archive <slug> [--force]              move a finished project to 5-Archive (never deletes)
+  brain.py check [--since ISO]                   what this session wrote or moved; weekdays verified
   brain.py lint                                  check formats, links, staleness
   brain.py scan [--path P | --stdin]             flag likely secrets and personal data
   brain.py pack [--output FILE.zip]              zip the workspace to carry it between sessions
@@ -45,6 +47,16 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+
+def utf8_console(streams=None) -> None:
+    """Windows consoles and pipes default to a narrow code page. Print UTF-8 so text never garbles or crashes there."""
+    for s in ((sys.stdout, sys.stderr) if streams is None else streams):
+        try: s.reconfigure(encoding="utf-8", errors="replace")
+        except Exception: pass
+
+
+utf8_console()
+
 SKILL_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES = SKILL_DIR / "templates"
 
@@ -59,6 +71,8 @@ SETUP = "Setup"            # preferences, guardrails, connections, cheat sheet
 PROJECT_TABLE = f"{MEMORY}/project-status.md"
 FOLLOWUPS = f"{MEMORY}/followups.md"
 SESSION_MARK = f"{MEMORY}/.session-start"  # written by `due --open`; `check` lists what changed after it
+TZ_MARK = f"{MEMORY}/.timezone-note"       # `now` says once per workspace that times come from this computer's clock
+TZ_NOTE = "Using this computer's clock for times. That's only a problem if you work in a different time zone."
 
 FOLLOWUP_RE = re.compile(
     r"^\s*-\s*\[(?P<done>[ xX])\]\s*"
@@ -102,7 +116,7 @@ def write_lf(path, text: str) -> None:
         fh.write(text)
 
 def read_text(path: Path) -> str:
-    return path.read_text(encoding="utf-8", errors="replace")
+    return path.read_text(encoding="utf-8-sig", errors="replace")  # -sig: a byte-order mark from Windows PowerShell is dropped
 
 
 def find_workspace(arg: str) -> Path:
@@ -170,15 +184,30 @@ def read_pref(ws: Path | None, key: str) -> str | None:
 
 
 def now_in(tzname: str | None):
+    """(now, label, ok). ok is False when the named zone isn't known here (Windows ships no timezone
+    database, and an unknown name fails too); the computer's own clock is used instead, so times still work."""
     if tzname:
         try:
             from zoneinfo import ZoneInfo
-            return dt.datetime.now(ZoneInfo(tzname)), tzname
-        except Exception as exc:  # unknown zone or missing tz database
-            hint = " On Windows, 'pip install tzdata' adds the timezone database." if os.name == "nt" else ""
-            print(f"Timezone '{tzname}' unavailable ({exc}); using this computer's local time.{hint}", file=sys.stderr)
+            return dt.datetime.now(ZoneInfo(tzname)), tzname, True
+        except Exception:
+            pass
     local = dt.datetime.now().astimezone()
-    return local, str(local.tzinfo)
+    return local, str(local.tzinfo), not tzname
+
+
+def tz_note_once(ws: Path | None) -> bool:
+    """Say that times come from this computer's clock, at most once per workspace (a marker in Memory)."""
+    mark = ws / TZ_MARK if ws is not None else None
+    if mark is not None and mark.exists():
+        return False
+    print(TZ_NOTE, file=sys.stderr)
+    if mark is not None and not escapes_root(ws, mark):
+        try:
+            write_lf(mark, dt.date.today().isoformat() + "\n")
+        except OSError:
+            pass
+    return True
 
 
 def get_today(ws: Path | None, override: str | None) -> dt.date:
@@ -187,7 +216,7 @@ def get_today(ws: Path | None, override: str | None) -> dt.date:
         if day is None:
             sys.exit(f"--today must look like YYYY-MM-DD (for example 2026-10-04), got '{override}'.")
         return day
-    return now_in(read_pref(ws, "timezone"))[0].date()
+    return now_in(read_pref(ws, "timezone"))[0].date()  # no note here; only `now` mentions the clock, once
 
 
 def add_business_days(day: dt.date, n: int) -> dt.date:
@@ -344,7 +373,7 @@ def compute_due(items, today: dt.date, days: int, stale: int, confirm_days: int 
     confirm_horizon = add_business_days(today, confirm_days)
     next_horizon = add_business_days(horizon, 5)
     out = {k: [] for k in ("overdue", "due_today", "due_soon", "waiting_overdue",
-                           "waiting_stale", "unconfirmed", "guessed", "unknown_owner", "next_up")}
+                           "waiting_stale", "unconfirmed", "waiting_later", "guessed", "unknown_owner", "next_up")}
     for it in items:
         if it["done"]:
             continue
@@ -365,6 +394,8 @@ def compute_due(items, today: dt.date, days: int, stale: int, confirm_days: int 
             listed = it in out["waiting_overdue"] or it in out["waiting_stale"]
             if not it["accepted"] and it["date"] <= confirm_horizon and not listed:
                 out["unconfirmed"].append(it)
+            elif not listed:
+                out["waiting_later"].append(it)  # every waiting item gets listed, with who, what, and when
         else:
             out["unknown_owner"].append(it)
         if it["guessed"] and it["date"] <= horizon:
@@ -436,7 +467,9 @@ def cmd_now(args) -> int:
     ws = None
     if args.workspace and (Path(args.workspace).expanduser() / MEMORY).is_dir():
         ws = Path(args.workspace).expanduser().resolve()
-    now, label = now_in(args.tz or read_pref(ws, "timezone"))
+    now, label, ok = now_in(args.tz or read_pref(ws, "timezone"))
+    if not ok:
+        tz_note_once(ws)
     utc = now.astimezone(dt.timezone.utc)
     print(f"{now.strftime('%A, %B')} {now.day}, {now.year}")
     print(f"Local time: {now.strftime('%H:%M')} ({label})")
@@ -470,26 +503,79 @@ HEDGE_RE = re.compile(
 
 
 def resolve_when(phrase: str, today: dt.date):
-    """Turn a spoken deadline into (date, exact, note). A hedge ("I think", "maybe", "?") makes any date a guess."""
+    """Turn a spoken deadline into (date, exact, note, span). A hedge ("I think", "maybe", "?") makes any date a guess.
+    span is None for a day, or (label, first, last) for a vague span like "next quarter"; date is then its last business day."""
     hedges = [h.group(0).strip(" ?") or "?" for h in HEDGE_RE.finditer(phrase)]
     if hedges:
         rest = " ".join(HEDGE_RE.sub(" ", phrase).replace(",", " ").split()).strip(" .-")
         if rest:
-            day, _, note = _resolve_when_core(rest, today)
+            day, _, note, span = _resolve_when_core(rest, today)
             if day is not None:
                 why = "it ended with a question mark" if hedges[0] == "?" else f"you said '{hedges[0]}'"
-                return day, False, f"{note}; {why}, so it's a guess"
+                return day, False, f"{note}; {why}, so it's a guess", span
     return _resolve_when_core(phrase, today)
 
 
-def _resolve_when_core(phrase: str, today: dt.date):
-    """Turn a spoken deadline into (date, exact, note). Returns (None, False, note) when it can't."""
-    raw = phrase
+def _when_norm(phrase: str) -> str:
     p = " ".join(phrase.lower().replace(",", " ").split())
     for lead in ("due ", "by ", "on ", "before ", "until ", "no later than "):
         if p.startswith(lead):
             p = p[len(lead):]
-    p = p.removeprefix("the ") if hasattr(p, "removeprefix") else (p[4:] if p.startswith("the ") else p)
+    return p[4:] if p.startswith("the ") else p
+
+
+SPAN_LEAD_RE = re.compile(r"^(?:(?:sometime|some time|in|during|within|over)\s+)*(?:the\s+)?")
+
+
+def _month_end(y: int, m: int) -> dt.date:
+    return dt.date(y + (m == 12), m % 12 + 1, 1) - dt.timedelta(days=1)
+
+
+def vague_span(phrase: str, today: dt.date):
+    """(label, first, last) for a span that has no single day in it: "next quarter", "Q1", "next month",
+    "later this year". None for anything more specific ("by Thursday", "end of next month")."""
+    p = SPAN_LEAD_RE.sub("", _when_norm(phrase))
+    cur = (today.month - 1) // 3 + 1
+    q = y = None
+    m = re.fullmatch(r"(this |next )?quarter", p)
+    if m:
+        q, y = (cur, today.year) if m.group(1) != "next " else (cur % 4 + 1, today.year + (cur == 4))
+    m = re.fullmatch(r"q([1-4])(?: (?:of )?(\d{4}))?", p)
+    if m:
+        q = int(m.group(1))
+        y = int(m.group(2)) if m.group(2) else (today.year if q >= cur else today.year + 1)
+    if q:
+        return f"Q{q} {y}", dt.date(y, 3 * q - 2, 1), _month_end(y, 3 * q)
+    m = re.fullmatch(r"(later |sometime )?(this|next) month", p)
+    if m:
+        y, mth = (today.year, today.month) if m.group(2) == "this" else (today.year + (today.month == 12), today.month % 12 + 1)
+        name = f"{dt.date(y, mth, 1).strftime('%B')} {y}"
+        if m.group(1) == "later " and m.group(2) == "this":
+            return f"the rest of {name}", today, _month_end(y, mth)
+        return name, dt.date(y, mth, 1), _month_end(y, mth)
+    if p in ("later this year", "this year", "sometime this year", "rest of the year", "rest of this year", "the rest of the year"):
+        return f"the rest of {today.year}", today, dt.date(today.year, 12, 31)
+    if p in ("next year", "sometime next year"):
+        return f"{today.year + 1}", dt.date(today.year + 1, 1, 1), dt.date(today.year + 1, 12, 31)
+    if p in ("early next year", "start of next year", "beginning of next year"):
+        return f"early {today.year + 1}", dt.date(today.year + 1, 1, 1), dt.date(today.year + 1, 3, 31)
+    return None
+
+
+def _resolve_when_core(phrase: str, today: dt.date):
+    """(date, exact, note, span); (None, False, note, None) when it can't read the phrase."""
+    span = vague_span(phrase, today)
+    if span:
+        label, first, last = span
+        day = last_business_day(last.year, last.month)
+        return day, False, f"a span, not a day: {label} runs {first.isoformat()} to {last.isoformat()}", span
+    return (*_resolve_day(phrase, today), None)
+
+
+def _resolve_day(phrase: str, today: dt.date):
+    """Turn a spoken deadline into (date, exact, note). Returns (None, False, note) when it can't."""
+    raw = phrase
+    p = _when_norm(phrase)
     iso = parse_date(p)
     if iso:
         return iso, True, "a calendar date"
@@ -573,9 +659,11 @@ def _resolve_when_core(phrase: str, today: dt.date):
         if weekend:
             return monday + dt.timedelta(days=4), False, f"read as Friday of the coming week; it could also mean {(monday + dt.timedelta(days=11)).isoformat()}"
         return monday + dt.timedelta(days=4), p == "end of next week", "read as Friday next week"
-    if p in ("end of month", "end of the month", "eom", "this month", "end of this month", "month end", "month-end"):
+    if p in ("end of month", "end of the month", "eom", "end of this month", "month end", "month-end"):
         return last_business_day(today.year, today.month), False, "read as the last business day of this month"
-    if p in ("end of next month", "next month"):
+    if p in ("end of year", "end of the year", "end of this year", "eoy", "year end", "year-end"):
+        return last_business_day(today.year, 12), False, "read as the last business day of this year"
+    if p in ("end of next month",):
         y, mth = (today.year + (today.month == 12), today.month % 12 + 1)
         return last_business_day(y, mth), False, "read as the last business day of next month"
     m = re.fullmatch(r"(end of )?(this |next )?(quarter|q([1-4]))", p) or (re.fullmatch(r"(eoq)", p) and re.fullmatch(r"(end of )?(this |next )?(quarter|q([1-4]))", "quarter"))
@@ -630,7 +718,7 @@ def cmd_when(args) -> int:
     rc = 0
     rows = []
     for phrase in args.phrase:
-        day, exact, note = resolve_when(phrase, today)
+        day, exact, note, span = resolve_when(phrase, today)
         if day is None:
             rows.append(dict(phrase=phrase, date=None, exact=False, note=note))
             rc = 2 if len(args.phrase) == 1 else rc
@@ -639,8 +727,11 @@ def cmd_when(args) -> int:
         if day.weekday() >= 5:
             nxt = add_business_days(day, 1)
             weekend = f". It falls on a {day.strftime('%A')}; the next business day is {nxt.strftime('%a')} {nxt.isoformat()}"
-        rows.append(dict(phrase=phrase, date=day.isoformat(), exact=exact, weekday=day.strftime("%a"),
-                         write_as=("" if exact else "~") + day.isoformat(), note=note + weekend))
+        row = dict(phrase=phrase, date=day.isoformat(), exact=exact, weekday=day.strftime("%a"),
+                   write_as=("" if exact else "~") + day.isoformat(), note=note + weekend)
+        if span:
+            row["range"] = dict(label=f"{span[0]} (estimate)", start=span[1].isoformat(), end=span[2].isoformat())
+        rows.append(row)
     if args.json:
         print(json.dumps(dict(today=today.isoformat(), results=rows), indent=1))
         return rc
@@ -648,6 +739,10 @@ def cmd_when(args) -> int:
     for r in rows:
         if r["date"] is None:
             print(f'  "{r["phrase"]}": {r["note"]}. Ask the person, or log a guess with ~ and say it is a guess.')
+        elif r.get("range"):
+            g = r["range"]
+            print(f'  "{r["phrase"]}": {g["label"]}, {g["start"]} to {g["end"]}. A span, not a day, so it\'s a guess. '
+                  f'Say it as a range; if a follow-up needs one date, write {r["write_as"]} ({r["weekday"]}, its last business day)')
         else:
             kind = "exact" if r["exact"] else "a guess, so write it with ~"
             print(f'  "{r["phrase"]}": {r["weekday"]} {r["date"]} ({kind}; {r["note"]}). Write as {r["write_as"]}')
@@ -660,6 +755,7 @@ DUE_LABELS = [
     ("waiting_overdue", "Waiting on others, past due"),
     ("waiting_stale", "Waiting on others, stale"),
     ("unconfirmed", "Waiting on others, not yet agreed"),
+    ("waiting_later", "Waiting on others, due today or later"),
     ("guessed", "Guessed dates coming up (confirm them)"),
     ("unknown_owner", "Owner not recognized (use @me or @waiting:Name)"),
     ("next_up", "After the window, yours (not due soon; quote the weekday from here)"),
@@ -696,7 +792,7 @@ def cmd_due(args) -> int:
     keys = OPEN_KEYS if args.open else [k for k, _ in DUE_LABELS]
     if args.open:
         try:  # the session mark lets `brain.py check` list what this session wrote; a read-only folder just skips it
-            write_lf(ws / SESSION_MARK, dt.datetime.now().astimezone().isoformat(timespec="seconds") + "\n")
+            write_session_mark(ws)
         except OSError:
             pass
         print(f"Session open, {fmt_day(today)}: mention only these, in two lines at most. If the list is empty, say nothing about having checked.")
@@ -718,10 +814,10 @@ def cmd_due(args) -> int:
             extra = ""
             if key in ("overdue", "waiting_overdue"):
                 extra = f" ({late_text(it['date'], today)})"
-            if key in ("waiting_overdue", "waiting_stale", "unconfirmed") and it["since"]:
+            if key in ("waiting_overdue", "waiting_stale", "unconfirmed", "waiting_later") and it["since"]:
                 bd = business_days_between(it["since"], today)
                 extra += f" (waiting {bd} business day{'s' if bd != 1 else ''}, since {it['since'].isoformat()})"
-            if key in ("waiting_overdue", "waiting_stale") and not it["accepted"]:
+            if key in ("waiting_overdue", "waiting_stale", "waiting_later") and not it["accepted"]:
                 extra += " (not yet agreed)"
             print(f"  {it['date'].strftime('%a')} {it['date'].isoformat()}{'~' if it['guessed'] else ''}{who}  {it['what']}  <{it['source']}>{extra}  (line {it['line']})")
     if not any_hit:
@@ -1067,27 +1163,86 @@ def check_weekdays(text: str, today: dt.date):
     return out
 
 
-def session_changes(ws: Path, since: dt.datetime):
-    """Files under the workspace changed or moved after `since` (a move keeps the file's modified time but updates its change time)."""
-    cutoff = since.timestamp()
-    found = []
+def _tracked_files(ws: Path):
+    """Workspace files `check` watches: no symlinks, nothing hidden (the session mark and the clock note included)."""
     for p in sorted(ws.rglob("*")):
         if p.is_symlink() or not p.is_file():
             continue
         rel = p.relative_to(ws)
-        if rel.as_posix() == SESSION_MARK or any(part.startswith(".") and part != ".keep" for part in rel.parts):
+        if any(part.startswith(".") and part != ".keep" for part in rel.parts):
             continue
+        yield p, rel
+
+
+def inventory(ws: Path) -> dict:
+    """{path: (size, whole-second modified time, file id)} for every tracked file, so a later look can spot moves."""
+    out = {}
+    for p, rel in _tracked_files(ws):
+        st = p.stat()
+        out[rel.as_posix()] = (st.st_size, int(st.st_mtime), st.st_ino)
+    return out
+
+
+def write_session_mark(ws: Path, when: dt.datetime | None = None) -> None:
+    """First line: when the session started. Then one line per file (size, time, id, path), so `check` can show moves."""
+    when = when or dt.datetime.now().astimezone()
+    lines = [when.isoformat()]  # full precision, so files written in the second before the mark stay out
+    lines += [f"{s}\t{m}\t{i}\t{rel}" for rel, (s, m, i) in inventory(ws).items()]
+    write_lf(ws / SESSION_MARK, "\n".join(lines) + "\n")
+
+
+def read_session_mark(path: Path):
+    """(start time, inventory). An older mark holds only the time, so its inventory is empty. Raises ValueError on a bad time."""
+    lines = read_text(path).splitlines() or [""]
+    since = dt.datetime.fromisoformat(lines[0].strip())
+    inv = {}
+    for ln in lines[1:]:
+        parts = ln.split("\t", 3)
+        if len(parts) == 4 and all(x.lstrip("-").isdigit() for x in parts[:3]):
+            inv[parts[3]] = (int(parts[0]), int(parts[1]), int(parts[2]))
+    return since, inv
+
+
+def find_moves(before: dict, now: dict):
+    """[(source, destination)]: files gone from their old path that turn up at a new one, matched by file id,
+    or by size and modified time when the id changed (a move between drives copies the file)."""
+    gone = {rel: v for rel, v in before.items() if rel not in now}
+    moves = []
+    for rel in sorted(r for r in now if r not in before):
+        size, mtime, ino = now[rel]
+        src = next((g for g, (_, _, gi) in gone.items() if ino and gi == ino), None) or \
+            next((g for g, (gs, gm, _) in gone.items() if (gs, gm) == (size, mtime)), None)
+        if src:
+            moves.append((src, rel))
+            del gone[src]
+    return moves
+
+
+def session_changes(ws: Path, since: dt.datetime):
+    """Files under the workspace changed or moved after `since` (a move keeps the file's modified time but updates its change time)."""
+    cutoff = since.timestamp()
+    found = []
+    for p, rel in _tracked_files(ws):
         st = p.stat()
         if max(st.st_mtime, st.st_ctime if os.name != "nt" else st.st_mtime) > cutoff:
             found.append(rel)
     return found
 
 
+def setup_copy(ws: Path, rel: Path) -> bool:
+    """True if the file is still an unedited copy of its template, which only setup (`init`) puts there."""
+    tpl = TEMPLATES / rel
+    try:
+        return tpl.is_file() and (ws / rel).read_bytes() == tpl.read_bytes()
+    except OSError:
+        return False
+
+
 def cmd_check(args) -> int:
     ws = find_workspace(args.workspace)
     today = get_today(ws, args.today)
     mark = ws / SESSION_MARK
-    since, how = None, ""
+    since, how, before = None, "", {}
     if args.since:
         try:
             since = dt.datetime.fromisoformat(args.since)
@@ -1098,22 +1253,44 @@ def cmd_check(args) -> int:
         how = f"since {since.strftime('%H:%M')}"
     elif mark.is_file():
         try:
-            since = dt.datetime.fromisoformat(read_text(mark).strip())
+            since, before = read_session_mark(mark)
             how = f"since the session started at {since.strftime('%H:%M')}"
         except ValueError:
             since = None
     if since is None:
         since = dt.datetime.now().astimezone() - dt.timedelta(hours=2)
         how = "in the last 2 hours (no session mark: `brain.py due --open` sets one at session start)"
+    if since.tzinfo is None:
+        since = since.astimezone()
     changed = session_changes(ws, since)
-    if not changed:
+    now_inv = inventory(ws) if before else {}
+    moves = find_moves(before, now_inv) if before else []
+    moved_to = {dst for _, dst in moves}
+    from_setup = [rel for rel in changed if rel.as_posix() not in moved_to and setup_copy(ws, rel)]
+    written = [rel for rel in changed if rel.as_posix() not in moved_to and rel not in from_setup]
+    if not (written or moves or from_setup):
         print(f"Nothing in the workspace changed {how}.")
         return 0
-    print(f"Changed {how}: {len(changed)} file{'s' if len(changed) != 1 else ''}. List these, exactly, as what you wrote or moved:")
-    for rel in changed:
-        print(f"  {rel.as_posix()}")
+    if written or moves:
+        counts = [f"{len(written)} written"] if written else []
+        counts += [f"{len(moves)} moved"] if moves else []
+        print(f"Changed {how}: {', '.join(counts)}. List these, exactly, as what you wrote or moved:")
+        for rel in written:
+            print(f"  {rel.as_posix()}")
+        if moves:
+            print("Moved (source -> destination):")
+            for src, dst in moves:
+                edited = now_inv.get(dst, before[src])[:2] != before[src][:2]  # size or time changed since the session started
+                print(f"  {src} -> {dst}" + (" (and edited)" if edited else ""))
+    if from_setup:
+        print(f"Created by setup ({len(from_setup)} file{'s' if len(from_setup) != 1 else ''}, unedited copies of the templates). "
+              "Sum these up in one line, like \"set up your folder\", instead of listing them:")
+        for rel in from_setup[:10]:
+            print(f"  {rel.as_posix()}")
+        if len(from_setup) > 10:
+            print(f"  ...and {len(from_setup) - 10} more")
     wrong, right, pronouns = [], 0, []
-    for rel in changed:
+    for rel in written + [Path(dst) for _, dst in moves]:
         p = ws / rel
         if p.suffix.lower() not in CHECK_SUFFIXES or rel.parts[:1] in ((INBOX,), (ARCHIVE,)):
             continue  # raw drops and archived originals are the sources themselves
@@ -1426,7 +1603,7 @@ def cmd_pack(args) -> int:
             if p.is_symlink() or not p.is_file() or p.resolve() == out:
                 continue
             rel = p.relative_to(ws)
-            if rel.as_posix() == SESSION_MARK:
+            if rel.as_posix() in (SESSION_MARK, TZ_MARK):  # both belong to this computer and this session
                 continue
             if not args.include_inbox and rel.parts[:1] == (INBOX,) and p.name.lower() != "readme.md":
                 left_out += 1
@@ -1523,6 +1700,22 @@ def cmd_selftest(args) -> int:
     check("when: 'Friday?' is a guess", resolve_when("Friday?", mon)[:2] == (dt.date(2026, 10, 9), False))
     check("when: 'end of month-ish' is a guess", resolve_when("end of month-ish", mon)[1] is False and resolve_when("end of month-ish", mon)[0] is not None)
     check("when: a bare hedge still can't be read", resolve_when("maybe", mon)[0] is None)
+    check("when: 'end of year', 'EOY', and 'by year end' are the last business day of the year, as a guess",
+          all(resolve_when(ph, mon)[:2] == (dt.date(2026, 12, 31), False) for ph in ("end of year", "EOY", "by year end")))
+    nq, nm, ly = resolve_when("next quarter", mon), resolve_when("next month", mon), resolve_when("later this year", mon)
+    check("when: 'next quarter' is a labeled range, still a guess",
+          nq[3] == ("Q1 2027", dt.date(2027, 1, 1), dt.date(2027, 3, 31)) and nq[1] is False and nq[0] == dt.date(2027, 3, 31))
+    check("when: 'next month' and 'later this year' are ranges too",
+          nm[3] == ("November 2026", dt.date(2026, 11, 1), dt.date(2026, 11, 30)) and nm[1] is False
+          and ly[3] == ("the rest of 2026", mon, dt.date(2026, 12, 31)))
+    check("when: specific phrases keep day precision",
+          resolve_when("by Thursday", mon)[3] is None and resolve_when("by Thursday", mon)[:2] == (dt.date(2026, 10, 8), True)
+          and resolve_when("end of next month", mon)[3] is None and resolve_when("sometime next quarter", mon)[3][0] == "Q1 2027")
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        cmd_when(argparse.Namespace(phrase=["next quarter", "by Thursday"], workspace=None, today=mon.isoformat(), json=False))
+    check("when prints a span as 'Q1 2027 (estimate)' with its first and last dates, and a day as a day",
+          "Q1 2027 (estimate), 2027-01-01 to 2027-03-31" in buf.getvalue() and "Thu 2026-10-08 (exact" in buf.getvalue())
     check("slugs avoid Windows device names and never collide on non-Latin names",
           slugify("CON") == "con-project" and fallback_slug("project", "定价") != fallback_slug("project", "发布"))
     check("weekend lateness is worded, not zero", late_text(dt.date(2026, 10, 9), dt.date(2026, 10, 11)) == "past due over the weekend")
@@ -1563,6 +1756,7 @@ def cmd_selftest(args) -> int:
             "- [ ] 2026-10-08 | @me | trailing comment still counts | 1:1 10/06 | accepted: true <!-- a note -->",
             "- [ ] 2026-10-08 | @Ana | owner written wrong | chat | accepted: true",
             "- [ ] 2026-10-20 | @waiting:Jo | bad since date here | email since:2026-13-45 | accepted: true",
+            "- [ ] 2026-10-08 | @waiting:Alex | architecture diagram | standup since:2026-10-06 | accepted: true",
             "- [ ] tomorrow | send the deck",
             "* [ ] 2026-10-01 | @me | wrong bullet marker | chat | accepted: true",
             "- [  ] 2026-10-01 | @me | two spaces in box | chat | accepted: true",
@@ -1580,6 +1774,9 @@ def cmd_selftest(args) -> int:
         check("waiting past due found", len(out["waiting_overdue"]) == 1)
         check("waiting stale found", len(out["waiting_stale"]) == 1 and out["waiting_stale"][0]["waiting_on"] == "Sam")
         check("unconfirmed limited to the confirm window", [i["waiting_on"] for i in out["unconfirmed"]] == ["Lee"])
+        check("every other waiting item is listed, soonest first", [i["waiting_on"] for i in out["waiting_later"]] == ["Alex", "Jo", "Kim"])
+        listed = sum(len(out[k]) for k in ("waiting_overdue", "waiting_stale", "unconfirmed", "waiting_later"))
+        check("the waiting lists cover every open waiting item once", listed == sum(1 for i in items if i["waiting_on"] and not i["done"]))
         check("unknown owner surfaced, not dropped", [i["owner"] for i in out["unknown_owner"]] == ["@Ana"])
         check("malformed lines caught (no date, star bullet, double space)", len(bad) == 3)
         check("no unclosed comment in a clean file", unclosed is None)
@@ -1638,6 +1835,10 @@ def cmd_selftest(args) -> int:
         with contextlib.redirect_stdout(buf):
             cmd_due(argparse.Namespace(workspace=str(ws), today=today.isoformat(), days=3, stale=5, open=False, json=False))
         check("due mentions files waiting in the inbox", "2 files waiting to be filed (deck.pdf, export.txt)" in buf.getvalue())
+        due_text = buf.getvalue()
+        check("due lists waiting items with who, what, and when",
+              "Waiting on others, due today or later" in due_text and "Thu 2026-10-08 [Alex]  architecture diagram" in due_text
+              and "[Kim]  annual vendor renewal notes" in due_text and "(not yet agreed)" in due_text.split("[Kim]", 1)[1].split("\n", 1)[0])
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             cmd_due(argparse.Namespace(workspace=str(ws), today=today.isoformat(), days=3, stale=5, open=True, json=False))
@@ -1816,19 +2017,23 @@ def cmd_selftest(args) -> int:
         with quiet:
             cmd_init(argparse.Namespace(folder=str(ws2), dry_run=False, force=False))
         (ws2 / INBOX / "call.txt").write_text("Ravi: I'll check with our team.\n", encoding="utf-8")
+        (ws2 / INBOX / "notes.txt").write_text("Old notes, never touched.\n", encoding="utf-8")
         import time
         time.sleep(1.2)
         old = dt.datetime.now().astimezone()
-        write_lf(ws2 / SESSION_MARK, old.isoformat(timespec="seconds") + "\n")
+        write_session_mark(ws2, old)
         time.sleep(1.2)
         write_lf(ws2 / REFERENCE / "people.md", "| Ravi | asked by Alex for the report; said he would check | vendor |\n")
         write_lf(ws2 / MEMORY / "meetings.md", "- Thu 2026-10-08 call (right), Fri 2026-10-08 (wrong), Thursday, Oct 8 (right)\n")
+        os.replace(ws2 / INBOX / "call.txt", ws2 / ARCHIVE / "processed" / "call.txt")  # filed: a move, not a write
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             rc = cmd_check(argparse.Namespace(workspace=str(ws2), today="2026-10-07", since=None))
         outp = buf.getvalue()
         check("check lists files changed after the session mark", "4-Reference/people.md" in outp and "Memory/meetings.md" in outp and "START-HERE.md" not in outp)
-        check("check leaves out the session mark and old files", ".session-start" not in outp and "call.txt" not in outp)
+        check("check leaves out the session mark and old files", ".session-start" not in outp and "notes.txt" not in outp)
+        check("check prints a move as source -> destination, in plain text, and only there",
+              "  1-Inbox/call.txt -> 5-Archive/processed/call.txt" in outp and outp.isascii() and outp.count("call.txt") == 2)
         check("check catches a wrong weekday and exits 1", rc == 1 and "\"Fri 2026-10-08\" is wrong" in outp)
         check("check accepts right weekdays in both forms", outp.count("is wrong") == 1)
         check("check flags a guessed pronoun", "said he would check" in outp)
@@ -1836,7 +2041,70 @@ def cmd_selftest(args) -> int:
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             cmd_due(argparse.Namespace(workspace=str(ws2), today="2026-10-07", days=3, stale=5, open=True, json=False))
-        check("due --open sets the session mark", dt.datetime.fromisoformat(read_text(ws2 / SESSION_MARK).strip()) > old)
+        mark_since, mark_inv = read_session_mark(ws2 / SESSION_MARK)
+        check("due --open sets the session mark, with the file list check uses for moves",
+              mark_since > old and "5-Archive/processed/call.txt" in mark_inv)
+
+        # A session mark from before setup: the files `init` copied are labeled, not listed as written.
+        ws3 = Path(tmp2) / "ws3"
+        (ws3 / MEMORY).mkdir(parents=True)
+        write_session_mark(ws3, dt.datetime.now().astimezone() - dt.timedelta(minutes=5))
+        with quiet:
+            cmd_init(argparse.Namespace(folder=str(ws3), dry_run=False, force=False))
+        os.utime(ws3 / "START-HERE.md")  # init keeps the template's file times; touch one so every system sees it as new
+        write_lf(ws3 / SETUP / "preferences.md", read_text(ws3 / SETUP / "preferences.md").replace("<Area/City, for example America/New_York>", "America/Chicago"))
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_check(argparse.Namespace(workspace=str(ws3), today="2026-10-07", since=None))
+        outp3 = buf.getvalue()
+        head, _, setup_part = outp3.partition("Created by setup")
+        check("check labels files setup created apart from what the session wrote",
+              "Setup/preferences.md" in head and "START-HERE.md" not in head and setup_part.strip()
+              and setup_copy(ws3, Path("START-HERE.md")) and not setup_copy(ws3, Path(SETUP) / "preferences.md"))
+
+    # The clock note: without the timezone data (or with a name this computer doesn't know), times still
+    # work from the computer's clock, and only `now` says so, once per workspace.
+    with tempfile.TemporaryDirectory() as tmp3:
+        ws4 = Path(tmp3) / "ws"
+        with quiet:
+            cmd_init(argparse.Namespace(folder=str(ws4), dry_run=False, force=False))
+        prefs = ws4 / SETUP / "preferences.md"
+        write_lf(prefs, read_text(prefs).replace("<Area/City, for example America/New_York>", "Nowhere/Not_A_Zone"))
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()) as out1:
+            day = get_today(ws4, None)
+            cmd_due(argparse.Namespace(workspace=str(ws4), today=None, days=3, stale=5, open=False, json=False))
+            cmd_now(argparse.Namespace(workspace=str(ws4), tz=None))
+            cmd_now(argparse.Namespace(workspace=str(ws4), tz=None))
+        check("times still work without the timezone data", isinstance(day, dt.date) and "Local time:" in out1.getvalue())
+        check("the clock note shows once, from `now`, and never from other commands", err.getvalue().count(TZ_NOTE) == 1
+              and err.getvalue().strip() == TZ_NOTE and "tzdata" not in err.getvalue())
+
+    # Windows console text: the UTF-8 switch never crashes, even on streams that can't switch.
+    class Stubborn:
+        def reconfigure(self, **kw):
+            raise ValueError("no")
+    wrapped = io.TextIOWrapper(io.BytesIO(), encoding="cp1252")
+    try:
+        utf8_console([io.StringIO(), None, Stubborn(), wrapped])
+        survived = True
+    except Exception:
+        survived = False
+    check("the UTF-8 console switch never crashes, and switches what it can", survived and wrapped.encoding.lower() == "utf-8")
+    with tempfile.TemporaryDirectory() as bom_tmp:
+        bom = Path(bom_tmp) / "followups.md"
+        bom.write_bytes(b"\xef\xbb\xbf- [ ] 2026-10-09 | @me | send the deck | standup | accepted: true\n")
+        check("a file saved with a byte-order mark (Windows PowerShell's UTF-8) still parses from its first line",
+              FOLLOWUP_RE.match(read_text(bom).splitlines()[0]) is not None)
+
+    # Finding the scripts and Python on any host: the docs agents follow give the same order.
+    order = ["python3 --version", "python --version", "py -3 --version"]
+    docs = [SKILL_DIR / "SKILL.md", SKILL_DIR / "references" / "scripts.md", SKILL_DIR / "references" / "no-python.md"]
+    in_order = all(all(o in read_text(d) for o in order) and
+                   [read_text(d).index(o) for o in order] == sorted(read_text(d).index(o) for o in order) for d in docs if d.exists())
+    check("SKILL.md, scripts.md, and no-python.md try python3, then python, then py -3", in_order)
+    check("SKILL.md says where the scripts are outside Claude, and warns about the Microsoft Store shortcut",
+          all(s in read_text(SKILL_DIR / "SKILL.md") for s in ("next to this SKILL.md", "${CLAUDE_SKILL_DIR}/scripts/", "Microsoft Store")))
 
     passed = sum(1 for _, ok in checks if ok)
     for name, ok in checks:
@@ -1849,12 +2117,6 @@ def cmd_selftest(args) -> int:
 # ---------------------------------------------------------------- main
 
 def main(argv=None) -> int:
-    for stream in (sys.stdout, sys.stderr):  # Windows consoles and pipes default to a narrow code page
-        if hasattr(stream, "reconfigure"):
-            try:
-                stream.reconfigure(encoding="utf-8", errors="replace")
-            except Exception:
-                pass
     parser = argparse.ArgumentParser(description="Deterministic helpers for the unpaid-intern skill.")
     sub = parser.add_subparsers(dest="cmd", required=True)
 

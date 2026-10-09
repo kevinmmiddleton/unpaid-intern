@@ -27,6 +27,8 @@ Checked 2026-10-04. Checked against vendor and Anthropic documentation in Octobe
 
 How it connects: **One click**: In Claude's connector directory. Find it, click Connect, and sign in with your work login. Some need an admin's approval the first time. **Add by web address**: Not in the directory. Added by web address as a custom connector. On company Claude plans an Owner usually adds it. **IT sets it up**: Your IT or tool admin has to set it up first. Use the fallback until then. **Needs a key**: Needs a key from the tool, not just your login. Usually an admin request. **No connector yet**: No connector yet. Use the fallback.
 
+In Codex, a tool the catalog connects in one click or by address goes one of three ways: **Comes with the plugin**: Comes with the Unpaid Intern plugin. Sign in with codex mcp login. Without the plugin, install it from Codex's plugin directory or add it by web address. **Codex plugin or web address**: Install it from Codex's plugin directory (/plugins) if it's listed there. Otherwise add it by web address with codex mcp add, then sign in. **Codex plugin only**: Only through Codex's plugin directory (/plugins). There's no web address Codex can add for it, so if it isn't listed, an admin turns the plugin on or shares a client ID. `connect.py plan --surface codex` works out which, tool by tool.
+
 ## Mail, calendar, and office suites
 
 | Tool | Id | How it connects | Address | Admin step | Read-only | Until it works |

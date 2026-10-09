@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "unpaid-intern",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Unpaid Intern: a free second brain for work. Turns your meeting transcripts, docs, tickets, and email into a morning briefing, meeting prep, status updates, and follow-ups with owners and dates, all in plain files you own. Guided setup, and it works with as much or as little as your company allows, from fully connected to chat only.",
   "author": {
     "name": "Kevin Middleton",

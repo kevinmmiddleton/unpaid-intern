@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.4
+
+Codex fixes from a second outside field test, on Windows.
+
+- In Codex, your intern gives you its commands in words. Codex only takes its own slash commands, so typing `/briefing` there gets "Unrecognized command", while "give me my briefing" works. Setup, the tour, the cheat sheet, START-HERE, and the README's Codex steps all say it that way in Codex, and every command has a plain-language form (in `references/what-you-unlock.md`) that runs the same procedure.
+- The connection plan has a real Codex version: `connect.py plan --surface codex`. The saved plan says it's for Codex and gives Codex's steps for each tool: its own plugin directory (`/plugins`) first, otherwise `codex mcp add` and `codex mcp login`, then setting the tool to ask before writes in Codex's config. It no longer carries Claude's steps, so the file stays right when you reopen it later. Atlassian and Notion, which come with the plugin, just need a sign-in.
+- With a Codex plan, the IT email names Codex and the tour says commands in words, without being told.
+- The IT email says "Error I saw" only for an error a connection attempt actually showed (`connect.py mark --error`, or a failed attempt). Any other note, like "admin approval required", goes in as a plain "Note".
+- When a brief mentions a vague span like "next quarter", it keeps both dates `brain.py when` printed: "Q1 2027 (estimate), 2027-01-01 to 2027-03-31".
+
+Thanks to Clint for two rounds of Windows and Codex field testing.
+
 ## 1.3.3
 
 Windows and Codex fixes from the first outside field test.

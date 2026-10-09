@@ -8,4 +8,4 @@ Your personal cheat sheet appears here after setup. Until then, these work with 
 - **/capture**: put an owner and a date on a promise.
 - **/debrief**: paste a transcript or your notes and get the decisions and follow-ups out.
 
-You never have to memorize these. Say what you want in plain words.
+You never have to memorize these. Say what you want in plain words. In Codex, which only takes its own slash commands, always say it in words: "explain this", "prep me for my next meeting", "log a promise", "debrief my last meeting".

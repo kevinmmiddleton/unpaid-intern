@@ -12,7 +12,7 @@ The core eight are /briefing, /prep, /debrief, /who, /capture, /close, /project-
 
 ## Ground rules for every command
 
-- A command is a name for a procedure. Plain-language requests run the same procedure.
+- A command is a name for a procedure. Plain-language requests run the same procedure: "give me my briefing" runs /briefing, "prep me for <meeting>" runs /prep, "debrief my last meeting" runs /debrief, "file my inbox" runs /sync-kb on everything waiting, and so on (every command's plain form is in `references/what-you-unlock.md`). In Codex, typing one of these slash commands gets "Unrecognized command", so there the plain form is the only way in: when you suggest a command, give the words, not the slash.
 - Read before writing. Use the retrieval order in SKILL.md.
 - Run `brain.py` for dates, due items, counts, and the status table.
 - Say which mode you are in (Connected, Files, or Conversational) once per session, not per command.
@@ -63,7 +63,7 @@ IN YOUR INBOX
 - 3 new files: vendor-deck.pdf and two transcripts. Want me to file them?
 ```
 
-Rules: lead with the three things that matter most. Keep under the word cap in preferences (default 150). Omit empty sections. Separate calendar facts, commitments, and suggestions. Quote short asks verbatim; never quote long passages. Do not write state unless asked. Under WAITING ON OTHERS, cover every item the `due` output lists under a "Waiting on others" heading, with who, what, and when as it prints them. If that would go over the word cap, keep in full every one that's past due, stale, not yet agreed, or due by the window date in the `due` header, and sum up the rest in one line: how many, and the soonest, as the script prints it. Only items the `due` output prints go under its window label ("Due by Thu Oct 8"); an item outside that window goes on its own line, quoted from the `due` output's "After the window" list, weekday included. When `brain.py due` reports files waiting in 1-Inbox, end the brief with one line naming them and offer to file them. Filing is `/sync-kb` (or `/debrief` for a transcript), and only after a yes.
+Rules: lead with the three things that matter most. Keep under the word cap in preferences (default 150). Omit empty sections. Separate calendar facts, commitments, and suggestions. Quote short asks verbatim; never quote long passages. Do not write state unless asked. Under WAITING ON OTHERS, cover every item the `due` output lists under a "Waiting on others" heading, with who, what, and when as it prints them. If that would go over the word cap, keep in full every one that's past due, stale, not yet agreed, or due by the window date in the `due` header, and sum up the rest in one line: how many, and the soonest, as the script prints it. Only items the `due` output prints go under its window label ("Due by Thu Oct 8"); an item outside that window goes on its own line, quoted from the `due` output's "After the window" list, weekday included. When the brief mentions a vague span ("next quarter", "later this year") that `brain.py when` turned into a labeled range, quote the label and both dates as `when` prints them ("Q1 2027 (estimate), 2027-01-01 to 2027-03-31"); never drop the dates and leave only the label, and never swap the range for its `~` follow-up date. When `brain.py due` reports files waiting in 1-Inbox, end the brief with one line naming them and offer to file them. Filing is `/sync-kb` (or `/debrief` for a transcript), and only after a yes.
 
 ### /pulse
 
@@ -448,10 +448,10 @@ Connect another tool, pick up the plan, or fix a tool that will not connect. Nev
 1. Read `Setup/connection-plan.md`. If tools are `to-do`, offer the next one. If any are `needs-admin`, ask once whether IT approved them.
 2. New tools: ask the matching picker screen (`connect.py screens --screen everyday`, `tracked`, or `role`), run `connect.py match`, then `connect.py plan --tools ...`. Statuses already set are kept.
 3. Connect one tool per message, exactly as in setup Step 5c: show the way in (a connector suggestion in Cowork when available, the plugin's listed connectors, or the plan's steps), wait for "done", lock down writes, ask before one harmless test read, then `connect.py mark <id> connected`.
-4. When it fails: get the exact message or a screenshot (never passwords or codes), run `connect.py diagnose "<text>" --tool <id>`, explain the top match in two lines, mark `needs-admin` or `failed` with the message as the note, give the fallback, and move on.
+4. When it fails: get the exact message or a screenshot (never passwords or codes), run `connect.py diagnose "<text>" --tool <id>`, explain the top match in two lines, mark `needs-admin` (with `--error "<the message>"`) or `failed`, give the fallback, and move on. Use `--note` instead of `--error` for anything that isn't a message an attempt showed.
 5. Anything blocked goes into one email: `connect.py it-request --write`. The person sends it.
-6. When something new connects, re-run `connect.py tour --write` and say in one line what it just unlocked ("`/prep` now reads your Jira tickets too").
+6. When something new connects, re-run `connect.py tour --write` and say in one line what it just unlocked ("`/prep` now reads your Jira tickets too"; in Codex, "prep me for a meeting now reads your Jira tickets too").
 7. Claude Code users: `connect.py mcp-json --tools ... --write` writes a merge-safe `.mcp.json` using read-only addresses where they exist. If they hit network or certificate errors, offer `connect.py check`, which tests the network from their own computer.
-8. Codex users: follow the "In Codex" paragraph at the top of setup Step 5 in `references/setup.md`: connect through Codex's plugin directory first, otherwise with `codex mcp add` and `codex mcp login`, lock each tool down in Codex's config, and add `--assistant "Codex"` to the IT email.
+8. Codex users: follow the "In Codex" paragraph at the top of setup Step 5 in `references/setup.md`: run the plan with `--surface codex`, connect through Codex's plugin directory first, otherwise with `codex mcp add` and `codex mcp login`, and lock each tool down in Codex's config. With a Codex plan, the IT email and the tour pick up Codex on their own.
 
 Full detail: `references/connectors.md` and the stack playbooks.

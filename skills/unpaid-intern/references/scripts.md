@@ -41,11 +41,11 @@ Its data lives in `connectors/catalog.json` (77 tools, checked October 2026).
 |---|---|
 | `screens --screen <id> [--role R] --json` | Setup and `/connect`: the picker questions, one screen at a time |
 | `match "<answer>" ...` | Turn picker answers or typed tool names into tools; returns follow-up questions |
-| `plan --tools a,b --surface S` | Write `Setup/connection-plan.md`; re-running keeps statuses |
-| `mark <tool> <status> [--note]` | After each connection attempt |
+| `plan --tools a,b --surface S` | Write `Setup/connection-plan.md`; re-running keeps statuses. Surfaces: `cowork`, `desktop`, `web`, `code`, and `codex` (Codex's own steps: its plugin directory, then `codex mcp add` and login) |
+| `mark <tool> <status> [--note \| --error]` | After each connection attempt. `--error` holds the exact message an attempt showed; `--note` holds anything else. The IT email quotes only an `--error` (or a `failed` note) as an error |
 | `diagnose "<error text>" [--tool T]` | Any connector error: plain meaning, who can fix it, whether it needs IT |
 | `it-request [--write] [--assistant NAME]` | One email to IT for everything blocked; the user sends it. Outside Claude, `--assistant` names the product (it defaults to Claude) |
-| `tour [--write \| --json]` | Setup's last step, and whenever a tool connects: what they unlocked, and a try-first picker |
+| `tour [--write \| --json] [--plain]` | Setup's last step, and whenever a tool connects: what they unlocked, and a try-first picker. `--plain` (on by default for a Codex plan) gives each command as words to say, since Codex rejects the kit's slash commands |
 | `mcp-json --tools a,b [--write]` | Claude Code: a merge-safe `.mcp.json`, read-only addresses first. In Codex, run it without `--write` to read each tool's address (setup Step 5) |
 | `check [--tools a,b]` | Only when asked, on Claude Code or Codex: tests the network from the user's computer (the only command that uses the network) |
 | `list` / `selftest` | Browse the catalog; verify the install |

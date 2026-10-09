@@ -1,8 +1,8 @@
-# Windows and Codex fixes
+# Codex fixes
 
-New in 1.3.3: Windows and Codex fixes from the first outside field test. Your intern finds Python under whatever name Windows gave it, and the scripts stop repeating a timezone warning. In Codex, setup now connects your tools with Codex's own plugins and commands and sets each one to ask before it changes anything. Your briefing lists everything you're waiting on, with who and when; vague deadlines like "next quarter" come back as a labeled range; and the finishing check shows each move as where it came from and where it went.
+New in 1.3.4: Codex fixes from a second outside field test. In Codex, your intern gives you its commands in words ("give me my briefing"), since Codex doesn't take slash commands it didn't define. Your saved connection plan in Codex now has Codex's own steps instead of Claude's. The IT email only says "Error I saw" when there was an error, and a brief keeps both dates when it mentions "next quarter".
 
-New in 1.3.2, if you missed it: before your intern hands anything back, it runs a finishing check that lists every file it wrote or moved and verifies any weekday it wrote.
+New in 1.3.3, if you missed it: Windows and Codex fixes from the first field test. Your intern finds Python under whatever name Windows gave it, and in Codex, setup connects your tools with Codex's own plugins and commands and sets each one to ask before it changes anything.
 
 If you're new here: your intern reads everything you hand it, preps your meetings, keeps your follow-ups, and never asks for a reference letter.
 

@@ -78,7 +78,7 @@ Why you can hand it real work:
 
 ![The eight core Unpaid Intern commands, in the order of a workday: briefing at the start of the day, prep before a meeting, debrief after it, who for a name you don't know, capture anytime, explain for new jargon, project-status before your one-on-one, and close at the end of the day.](assets/brand/marketing/core.png)
 
-You never have to memorize these. Ask in plain words and it picks the right one.
+You never have to memorize these. Ask in plain words and it picks the right one. In Codex, plain words are the way in (more under Install).
 
 ### Everything your intern can do
 
@@ -139,6 +139,8 @@ codex plugin add unpaid-intern@unpaid-intern
 ```
 
 Codex may warn that Atlassian and Notion aren't signed in. That's fine; skip any you don't use.
+
+Then say "set me up." In Codex, ask for things in words rather than typing the slash commands: Codex only takes its own, so `/briefing` gets "Unrecognized command" while "give me my briefing" works. The same goes for "prep me for my 2pm", "debrief my last meeting", and "file my inbox".
 
 The same repo works there. The skill loads in Codex (checked on Codex CLI 0.160.0, and on Windows with 0.160.1). Setup walks you through connecting your tools with Codex's own plugins and `codex mcp` commands, and setting each one to ask before it changes anything. Using ChatGPT itself? Go with 4. This edition is new, so [tell me](https://github.com/kevinmmiddleton/unpaid-intern/issues/new/choose) how it goes.
 

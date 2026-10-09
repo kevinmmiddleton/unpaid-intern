@@ -57,7 +57,7 @@ When someone asks whether it can work at all, first give the whole ladder in one
    - "Access blocked" or "This app is blocked" (Google Workspace)
    - "Need admin approval" (Microsoft 365)
    - A notice that a workspace admin must approve the app (Slack and many others)
-   Run `connect.py diagnose "<message>" --tool <id>` to confirm, mark the tool `needs-admin`, and let `connect.py it-request` write the email.
+   Run `connect.py diagnose "<message>" --tool <id>` to confirm, mark the tool `needs-admin` with `--error "<message>"`, and let `connect.py it-request` write the email.
 4. **If the admin says no to connectors** but allows browser extensions, use the browser route for read-only work.
 5. **If extensions are blocked too,** look for an Office add-in (Microsoft shops) or a scheduled export: a saved tracker filter emailed daily, a report subscription, a transcript folder. Point it at `1-Inbox/`.
 6. **If the tool lives behind a VPN** (for example an on-premises tracker), cloud connectors cannot reach it because they run from Anthropic's cloud, not the user's laptop. Use exports, or ask IT whether Anthropic's option for private-network servers is available on the company plan.
@@ -137,7 +137,7 @@ The workspace is plain files plus `AGENTS.md`, so it travels.
 
 ## Asking IT
 
-`connect.py it-request --write` builds one email from everything marked `needs-admin` or `failed`, with each tool's admin step, read-only option, vendor guide, and the exact error the user saw. `Setup/it-request.md` is the blank version for anything the script does not know. What makes a yes likely:
+`connect.py it-request --write` builds one email from everything marked `needs-admin` or `failed`, with each tool's admin step, read-only option, vendor guide, and the exact error the user saw. Only a message recorded with `mark --error`, or from a `failed` attempt, goes in as "Error I saw"; any other note goes in as "Note". `Setup/it-request.md` is the blank version for anything the script does not know. What makes a yes likely:
 
 - Keep the list short and put the most important tool first. If it runs past four or five tools, send the top two now and the rest after the pilot.
 - Name the official vendor documentation and the read-only option.

@@ -12,7 +12,7 @@ Usage:
   connect.py screens [--screen ID] [--role R] [--json]  setup questions, ready for a picker
   connect.py match <answer> [<answer> ...]         turn picker answers or tool names into tools
   connect.py plan --tools a,b [--surface S]        write Setup/connection-plan.md (keeps statuses)
-  connect.py mark <tool> <status> [--note TEXT]    record how a connection went
+  connect.py mark <tool> <status> [--note TEXT | --error TEXT]  record how a connection went
   connect.py diagnose [TEXT | --stdin] [--tool T]  explain an error message and what to do
   connect.py it-request [--tools a,b] [--write]    one email to IT for everything that needs an admin
   connect.py tour [--help-first ...] [--write]     what the connected tools unlock, with a try-it for each
@@ -21,7 +21,7 @@ Usage:
   connect.py export-md [--check]                   refresh the markdown copies used when Python can't run
   connect.py selftest                              run the built-in tests
 
-Surfaces: cowork, desktop, web, code. Statuses: to-do, connected, needs-admin,
+Surfaces: cowork, desktop, web, code, codex. Statuses: to-do, connected, needs-admin,
 failed, using-fallback, skipped. plan, mark, tour, it-request, and check take
 --workspace <folder> (default: current folder).
 """
@@ -59,14 +59,18 @@ HERE = Path(__file__).resolve().parent
 CATALOG_PATH = HERE.parent / "connectors" / "catalog.json"
 SETUP = "Setup"
 PLAN_REL = Path(SETUP) / "connection-plan.md"
+ERROR_TAG = "error seen: "   # how `mark --error` tags a note in the plan's log, so the IT email can tell errors from notes
 STATUSES = ["to-do", "connected", "needs-admin", "failed", "using-fallback", "skipped"]
-SURFACES = ["cowork", "desktop", "web", "code"]
+SURFACES = ["cowork", "desktop", "web", "code", "codex"]
 ROUTE_ORDER = {"one-click": 0, "add-by-url": 1, "api-key": 2, "admin-project": 3, "none": 4}
 ROUTE_SHORT = {"one-click": "One click", "add-by-url": "Add by web address", "api-key": "Needs a key",
                "admin-project": "IT sets it up", "none": "No connector yet"}
 CATEGORY_ORDER = ["suite", "chat", "meetings", "files", "tracker", "docs", "work-management", "crm", "support",
                   "sales", "design", "analytics", "dev", "data", "marketing", "hr", "finance", "automation"]
-SURFACE_NAME = {"cowork": "Cowork", "desktop": "Claude Desktop", "web": "claude.ai", "code": "Claude Code"}
+SURFACE_NAME = {"cowork": "Cowork", "desktop": "Claude Desktop", "web": "claude.ai", "code": "Claude Code", "codex": "Codex"}
+CODEX_SHORT = {"with-plugin": "Comes with the plugin", "plugin-or-address": "Codex plugin or web address",
+               "plugin-only": "Codex plugin only"}
+CODEX_PLUGINS = "Codex's plugin directory (/plugins in the Codex terminal app, or Plugins in the ChatGPT desktop app)"
 
 
 # ---------------------------------------------------------------- catalog
@@ -284,6 +288,44 @@ def mcp_url(c: dict, readonly: bool = True) -> str:
     return (c.get("mcp") or {}).get("url", "")
 
 
+def mentions_claude(text: str) -> bool:
+    return bool(re.search(r"claude|anthropic", text or "", re.I))
+
+
+def codex_address(c: dict) -> str:
+    """The address Codex can add with `codex mcp add`: mcp-json's read-only address, minus Claude-hosted or
+    Claude-registered sign-ins (an `oauth` block, or a tool that only signs in through a Claude account)."""
+    url = mcp_url(c)
+    if not url or c.get("claude_code") == "account" or (c.get("mcp") or {}).get("oauth") or mentions_claude(url):
+        return ""
+    return url
+
+
+def codex_route(c: dict) -> str | None:
+    """How a tool connects in Codex, or None when the catalog route (admin, key, nothing yet) already says it."""
+    if c["route"] in ("admin-project", "api-key", "none") or c["id"].startswith("other:"):
+        return None
+    if codex_address(c):
+        return "with-plugin" if c.get("bundled") else "plugin-or-address"
+    return "plugin-only"
+
+
+def for_codex(text: str, field: str) -> str:
+    """Catalog text for a Codex plan: drop what only applies to Claude. A fallback keeps its other clauses."""
+    if not mentions_claude(text):
+        return text or ""
+    if field != "fallback":
+        return ""
+    kept = []
+    for part in text.split("; "):
+        if mentions_claude(part):
+            part = part.split(", or ", 1)[1] if ", or " in part and not mentions_claude(part.split(", or ", 1)[1]) else ""
+        if part:
+            kept.append(part)
+    out = "; ".join(kept)
+    return out[:1].upper() + out[1:]
+
+
 # ---------------------------------------------------------------- list / screens / match
 
 def cmd_list(args) -> int:
@@ -380,14 +422,18 @@ def steps_for(c: dict, surface: str) -> list[str]:
     if r in ("admin-project", "api-key", "none"):
         if r == "none":
             if c["id"].startswith("other:"):
-                return [f"Look for {name} in Claude's connector directory (Customize, then Connectors). If it's there, connect it like any other tool.",
+                where = CODEX_PLUGINS if surface == "codex" else "Claude's connector directory (Customize, then Connectors)"
+                return [f"Look for {name} in {where}. If it's there, connect it like any other tool.",
                         "If it isn't, use the fallback below; it still feeds your second brain."]
             return [f"There is no connector for {name} yet. Use the fallback below; it still works with the second brain."]
         steps = ["Ask me for the IT email. I'll write it with exactly what the admin needs to do, and you send it."]
         if r == "api-key":
-            steps.append("Once there's a key, an admin or your Claude Owner adds it. Never paste a key into the chat.")
+            steps.append("Once there's a key, ask me how to add it in Codex. Never paste a key into the chat." if surface == "codex" else
+                         "Once there's a key, an admin or your Claude Owner adds it. Never paste a key into the chat.")
         steps.append("Use the fallback below until it is set up.")
         return steps
+    if surface == "codex":
+        return codex_steps(c, name)
     if surface == "code":
         if url and c.get("claude_code") != "account":
             pre = [f"If you installed the Unpaid Intern plugin, {name} is already listed: type /mcp, pick it, and sign in."] if c.get("bundled") else []
@@ -412,6 +458,31 @@ def steps_for(c: dict, surface: str) -> list[str]:
                   "On company Claude plans, only an Owner can add custom connectors. If you can't, send the Owner the name and address above."]
     steps.append("If you see Request instead of Connect, your company's Claude Owner has to turn it on. Click Request; it is not something you did wrong.")
     steps.append("Open the connector's tool settings and set anything that sends, posts, deletes, or shares to need approval, or turn it off.")
+    return steps
+
+
+def codex_steps(c: dict, name: str) -> list[str]:
+    """Codex's route, from setup's Codex branch: its own plugin directory first, then codex mcp add and login."""
+    route, url, tid = codex_route(c), codex_address(c), c["id"]
+    look = (f"Look for {name} in {CODEX_PLUGINS}. If it's there, install it and sign in with your work account. "
+            "A company ChatGPT workspace may need its admin to turn the plugin on first.")
+    if (c.get("mcp") or {}).get("headers"):
+        env = re.search(r"\$\{(\w+)\}", json.dumps(c["mcp"]["headers"]))
+        add = (f"If it isn't there, ask me to add it by address with a token: `codex mcp add {tid} --url {url} "
+               f"--bearer-token-env-var {env.group(1) if env else 'TOKEN'}`, and no sign-in. I'll walk you through the token, "
+               "which has to be set before you start Codex.")
+    else:
+        add = f"If it isn't there, ask me to add it by address: `codex mcp add {tid} --url {url}`, then `codex mcp login {tid}` if the add didn't already open a sign-in."
+    if route == "with-plugin":
+        steps = [f"If you installed the Unpaid Intern plugin, {name} comes with it. Don't install a second copy: ask me to sign you in with `codex mcp login {tid}`.",
+                 f"Without the plugin, look for {name} in {CODEX_PLUGINS} and install it, or ask me to add it by address: `codex mcp add {tid} --url {url}`, then `codex mcp login {tid}`."]
+    elif route == "plugin-or-address":
+        steps = [look, add]
+    else:
+        steps = [look, f"If it isn't there, there's no address Codex can add for {name} yet. Use the fallback below, and ask me for the IT email: an admin can turn the plugin on or share a client ID."]
+    steps.append("If the sign-in fails with \"invalid_client\" or a registration error, an admin has to turn the plugin on or share a client ID. Ask me for the IT email; it is not something you did wrong.")
+    steps.append("Ask me to set it to ask before writes in Codex's config (`default_tools_approval_mode = \"writes\"` in ~/.codex/config.toml). The plugin's ask-first hook doesn't run in Codex, so this setting is what asks you first.")
+    steps.append("Codex shows a new plugin or connection only in a new session. Start a new Codex session in the same folder, then ask me to test it.")
     return steps
 
 
@@ -445,10 +516,13 @@ def render_plan(cat: dict, ids: list[str], surface: str, statuses: dict, log: li
              "Adding tools later keeps every status already set here.", "",
              "Status: to-do, connected, needs-admin, failed, using-fallback, or skipped.", "",
              "| Order | Tool | Id | How it connects | Status |", "|---|---|---|---|---|"]
+    codex = surface == "codex"
     for n, c in enumerate(chosen, 1):
-        short = "Claude Code only" if c.get("code_only") and surface != "code" else ROUTE_SHORT[c["route"]]
+        short = "Claude Code only" if c.get("code_only") and surface not in ("code", "codex") else ROUTE_SHORT[c["route"]]
         if c["id"].startswith("other:"):
-            short = "Check Claude's directory"
+            short = "Check Codex's plugins" if codex else "Check Claude's directory"
+        elif codex and codex_route(c):
+            short = CODEX_SHORT[codex_route(c)]
         elif c["route"] == "one-click" and needs_admin_once(c):
             short = "One click, often after an admin approves it once"
         lines.append(f"| {n} | {c['name']} | `{c['id']}` | {short} | {statuses.get(c['id'], 'to-do')} |")
@@ -456,24 +530,30 @@ def render_plan(cat: dict, ids: list[str], surface: str, statuses: dict, log: li
     for n, c in enumerate(chosen, 1):
         lines.append(f"### {n}. {c['name']}")
         lines.append("")
-        how = ("Only in Claude Code for now. Elsewhere, use the fallback." if c.get("code_only") and surface != "code"
-               else "Not in this kit's catalog yet." if c["id"].startswith("other:") else cat["routes"][c["route"]])
+        how = ("Not in this kit's catalog yet." if c["id"].startswith("other:")
+               else cat["codex_routes"][codex_route(c)] if codex and codex_route(c)
+               else "Only in Claude Code for now. Elsewhere, use the fallback." if c.get("code_only") and surface not in ("code", "codex")
+               else cat["routes"][c["route"]])
         lines.append(f"How it connects: {how}")
         lines.append("")
         for i, s in enumerate(steps_for(c, surface), 1):
             lines.append(f"{i}. {s}")
         lines.append("")
-        if c.get("admin"):
-            lines.append(f"- What your admin does (for IT, if needed): {c['admin']}")
-        if c.get("readonly"):
-            lines.append(f"- Keeping it read-only: {c['readonly']}")
-        if c.get("fallback"):
-            lines.append(f"- Until it works: {c['fallback']}")
-        if c.get("notes"):
-            lines.append(f"- Good to know: {c['notes']}")
+        src = c
+        if codex and (c.get("admin") or "").startswith("Same as Gmail"):
+            src = dict(c, admin=by_id(cat)["gmail"]["admin"])
+        text = {k: (for_codex(src.get(k), k) if codex else src.get(k)) for k in ("admin", "readonly", "fallback", "notes", "docs")}
+        if text["admin"]:
+            lines.append(f"- What your admin does (for IT, if needed): {text['admin']}")
+        if text["readonly"]:
+            lines.append(f"- Keeping it read-only: {text['readonly']}")
+        if text["fallback"]:
+            lines.append(f"- Until it works: {text['fallback']}")
+        if text["notes"]:
+            lines.append(f"- Good to know: {text['notes']}")
         lines.append("- If it fails: copy the exact error message (or take a screenshot) and say \"it didn't work\". I'll tell you what it means and who can fix it.")
-        if c.get("docs"):
-            lines.append(f"- Vendor guide: {c['docs']}")
+        if text["docs"]:
+            lines.append(f"- Vendor guide: {text['docs']}")
         lines.append("")
     lines += ["## Log", ""]
     lines += log if log else [f"- {today} plan created"]
@@ -484,7 +564,7 @@ def render_plan(cat: dict, ids: list[str], surface: str, statuses: dict, log: li
 def plan_surface(path: Path) -> str | None:
     if not path.exists():
         return None
-    m = re.search(r"for (Cowork|Claude Desktop|claude\.ai|Claude Code)\.", path.read_text(encoding="utf-8-sig", errors="replace"))
+    m = re.search(r"for (Cowork|Claude Desktop|claude\.ai|Claude Code|Codex)\.", path.read_text(encoding="utf-8-sig", errors="replace"))
     return {v: k for k, v in SURFACE_NAME.items()}[m.group(1)] if m else None
 
 
@@ -532,6 +612,8 @@ def cmd_plan(args) -> int:
                 key = "one-click-admin"
             if i.startswith("other:"):
                 key = "other"
+            elif surface == "codex" and codex_route(c):
+                key = codex_route(c)
             groups.setdefault(key, []).append(c["name"].split(" (")[0])
     print(f"Wrote {PLAN_REL}.")
     labels = {"one-click": "Ready to connect now",
@@ -539,7 +621,13 @@ def cmd_plan(args) -> int:
               "add-by-url": "Add by web address", "api-key": "Needs a key from an admin",
               "admin-project": "Needs IT to set it up first", "none": "No connector yet (we'll use exports or the browser)",
               "other": "Not in this kit's catalog (we'll check Claude's directory, then fall back to exports)"}
-    order = ["one-click", "one-click-admin", "add-by-url", "api-key", "admin-project", "none", "other"]
+    if surface == "codex":
+        labels.update({"with-plugin": "Comes with the plugin (sign in only)",
+                       "plugin-or-address": "Codex's plugin directory, or by web address",
+                       "plugin-only": "Codex's plugin directory only (an admin may need to turn it on)",
+                       "other": "Not in this kit's catalog (we'll check Codex's plugins, then fall back to exports)"})
+    order = ["with-plugin", "one-click", "one-click-admin", "add-by-url", "plugin-or-address", "plugin-only",
+             "api-key", "admin-project", "none", "other"]
     for r in sorted(groups, key=order.index):
         print(f"{labels[r]}: {', '.join(groups[r])}")
     return 0
@@ -563,8 +651,12 @@ def cmd_mark(args) -> int:
         sys.exit(f"'{tid}' is not in the plan. Add it with 'connect.py plan --tools {tid}'.")
     statuses[tid] = status
     day = today_str(args.today)
-    clean = redact(args.note).replace("|", "/") if args.note else ""
-    note = f": {clean}" if clean else ""
+    error = getattr(args, "error", None)
+    if error and args.note:
+        sys.exit("Pass --note or --error, not both.")
+    raw = error or args.note
+    clean = redact(raw).replace("|", "/") if raw else ""
+    note = f": {ERROR_TAG}{clean}" if clean and error else f": {clean}" if clean else ""
     log.append(f"- {day} {tid} {status}{note}")
     surface = plan_surface(path) or "cowork"
     made = re.search(r"^Made on (\d{4}-\d{2}-\d{2})", path.read_text(encoding="utf-8-sig", errors="replace"), flags=re.M)
@@ -657,6 +749,11 @@ def build_tour(cat: dict, connected: list[str], pending: list[str], help_first: 
     return start, rows, reads, better
 
 
+def spoken_name(c: dict) -> str:
+    """A command's name without the slash, for hosts that don't take the kit's slash commands: /project-status is Project status."""
+    return c["command"].lstrip("/").replace("-", " ").capitalize()
+
+
 def cmd_tour(args) -> int:
     cat = load_catalog()
     ws = None
@@ -672,11 +769,19 @@ def cmd_tour(args) -> int:
         pending = [t for t, s in st.items() if s in ("to-do", "needs-admin", "failed")]
     help_first = split_help(args.help_first or "", cat) or read_help_first(ws)
     start, rows, reads, better = build_tour(cat, connected, pending, help_first)
+    # Codex rejects slash commands it doesn't define ("Unrecognized command"), so there the tour says each one in words.
+    plain = bool(getattr(args, "plain", False) or (ws and plan_surface(ws / PLAN_REL) == "codex"))
+
+    def title(c):
+        return spoken_name(c) if plain else c["command"]
+
+    def try_line(c):
+        return c["say"] if plain else c["try_it"]
 
     if args.json:
         print(json.dumps({"question": "Which one do you want to try first?", "header": "Try first", "multiSelect": False,
-                          "options": [{"label": r["cmd"]["command"], "description": r["cmd"]["what"]} for r in start],
-                          "try_it": {r["cmd"]["command"]: r["cmd"]["try_it"] for r in start}}, indent=1))
+                          "options": [{"label": title(r["cmd"]), "description": r["cmd"]["what"]} for r in start],
+                          "try_it": {title(r["cmd"]): try_line(r["cmd"]) for r in start}}, indent=1))
         return 0
 
     out = [TOUR_MARK, "# What you just unlocked", ""]
@@ -688,24 +793,27 @@ def cmd_tour(args) -> int:
     out += ["", "## Start with these", ""]
     for r in start:
         c = r["cmd"]
-        out.append(f"**{c['command']}**: {c['what']}")
+        out.append(f"**{title(c)}**: {c['what']}")
         out.append(f"- {reads(r)}")
         b = better(r)
         if b:
             out.append(f"- {b}")
-        out.append(f"- Try it: `{c['try_it']}`")
+        out.append(f"- {'Say' if plain else 'Try it'}: `{try_line(c)}`")
         out.append("")
     core_rest = [r for r in rows if r not in start and r["cmd"].get("core")]
     if core_rest:
         out += ["## The rest of the core eight", ""]
         for r in core_rest:
             tail = " (live)" if r["live"] else ""
-            out.append(f"- **{r['cmd']['command']}**{tail}: {r['cmd']['what']}")
+            say = f" Say: `{r['cmd']['say']}`" if plain else ""
+            out.append(f"- **{title(r['cmd'])}**{tail}: {r['cmd']['what']}{say}")
         out.append("")
     extra = [r["cmd"]["command"] for r in rows if r not in start and not r["cmd"].get("core")]
     out += [f"There are {len(extra)} more for later. When you're ready, ask \"what else can you do?\"", ""]
     out += ["## Good to know", "",
-            "- You never have to remember these. Say what you want in plain words and the agent picks the command.",
+            ("- You never have to remember these. Say what you want in plain words and the agent picks the command. "
+             "In Codex, type the words, not a slash: Codex only knows its own slash commands." if plain else
+             "- You never have to remember these. Say what you want in plain words and the agent picks the command."),
             "- Nothing gets sent, posted, or deleted without you seeing it first.",
             "- To add a tool, ask me to connect it. This page refreshes when something new connects.", ""]
     text = "\n".join(out)
@@ -964,7 +1072,7 @@ def cmd_it_request(args) -> int:
     ids = resolve_tools(cat, args.tools, keep_unknown=True)
     if args.tools and not ids:
         sys.exit("No tools named. Use ids from `connect.py list`, or tool names.")
-    notes: dict[str, list[str]] = {}
+    notes: dict[str, list[tuple[str, str]]] = {}
     statuses: dict[str, str] = {}
     ws = None
     if args.workspace:
@@ -979,7 +1087,7 @@ def cmd_it_request(args) -> int:
         for line in log:
             m = re.match(r"- \S+ (\S+) (needs-admin|failed)(?:: (.*))?", line)
             if m and m.group(3):
-                notes.setdefault(m.group(1), []).append(redact(m.group(3)))
+                notes.setdefault(m.group(1), []).append((m.group(2), redact(m.group(3))))
     tools = tools_with_others(cat, ids)
     ids = [i for i in ids if i in tools and (tools[i]["route"] != "none" or i.startswith("other:"))]
     if not ids and not args.personal:
@@ -990,7 +1098,9 @@ def cmd_it_request(args) -> int:
     names = [c["name"].split(" (")[0] for c in chosen + unclear_tools]
     listing = ("work tools" if not names else names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1])
     who = args.name or "<your name>"
-    ai = (getattr(args, "assistant", None) or "Claude").strip() or "Claude"
+    ai = (getattr(args, "assistant", None) or "").strip()
+    if not ai:
+        ai = "Codex" if ws and plan_surface(ws / PLAN_REL) == "codex" else "Claude"
     plan_example = ("Claude Team or Enterprise workspace" if ai == "Claude" else
                     "ChatGPT Business or Enterprise workspace, which includes Codex" if ai.lower() == "codex" else
                     f"{ai} business or enterprise workspace")
@@ -1031,15 +1141,20 @@ def cmd_it_request(args) -> int:
             out.append(f"   Connector address: {url}")
         if c.get("docs") and not claude_only(c["docs"]):
             out.append(f"   Setup guide: {c['docs']}")
-        for note in notes.get(c["id"], []):
-            out.append(f"   Error I saw: {note}")
+        for status, note in notes.get(c["id"], []):
+            # Only a note recorded as an error (mark --error), or one from a failed attempt, is an error someone saw.
+            # Any other note ("needs admin approval", "no Codex plugin") goes in neutrally.
+            if note.startswith(ERROR_TAG) or status == "failed":
+                out.append(f"   Error I saw: {note[len(ERROR_TAG):] if note.startswith(ERROR_TAG) else note}")
+            else:
+                out.append(f"   Note: {note}")
         out.append("")
     if unclear_tools:
         out += ["Also not working yet (I couldn't tell why)", ""]
         for n, c in enumerate(unclear_tools, 1):
             out.append(f"{n}. {c['name']}: it didn't connect and the error didn't say why. Could you check whether it's allowed, or blocked by a network rule?")
-            for note in notes.get(c["id"], []):
-                out.append(f"   What happened: {note}")
+            for _, note in notes.get(c["id"], []):
+                out.append(f"   What happened: {note[len(ERROR_TAG):] if note.startswith(ERROR_TAG) else note}")
             out.append("")
     out += ["What it will not do", "",
             "- Send, post, delete, or share anything on its own. Those tools stay off or need my approval every time.",
@@ -1290,7 +1405,10 @@ def markdown_copies(cat: dict) -> dict:
     lines = ["# Connector catalog", "", "Contents", ""] + [f"- {CATEGORY_TITLES[k]}" for k in cats] + [
         "", GEN_NOTE, "",
         f"Checked {cat['version']}. {cat['note']}", "",
-        "How it connects: " + " ".join(f"**{ROUTE_SHORT[k]}**: {v}" for k, v in cat["routes"].items()), ""]
+        "How it connects: " + " ".join(f"**{ROUTE_SHORT[k]}**: {v}" for k, v in cat["routes"].items()), "",
+        "In Codex, a tool the catalog connects in one click or by address goes one of three ways: "
+        + " ".join(f"**{CODEX_SHORT[k]}**: {v}" for k, v in cat["codex_routes"].items())
+        + " `connect.py plan --surface codex` works out which, tool by tool.", ""]
     for k in cats:
         lines += [f"## {CATEGORY_TITLES[k]}", "", "| Tool | Id | How it connects | Address | Admin step | Read-only | Until it works |", "|---|---|---|---|---|---|---|"]
         for c in (c for c in tools if c["category"] == k):
@@ -1327,14 +1445,16 @@ def markdown_copies(cat: dict) -> dict:
     out["references/setup-questions.md"] = "\n".join(lines)
 
     lines = ["# What each command unlocks", "", GEN_NOTE, "",
-             "Use this for the tour when scripts can't run: pick four of the core eight that match what the person asked for help with, say what each one reads for them, and have them try one. List the other four core commands after them; mention the rest only when asked.", ""]
+             "Use this for the tour when scripts can't run: pick four of the core eight that match what the person asked for help with, say what each one reads for them, and have them try one. List the other four core commands after them; mention the rest only when asked.",
+             "",
+             "Each request in the last column runs the same procedure as its command. In Codex, which rejects slash commands it doesn't define, give people only the words.", ""]
     for title, rows_ in (("The core eight", [c for c in cat["commands"] if c.get("core")]),
                          ("When you want more", [c for c in cat["commands"] if not c.get("core")])):
-        lines += [f"## {title}", "", "| Command | What it does | Reads (when connected) | With nothing connected | Try it |", "|---|---|---|---|---|"]
+        lines += [f"## {title}", "", "| Command | What it does | Reads (when connected) | With nothing connected | Try it | Or say it in words |", "|---|---|---|---|---|---|"]
         for c in rows_:
             reads = ", ".join(cat["kinds"][k].replace("your ", "") for k in c["uses"]) or "nothing; your own records"
             without = c.get("without") or ("Works fully." if not c["uses"] else "Works from pasted text and dropped files.")
-            lines.append(f"| {c['command']} | {_cell(c['what'])} | {_cell(reads)} | {_cell(without)} | `{c['try_it']}` |")
+            lines.append(f"| {c['command']} | {_cell(c['what'])} | {_cell(reads)} | {_cell(without)} | `{c['try_it']}` | {_cell(c['say'])} |")
         lines.append("")
     lines.pop()
     out["references/what-you-unlock.md"] = "\n".join(lines) + "\n"
@@ -1469,7 +1589,7 @@ def cmd_selftest(args) -> int:
         try:
             sys.stdout = quiet
             cmd_mark(argparse.Namespace(workspace=str(ws), tool="slack", status="connected", note=None, today="2026-10-05"))
-            cmd_mark(argparse.Namespace(workspace=str(ws), tool="jira", status="needs-admin", note="Your site admin must authorize | this app", today="2026-10-07"))
+            cmd_mark(argparse.Namespace(workspace=str(ws), tool="jira", status="needs-admin", note=None, error="Your site admin must authorize | this app", today="2026-10-07"))
         finally:
             sys.stdout = old
         check("mark keeps the date the plan was made", "Made on 2026-10-05" in (ws / PLAN_REL).read_text(encoding="utf-8"))
@@ -1481,7 +1601,7 @@ def cmd_selftest(args) -> int:
         st, log = parse_plan(ws / PLAN_REL)
         check("mark sets status", st.get("slack") == "connected" and st.get("atlassian") == "needs-admin")
         check("re-plan keeps statuses and adds tools", st.get("slack") == "connected" and st.get("notion") == "to-do")
-        check("log kept and pipes escaped", any("atlassian needs-admin: Your site admin must authorize / this app" in l for l in log))
+        check("log kept and pipes escaped", any("atlassian needs-admin: error seen: Your site admin must authorize / this app" in l for l in log))
         check("plan table still parses", len(st) == 6)
         try:
             sys.stdout = quiet
@@ -1536,6 +1656,7 @@ def cmd_selftest(args) -> int:
         check("match joins split names and skips 'nothing really'", m2["ids"] == ["salesforce"] and not m2["unknown"])
         try:
             sys.stdout = quiet
+            cmd_mark(argparse.Namespace(workspace=str(ws), tool="notion", status="needs-admin", note="admin approval required", today="2026-10-07"))
             cmd_it_request(argparse.Namespace(workspace=str(ws), tools=None, name="Pat", write=True, personal=False))
         finally:
             sys.stdout = old
@@ -1543,6 +1664,9 @@ def cmd_selftest(args) -> int:
         req = reqs[0].read_text(encoding="utf-8") if reqs else ""
         check("it-request picks needs-admin tools", "Atlassian (Jira, Confluence, Loom)" in req and "Slack" not in req.split("What it will not do")[0].split("What I'm asking for")[1])
         check("it-request carries the error seen", "Error I saw: Your site admin must authorize" in req)
+        notion_part = req.split(". Notion\n", 1)[-1].split("\n\n", 1)[0]
+        check("it-request labels a note that isn't an error neutrally",
+              "   Note: admin approval required" in notion_part and "Error I saw" not in notion_part and req.count("Error I saw") == 1)
         check("it-request uses catalog admin text", "site admin completes first consent" in req)
         try:
             sys.stdout = quiet
@@ -1600,6 +1724,49 @@ def cmd_selftest(args) -> int:
         check("files saved by Windows PowerShell (byte-order mark, ANSI bytes) still read",
               bom_ok and read_help_first(ws) == ["Status updates"])
         quiet.close()
+
+    # Codex: the saved plan is for Codex, with Codex's steps, in the same order with the same statuses
+    with tempfile.TemporaryDirectory() as tmp:
+        every = ",".join(c["id"] for c in cat["connectors"]) + ",Some Unknown Tool"
+        plans = {}
+        for surf in ("code", "codex"):
+            ws = Path(tmp) / surf
+            (ws / SETUP).mkdir(parents=True)
+            with contextlib.redirect_stdout(io.StringIO()):
+                cmd_plan(argparse.Namespace(workspace=str(ws), tools=every, surface=surf, today="2026-10-09", print=False))
+            plans[surf] = (ws / PLAN_REL).read_text(encoding="utf-8")
+        cx = plans["codex"]
+        check("Codex plan header names Codex", "Made on 2026-10-09 for Codex." in cx and plan_surface(Path(tmp) / "codex" / PLAN_REL) == "codex")
+        check("Codex plan has no Claude-only instructions",
+              "claude.ai" not in cx and "type /mcp" not in cx and "Customize" not in cx and "claude" not in cx.lower() and "anthropic" not in cx.lower())
+        check("Codex plan keeps the same order and status column",
+              list(parse_plan(Path(tmp) / "codex" / PLAN_REL)[0]) == list(parse_plan(Path(tmp) / "code" / PLAN_REL)[0])
+              and "| Order | Tool | Id | How it connects | Status |" in cx)
+        check("Codex plan starts each tool at Codex's plugin directory and locks it down in Codex's config",
+              "/plugins" in cx and "default_tools_approval_mode" in cx and "new Codex session" in cx)
+        check("Codex plan adds by address with codex mcp add, and only the plugin's own connectors just sign in",
+              "`codex mcp add linear --url https://mcp.linear.app/mcp/readonly`" in cx and "`codex mcp login atlassian`" in cx
+              and "codex mcp add slack" not in cx and "codex mcp add microsoft-365" not in cx and "--bearer-token-env-var GITHUB_PAT" in cx)
+        wc = Path(tmp) / "codex"
+        with contextlib.redirect_stdout(io.StringIO()):
+            cmd_mark(argparse.Namespace(workspace=str(wc), tool="gmail", status="connected", note=None, today="2026-10-10"))
+            cmd_plan(argparse.Namespace(workspace=str(wc), tools="gmail", surface=None, today="2026-10-10", print=False))
+        cx2 = (wc / PLAN_REL).read_text(encoding="utf-8")
+        check("Codex plan stays Codex after mark and re-plan, statuses kept",
+              "for Codex." in cx2 and parse_plan(wc / PLAN_REL)[0].get("gmail") == "connected" and "claude" not in cx2.lower())
+        with contextlib.redirect_stdout(io.StringIO()):
+            cmd_mark(argparse.Namespace(workspace=str(wc), tool="hubspot", status="needs-admin", note="no Codex plugin or sign-in worked", today="2026-10-10"))
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_it_request(argparse.Namespace(workspace=str(wc), tools=None, name="Pat", write=False, personal=False, today="2026-10-10", assistant=None))
+        check("IT email names Codex by default for a Codex plan", "company's Codex account" in buf.getvalue() and "Claude" not in buf.getvalue())
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cmd_tour(argparse.Namespace(workspace=str(wc), connected=None, help_first="A morning brief", write=False, json=False))
+        tour = buf.getvalue()
+        check("tour for a Codex plan says commands in words, never as a slash to type",
+              "`give me my briefing`" in tour and "`/" not in tour and "**/" not in tour)
+    check("every command has a plain-language form", all(c.get("say") and not c["say"].startswith("/") for c in cat["commands"]))
 
     # commands and tour
     labels = {o["label"] for s in cat["screens"] for q in s["questions"] if q["header"] in ("Help with", "New here?") for o in q["options"]}
@@ -1712,7 +1879,8 @@ def main(argv=None) -> int:
     p = sub.add_parser("mark", help="record how a connection went")
     p.add_argument("tool")
     p.add_argument("status")
-    p.add_argument("--note")
+    p.add_argument("--note", help="what happened, in a few words")
+    p.add_argument("--error", help="the exact error message a connection attempt showed (instead of --note)")
     p.add_argument("--workspace", default=".")
     p.add_argument("--today")
     p.set_defaults(func=cmd_mark)
@@ -1729,7 +1897,7 @@ def main(argv=None) -> int:
     p.add_argument("--workspace", default=".")
     p.add_argument("--name")
     p.add_argument("--personal", action="store_true", help="lead with asking for an approved AI account")
-    p.add_argument("--assistant", default="Claude", help="the AI product the email names (default: Claude), for example Codex")
+    p.add_argument("--assistant", default=None, help="the AI product the email names, for example Codex (default: Codex for a Codex plan, else Claude)")
     p.add_argument("--write", action="store_true")
     p.add_argument("--today", help="override today's date, YYYY-MM-DD")
     p.set_defaults(func=cmd_it_request)
@@ -1740,6 +1908,7 @@ def main(argv=None) -> int:
     p.add_argument("--help-first", help="comma list of the 'help with first' answers")
     p.add_argument("--write", action="store_true", help="save Setup/my-commands.md")
     p.add_argument("--json", action="store_true", help="picker payload for 'which one first?'")
+    p.add_argument("--plain", action="store_true", help="say each command in words, not as a slash command (Codex; on by default for a Codex plan)")
     p.set_defaults(func=cmd_tour)
 
     p = sub.add_parser("mcp-json", help="Claude Code config")

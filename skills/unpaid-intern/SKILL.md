@@ -4,7 +4,7 @@ description: "Unpaid Intern runs a portable second brain for knowledge work: a p
 license: MIT
 compatibility: "Claude (claude.ai, Desktop, Cowork), Claude Code, and Codex. Needs a folder it can read and write for memory; connectors are optional. Scripts need Python 3.9+ with the standard library only. Other agents can share the workspace through AGENTS.md."
 metadata:
-  version: "1.3.3"
+  version: "1.3.4"
   author: "Kevin Middleton"
   homepage: "https://middleton.io"
 ---
@@ -119,16 +119,16 @@ Retrieval order: what the user just pasted or dropped, then `Memory/`, `2-Projec
 
 Full specs, templates, and edge cases: `references/commands.md`. Lead with the core eight. Mention the rest only when the person asks for more or the task calls for one.
 
-| Core | What it does |
-|---|---|
-| `/briefing` | The day: what needs you, the calendar, what you are waiting on, prep for tomorrow |
-| `/prep` | One meeting: who, why, last decision, open items both ways, the outcome to seek |
-| `/debrief` | A transcript or notes into decisions, follow-ups, and a clean meeting note |
-| `/who` | Who someone is, what they own, who they report to, and what's open between you |
-| `/capture` | One commitment logged with owner, date, deliverable, and source |
-| `/close` | Day log, live threads, unfinished work, tomorrow's first move |
-| `/project-status` | A manager-ready project table built from the workspace, one paste |
-| `/explain` | What does this mean, explain it like I am new, plain English |
+| Core | What it does | Or in words |
+|---|---|---|
+| `/briefing` | The day: what needs you, the calendar, what you are waiting on, prep for tomorrow | "give me my briefing" |
+| `/prep` | One meeting: who, why, last decision, open items both ways, the outcome to seek | "prep me for <meeting>" |
+| `/debrief` | A transcript or notes into decisions, follow-ups, and a clean meeting note | "debrief my last meeting" |
+| `/who` | Who someone is, what they own, who they report to, and what's open between you | "who is <name>" |
+| `/capture` | One commitment logged with owner, date, deliverable, and source | "log a promise" |
+| `/close` | Day log, live threads, unfinished work, tomorrow's first move | "close out my day" |
+| `/project-status` | A manager-ready project table built from the workspace, one paste | "give me my project status table" |
+| `/explain` | What does this mean, explain it like I am new, plain English | "explain this" |
 
 When they want more:
 
@@ -141,7 +141,7 @@ When they want more:
 - **Keeping the record:** `/new-project`, `/decision`, `/sync-kb` (file a dropped source), `/kb-lint` (health check), `/tidy` (merge, fix dates, retire finished items)
 - **Setup:** `/setup` (guided setup, or change answers later), `/connect` (add a tool, resume the plan, or fix one that will not connect)
 
-When someone asks what you can do, give the core eight in a line each, say plain words work as well as commands, and offer the rest. Commands are words, not magic. If the user asks for the same thing in plain language, run the same procedure. When the same request shows up three times without a command, offer to make it one.
+When someone asks what you can do, give the core eight in a line each, say plain words work as well as commands, and offer the rest. Commands are words, not magic. If the user asks for the same thing in plain language, run the same procedure: "give me my briefing" is /briefing, "prep me for my 2pm" is /prep, "file my inbox" is /sync-kb, and every command's plain form is in `references/what-you-unlock.md`. When the same request shows up three times without a command, offer to make it one.
 
 ## Voice for briefs and updates
 
@@ -154,9 +154,9 @@ When a name shows up that isn't in `4-Reference/people.md` and the person said s
 ## How to work
 
 - Before handing back any task that wrote files, run `brain.py check`. List exactly the files it prints as what you wrote or moved (moves as source -> destination; files it labels as created by setup take one line), fix any weekday it marks wrong, and change any pronoun it flags to the name or "they" unless a source gives one.
-- Keep replies short. A one-line question gets a few lines back. Lead with the answer, cut the preamble, and never narrate your process ("I checked", "I ran", "let me look"). Name folders the way the user sees them, without code formatting. Mention commands by name, but phrase it as something they can ask for ("ask me for a /prep"), never as something to type.
+- Keep replies short. A one-line question gets a few lines back. Lead with the answer, cut the preamble, and never narrate your process ("I checked", "I ran", "let me look"). Name folders the way the user sees them, without code formatting. Mention commands by name, but phrase it as something they can ask for ("ask me for a /prep"), never as something to type. In Codex, typing one of these gets "Unrecognized command" (Codex takes only its own slash commands), so there leave the slash out and give the words: "ask me to prep you for that meeting", "say 'give me my briefing'".
 - Refer to people by name, or "they", until a source gives a pronoun. This holds in chat and in every file you write.
-- Outside Claude (Codex, ChatGPT), the workspace, the scripts, and every command work the same. Setup's connector steps are written for Claude. Elsewhere, connect tools with that product's own steps (in Codex: a plugin from Codex's own directory when it has one, otherwise `codex mcp add <name> --url <address>` with the address from `connect.py mcp-json --tools <ids>`), lock them down as Step 5 of `references/setup.md` says for Codex, and say so once.
+- Outside Claude (Codex, ChatGPT), the workspace, the scripts, and every command work the same. Setup's connector steps are written for Claude, except in Codex: there, `connect.py plan --surface codex` gives Codex's own steps (a plugin from Codex's own directory when it has one, otherwise `codex mcp add <name> --url <address>`), and Step 5 of `references/setup.md` says how to lock each tool down. Elsewhere, connect tools with that product's own steps, lock them down the same way, and say so once.
 - Plan anything with three or more steps before building it. If the approach breaks, stop and re-plan. Say when something is a hole in the plan.
 - Never assess anyone's motives, competence, or reliability. Record what people own and what they said.
 - Match depth to the room: a weekly teammate gets three lines; an executive, legal, or first meeting gets the full block.

@@ -8,6 +8,11 @@
   "api-key": "Needs a key from the tool, not just your login. Usually an admin request.",
   "none": "No connector yet. Use the fallback."
  },
+ "codex_routes": {
+  "with-plugin": "Comes with the Unpaid Intern plugin. Sign in with codex mcp login. Without the plugin, install it from Codex's plugin directory or add it by web address.",
+  "plugin-or-address": "Install it from Codex's plugin directory (/plugins) if it's listed there. Otherwise add it by web address with codex mcp add, then sign in.",
+  "plugin-only": "Only through Codex's plugin directory (/plugins). There's no web address Codex can add for it, so if it isn't listed, an admin turns the plugin on or shares a client ID."
+ },
  "screens": [
   {
    "id": "home",
@@ -2887,6 +2892,7 @@
     "A morning brief"
    ],
    "try_it": "/briefing",
+   "say": "give me my briefing",
    "without": "Works today from your follow-up list and dropped files.",
    "starter": true,
    "core": true
@@ -2904,6 +2910,7 @@
     "A morning brief"
    ],
    "try_it": "/pulse",
+   "say": "what changed since my briefing?",
    "without": "",
    "starter": false,
    "core": false
@@ -2921,6 +2928,7 @@
     "Status updates"
    ],
    "try_it": "/week",
+   "say": "walk me through my week",
    "without": "",
    "starter": false,
    "core": false
@@ -2942,6 +2950,7 @@
     "Meeting prep and notes"
    ],
    "try_it": "/prep my next meeting",
+   "say": "prep me for my next meeting",
    "without": "Paste the invite or name the meeting.",
    "starter": true,
    "core": true
@@ -2959,6 +2968,7 @@
     "Tracking follow-ups"
    ],
    "try_it": "/debrief the last meeting",
+   "say": "debrief my last meeting",
    "without": "Drop or paste the transcript.",
    "starter": true,
    "core": true
@@ -2974,6 +2984,7 @@
     "Meeting prep and notes"
    ],
    "try_it": "/slots 30 minutes with my manager next week",
+   "say": "find 30 minutes with my manager next week",
    "without": "Paste your free times.",
    "starter": false,
    "core": false
@@ -2992,6 +3003,7 @@
     "Yes, still ramping up"
    ],
    "try_it": "/who and a name from your last meeting",
+   "say": "who is (then a name from your last meeting)",
    "without": "Works from your people page, meeting notes, and follow-ups.",
    "starter": true,
    "core": true
@@ -3005,6 +3017,7 @@
     "Tracking follow-ups"
    ],
    "try_it": "/capture and the promise, like \"I owe my manager the draft by Thursday\"",
+   "say": "log a promise, like \"I owe my manager the draft by Thursday\"",
    "without": "",
    "starter": true,
    "core": true
@@ -3022,6 +3035,7 @@
     "A morning brief"
    ],
    "try_it": "/triage my inbox from the last two days",
+   "say": "sort my inbox from the last two days",
    "without": "Paste the messages.",
    "starter": false,
    "core": false
@@ -3035,6 +3049,7 @@
     "Tracking follow-ups"
    ],
    "try_it": "/close",
+   "say": "close out my day",
    "without": "",
    "starter": false,
    "core": true
@@ -3050,6 +3065,7 @@
     "Status updates"
    ],
    "try_it": "/project-status",
+   "say": "give me my project status table",
    "without": "Works today from your own project records.",
    "starter": true,
    "core": true
@@ -3067,6 +3083,7 @@
     "Status updates"
    ],
    "try_it": "/gofer",
+   "say": "do the legwork on my plate",
    "without": "",
    "starter": false,
    "core": false
@@ -3081,6 +3098,7 @@
    ],
    "helps": [],
    "try_it": "/draft a reply to the last email from my manager",
+   "say": "draft a reply to the last email from my manager",
    "without": "Paste the thread.",
    "starter": false,
    "core": false
@@ -3092,6 +3110,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/redline (then paste the draft)",
+   "say": "redline this (then paste the draft)",
    "without": "",
    "starter": false,
    "core": false
@@ -3105,6 +3124,7 @@
    ],
    "helps": [],
    "try_it": "/write-epic from these notes",
+   "say": "write an epic from these notes",
    "without": "Drafts from your notes today; filing it live needs a tracker.",
    "starter": false,
    "core": false
@@ -3118,6 +3138,7 @@
     "Yes, still ramping up"
    ],
    "try_it": "/explain (then paste the thing)",
+   "say": "explain this (then paste the thing)",
    "without": "",
    "starter": true,
    "core": true
@@ -3129,6 +3150,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/bro",
+   "say": "explain that again, simpler",
    "without": "",
    "starter": false,
    "core": false
@@ -3140,6 +3162,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/quick 3",
+   "say": "give me that in 3 points",
    "without": "",
    "starter": false,
    "core": false
@@ -3151,6 +3174,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/grill (then paste the plan)",
+   "say": "grill me on this plan (then paste the plan)",
    "without": "",
    "starter": false,
    "core": false
@@ -3165,6 +3189,7 @@
    ],
    "helps": [],
    "try_it": "/study our product glossary",
+   "say": "quiz me on our product glossary",
    "without": "",
    "starter": false,
    "core": false
@@ -3185,6 +3210,7 @@
     "Yes, still ramping up"
    ],
    "try_it": "/learn the billing migration",
+   "say": "teach me the billing migration",
    "without": "",
    "starter": false,
    "core": false
@@ -3196,6 +3222,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/new-project",
+   "say": "start a new project",
    "without": "",
    "starter": false,
    "core": false
@@ -3207,6 +3234,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/decision",
+   "say": "log a decision",
    "without": "",
    "starter": false,
    "core": false
@@ -3220,6 +3248,7 @@
    ],
    "helps": [],
    "try_it": "/sync-kb",
+   "say": "file my inbox",
    "without": "",
    "starter": false,
    "core": false
@@ -3231,6 +3260,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/kb-lint",
+   "say": "check my second brain for problems",
    "without": "",
    "starter": false,
    "core": false
@@ -3242,6 +3272,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/tidy",
+   "say": "tidy up my records",
    "without": "",
    "starter": false,
    "core": false
@@ -3253,6 +3284,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/connect",
+   "say": "connect a tool",
    "without": "",
    "starter": false,
    "core": false
@@ -3264,6 +3296,7 @@
    "uses": [],
    "helps": [],
    "try_it": "/setup",
+   "say": "set me up",
    "without": "",
    "starter": false,
    "core": false

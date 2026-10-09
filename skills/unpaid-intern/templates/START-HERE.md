@@ -11,7 +11,7 @@ Timezone: set in Setup/preferences.md
 ## How to use it
 
 - Drop anything into **1-Inbox**: transcripts, PDFs, screenshots, exports, notes. If you can save it, your assistant can read it.
-- Say /briefing to start the day, /prep before a meeting, /debrief after one, and /close at the end.
+- Ask for your briefing to start the day, a prep before a meeting, a debrief after one, and a close at the end. In Claude these are also commands you can type (/briefing, /prep, /debrief, /close). In Codex, which only takes its own slash commands, say them in words: "give me my briefing", "prep me for my 2pm".
 - You never have to memorize commands. Say what you want in plain words. Your personal cheat sheet is [Setup/my-commands.md](Setup/my-commands.md).
 - Everything lives in plain files you can open and edit yourself. Nothing here is ever deleted; finished things move to 5-Archive.
 

@@ -122,10 +122,10 @@ The connection script's data is also kept as plain pages:
 |---|---|
 | The setup questions (`screens`) | `references/setup-questions.md` |
 | Which tool is which, and how each connects (`match`, `list`) | `connectors/catalog.md` |
-| The connection plan (`plan`, `mark`) | Write `Setup/connection-plan.md` yourself: a table of Order, Tool, How it connects, and Status (to-do, connected, needs-admin, failed, using-fallback, skipped), then a short steps section per tool from the catalog |
+| The connection plan (`plan`, `mark`) | Write `Setup/connection-plan.md` yourself: a table of Order, Tool, How it connects, and Status (to-do, connected, needs-admin, failed, using-fallback, skipped), then a short steps section per tool from the catalog. In Codex, write "Made on <date> for Codex" and use the catalog's Codex routes (its plugin directory first, then `codex mcp add` and login), never Claude's steps |
 | An error message (`diagnose`) | `references/error-decoder.md` |
 | The IT email (`it-request`) | Fill in `Setup/it-request.md` with each blocked tool's admin step and read-only option from the catalog. Never include passwords, codes, or tokens |
-| The tour (`tour`) | `references/what-you-unlock.md` |
+| The tour (`tour`) | `references/what-you-unlock.md`. In Codex, give each command in words from its last column, never as a slash |
 | Claude Code settings (`mcp-json`) | Copy the address from the catalog into Claude Code's own add-connector command, read-only address first |
 | The network test (`check`) | Skip it. Explain that it needs Python, and use the error decoder instead |
 

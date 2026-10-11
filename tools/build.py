@@ -219,8 +219,8 @@ PLUGIN_EXCLUDE = ("dist/", "tools/", "evals/", ".github/", ".git/", "assets/bran
 
 
 def _readme_marketing() -> set:
-    """Marketing images the README shows. Only these ship in the .plugin, so its README still renders."""
-    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    """Marketing images the README shows, plus the plugin's screenshots. Only these ship in the .plugin."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8") + (ROOT / "plugin.json").read_text(encoding="utf-8")
     return set(re.findall(r'(assets/brand/marketing/[\w.-]+\.png)', text))
 
 

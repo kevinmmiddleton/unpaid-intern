@@ -11,7 +11,7 @@ You're in back-to-back meetings. You've got a dozen projects going, follow-ups s
 
 Unpaid Intern is a free second brain for work. Hand it your meeting transcripts, docs, tickets, and email, and it hands back your morning briefing, prep for your next meeting, a status update ready to paste, and every follow-up with an owner and a date. It all lives in plain files you own. It does the legwork. You make the calls. It's for anyone juggling more than they can keep in their head, and it's extra helpful when you've just started somewhere new.
 
-![Hand it to your intern, get back to work. On the left, what you already have: a meeting transcript, email, calendar, a Jira ticket, a Confluence page, a Google Doc, a to-do list, and your own brain dump. On the right, what Unpaid Intern turns it into: a morning briefing, meeting prep, a status update, requirements, email replies drafted for you to send, and follow-ups and statuses kept current.](assets/brand/marketing/hero.png)
+![Animated: what you already have (a meeting transcript, an email asking about the launch date for the second time, a calendar invite, a Jira ticket, a Confluence page, a Google Doc, a to-do, and the question “Wait, who is Marco?”) flies into a pink brain in glasses, which hands back a sorted desk: morning briefing, meeting prep, follow-ups, requirements, a status update, and email replies.](https://raw.githubusercontent.com/kevinmmiddleton/unpaid-intern/main/assets/brand/marketing/hero.gif)
 
 ## Three commands you'll use every day
 
@@ -21,7 +21,7 @@ Most workdays come down to three moments. Your intern has one for each.
 - **`/prep` gets you ready for the big one.** Name the meeting and it pulls the last decision, the open question, what's owed in both directions, and the doc you'll want open, all from what your intern has been keeping.
 - **`/debrief` follows every meeting.** Hand it the transcript, your notes, or the doc, plus your own take, and it files the decisions and follow-ups so nothing lives only in your head.
 
-![A sample morning brief from Unpaid Intern: what needs you, what you're waiting on, what's due today, and tomorrow, with an offer to draft the reply](assets/brand/marketing/sample-brief.png)
+![Animated: someone types /briefing, and Unpaid Intern answers with a Tuesday 8:30 AM brief: what needs you (Hollis asked twice about the launch date, and the 2:00 pricing review), what you're waiting on, what's due today, and a file waiting in your inbox.](https://raw.githubusercontent.com/kevinmmiddleton/unpaid-intern/main/assets/brand/marketing/sample-brief.gif)
 
 That's `/briefing` with mail and calendar connected. Before anything's connected, it briefs you from your follow-ups and whatever you've dropped in.
 
@@ -38,7 +38,7 @@ That's `/briefing` with mail and calendar connected. Before anything's connected
 
 Your second brain has an inbox. Put a shortcut to it on your desktop and saving something for your intern is one drag. Messy is fine. Just get it in there.
 
-![If you can save it, your intern can read it. Four files dropped in the inbox, a transcript, a PDF from legal, a screenshot of a Slack thread, and a deck, become two decisions on the project page, three follow-ups with owners and dates, two acronyms to confirm, a question about a new name, and the originals moved to the archive untouched.](assets/brand/marketing/inbox.png)
+![Animated: four files drop into 1-Inbox (a meeting transcript, a PDF from legal, a Slack screenshot, and a deck). After “file my inbox,” the intern shows where each one went: two decisions and the new date on Launch v2, three follow-ups with owners and dates, two acronyms for the glossary, a question about a new name, and the originals in 5-Archive, untouched.](https://raw.githubusercontent.com/kevinmmiddleton/unpaid-intern/main/assets/brand/marketing/inbox.gif)
 
 Then say "file my inbox."
 
@@ -53,7 +53,7 @@ You don't have to remember to check it. Your morning **`/briefing`** tells you w
 
 Org charts and `/who` help anyone, but they're a lifesaver in your first few months.
 
-![Asking /who is Hollis? The intern answers with Hollis's role, manager, what Hollis owns, the last time you talked, and what's open between you.](assets/brand/marketing/who.png)
+![Animated: an org chart screenshot gets read into your people page, then “/who is Hollis?” fills in Hollis's role, what Hollis owns, the last time you talked, what's open between you, and the source.](https://raw.githubusercontent.com/kevinmmiddleton/unpaid-intern/main/assets/brand/marketing/who.gif)
 
 - **Drop in your org chart.** A screenshot is enough. Your intern reads who reports to whom, saves it to your people page, and shows you what it saved so you can fix anything it misread.
 - **New names get asked about.** When someone comes up in a meeting or a thread, your intern asks who they are, a few at a time, and never guesses.

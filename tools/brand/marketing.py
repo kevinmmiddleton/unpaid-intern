@@ -223,7 +223,7 @@ BRIEF = [
         "One-on-one with your manager. Your status table is one command away: /project-status.",
     ]),
     ("New names", YEL, [
-        "Nadia and Theo came up in yesterday's planning call. Who are they? Or drop your org chart in 1-Inbox.",
+        "Nadia and Theo came up in yesterday's planning call. Who are they? Or drop your org chart in your Inbox.",
     ]),
 ]
 

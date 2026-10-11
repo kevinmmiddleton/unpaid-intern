@@ -93,7 +93,7 @@ These hold the most sensitive data in the company: pay, identity numbers, candid
 | NetSuite | Remote server (in directory) | Needs a custom role; the Administrator role is blocked by design |
 | DocuSign | Remote server, beta (in directory) | Can send envelopes; contract terms are sensitive |
 
-Anything involving money or contracts always pauses for the user, regardless of the guardrail profile.
+Sending, sharing, signing, or paying anything involving money or contracts always pauses for the user, regardless of the guardrail profile. Reading it and filing notes about it in the workspace don't.
 
 ## Automation bridges
 

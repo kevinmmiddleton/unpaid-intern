@@ -55,7 +55,7 @@ Scheduled or unattended runs read only the systems marked yes above, skip the on
 ## Always pause for
 
 - Anything that goes to someone outside the company
-- Anything involving money, contracts, legal, HR, or security
+- Sending or sharing anything about money, contracts, legal, HR, or security (reading it and filing notes about it in this folder don't need a pause)
 - Anything that cannot be undone
 
 ## Connected tools

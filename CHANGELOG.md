@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.5
+
+Two fixes that were ready before 1.3.4 but didn't make it in.
+
+- Your intern pauses before it sends or shares anything about money, contracts, legal, HR, or security, instead of before it reads or files notes about them. Reading those and filing notes in your folder no longer waits for a yes; sending, sharing, signing, and paying still do. Setup's question 15, the guardrail profile it writes, and the note on finance and contract tools all say it this way.
+- In Codex, the client-ID route is in the right order. Codex opens the sign-in in the same command that prints the callback URL, so if your admin hasn't allowed that URL yet, send it to them and run `codex mcp login` once they have. Setup also says never to quote the client secret Codex saves in its config.
+- The README shows four animated pictures, and the `.plugin` file always keeps the screenshots `plugin.json` lists, whatever the README shows.
+
 ## 1.3.4
 
 Codex fixes from a second outside field test, on Windows.

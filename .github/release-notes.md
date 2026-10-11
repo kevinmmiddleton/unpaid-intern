@@ -1,8 +1,8 @@
-# Codex fixes
+# Guardrail and Codex sign-in fixes
 
-New in 1.3.4: Codex fixes from a second outside field test. In Codex, your intern gives you its commands in words ("give me my briefing"), since Codex doesn't take slash commands it didn't define. Your saved connection plan in Codex now has Codex's own steps instead of Claude's. The IT email only says "Error I saw" when there was an error, and a brief keeps both dates when it mentions "next quarter".
+New in 1.3.5: your intern pauses before it sends or shares anything about money, contracts, legal, HR, or security, instead of before it reads or files notes about them. And in Codex, the sign-in steps for a tool your admin set up come in the right order.
 
-New in 1.3.3, if you missed it: Windows and Codex fixes from the first field test. Your intern finds Python under whatever name Windows gave it, and in Codex, setup connects your tools with Codex's own plugins and commands and sets each one to ask before it changes anything.
+New in 1.3.4, if you missed it: Codex fixes from a second field test. In Codex, your intern gives you its commands in words ("give me my briefing"), and your saved connection plan has Codex's own steps instead of Claude's.
 
 If you're new here: your intern reads everything you hand it, preps your meetings, keeps your follow-ups, and never asks for a reference letter.
 

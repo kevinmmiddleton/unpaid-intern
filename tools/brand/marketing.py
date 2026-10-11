@@ -395,7 +395,7 @@ PILE = [
     ("Confluence", "Launch v2 runbook", -2.5),
     ("Google Doc", "Pricing one-pager (draft)", 3.0),
     ("To-do", "chase Sam re: security notes", 1.5),
-    ("You", "“okay so… who is Marco?”", -1.5),
+    ("You", "“who is Marco?”", -1.5),
 ]
 DESK = [
     ("Morning briefing", "What needs you today, and what can wait."),

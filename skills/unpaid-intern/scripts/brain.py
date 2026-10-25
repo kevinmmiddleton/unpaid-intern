@@ -76,6 +76,7 @@ FOLLOWUPS = f"{MEMORY}/followups.md"
 SESSION_MARK = f"{MEMORY}/.session-start"  # written by `due --open`; `check` lists what changed after it
 TZ_MARK = f"{MEMORY}/.timezone-note"       # `now` says once per workspace that times come from this computer's clock
 TERMS_LOG = f"{MEMORY}/.glossary-adds"     # `term` logs what it adds; `check` names this session's terms for the reply
+APP_CHAT_DIR_RE = re.compile(r"/Documents/Codex/\d{4}-\d{2}-\d{2}/")  # a ChatGPT app Work chat with no project works here, one folder per chat
 TZ_NOTE = "Using this computer's clock for times. That's only a problem if you work in a different time zone."
 
 FOLLOWUP_RE = re.compile(
@@ -422,6 +423,10 @@ def cmd_init(args) -> int:
     repo = next((p for p in [dest, *dest.parents] if (p / ".git").exists()), None)
     if repo and not args.force:
         sys.exit(f"{dest} is inside a code repository ({repo}). Use a dedicated folder for the workspace, or pass --force.")
+    if APP_CHAT_DIR_RE.search(dest.as_posix() + "/") and not args.force:
+        sys.exit(f"{dest} is a folder the ChatGPT app made for this one chat, and the next chat gets a new one, so it wouldn't find "
+                 "your notes. Start a Work chat with a project on the folder you want (Choose project, then New project, then add "
+                 "the folder) and set up there, or pass --force.")
     existing = [p for p in dest.iterdir()] if dest.is_dir() else []
     created, skipped, refused = [], [], []
     for src in sorted(TEMPLATES.rglob("*")):
@@ -2437,6 +2442,26 @@ def cmd_selftest(args) -> int:
         with contextlib.redirect_stdout(io.StringIO()) as o:
             cmd_check(argparse.Namespace(workspace=str(gws), today="2026-10-25", since=(dt.datetime.now().astimezone() + dt.timedelta(minutes=1)).isoformat()))
         check("check leaves out terms added before the session started", "Glossary:" not in o.getvalue())
+
+    # A ChatGPT app Work chat with no project works in a folder made for that chat alone; init refuses it.
+    with tempfile.TemporaryDirectory() as app_tmp:
+        chat_dir = Path(app_tmp) / "Documents" / "Codex" / "2026-10-25" / "unpaid-2"
+        chat_dir.mkdir(parents=True)
+        try:
+            with quiet:
+                cmd_init(argparse.Namespace(folder=str(chat_dir), force=False, dry_run=False))
+            refused = False
+        except SystemExit as e:
+            refused = "made for this one chat" in str(e) and "New project" in str(e)
+        check("init refuses a ChatGPT app chat folder (Documents/Codex/<date>/...) and says to use a Work chat with a project",
+              refused and not (chat_dir / "START-HERE.md").exists())
+        with quiet:
+            cmd_init(argparse.Namespace(folder=str(chat_dir), force=True, dry_run=False))
+        check("init --force still sets up there if someone insists", (chat_dir / "START-HERE.md").exists())
+        own = Path(app_tmp) / "Documents" / "Codex notes" / "Second Brain"
+        with quiet:
+            cmd_init(argparse.Namespace(folder=str(own), force=False, dry_run=False))
+        check("init leaves other folders under Documents alone", (own / "START-HERE.md").exists())
 
     passed = sum(1 for _, ok in checks if ok)
     for name, ok in checks:

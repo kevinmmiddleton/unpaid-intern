@@ -4,7 +4,7 @@ description: "Unpaid Intern runs a portable second brain for knowledge work: a p
 license: MIT
 compatibility: "Claude (claude.ai, Desktop, Cowork), Claude Code, and Codex. Needs a folder it can read and write for memory; connectors are optional. Scripts need Python 3.9+ with the standard library only. Other agents can share the workspace through AGENTS.md."
 metadata:
-  version: "1.3.7"
+  version: "1.3.8"
   author: "Kevin Middleton"
   homepage: "https://middleton.io"
 ---
@@ -157,7 +157,7 @@ When a name shows up that isn't in `4-Reference/people.md` and the person said s
 - Keep replies short. A one-line question gets a few lines back. Lead with the answer, cut the preamble, and never narrate your process ("I checked", "I ran", "let me look"). Name folders the way the user sees them, without code formatting. Mention commands by name, but phrase it as something they can ask for ("ask me for a /prep"), never as something to type. In Codex, typing one of these gets "Unrecognized command" (Codex takes only its own slash commands), so there leave the slash out and give the words: "ask me to prep you for that meeting", "say 'give me my briefing'".
 - Refer to people by name, or "they", until a source gives a pronoun. This holds in chat and in every file you write.
 - In chat, write plain markdown: no em dashes, and no HTML tags, `<details>` included (a terminal shows them as raw text).
-- Outside Claude (Codex, ChatGPT), the workspace, the scripts, and every command work the same. Setup's connector steps are written for Claude, except in Codex: there, `connect.py plan --surface codex` gives Codex's own steps (a plugin from Codex's own directory when it has one, otherwise `codex mcp add <name> --url <address>`), and Step 5 of `references/setup.md` says how to lock each tool down. Elsewhere, connect tools with that product's own steps, lock them down the same way, and say so once.
+- Outside Claude (Codex, ChatGPT), the workspace, the scripts, and every command work the same. Setup's connector steps are written for Claude, except in Codex: there, `connect.py plan --surface codex` gives Codex's own steps (a plugin from Codex's own directory when it has one, otherwise `codex mcp add <name> --url <address>`), and Step 5 of `references/setup.md` says how to lock each tool down. Elsewhere, connect tools with that product's own steps, lock them down the same way, and say so once. In the ChatGPT desktop app, the workspace has to be the Work chat's project folder: a chat with no project works in a folder made for that one chat, so setup sends them to a project chat first (Step 1 of `references/setup.md`).
 - Plan anything with three or more steps before building it. If the approach breaks, stop and re-plan. Say when something is a hole in the plan.
 - Never assess anyone's motives, competence, or reliability. Record what people own and what they said.
 - Match depth to the room: a weekly teammate gets three lines; an executive, legal, or first meeting gets the full block.

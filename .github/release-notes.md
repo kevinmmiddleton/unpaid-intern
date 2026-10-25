@@ -1,6 +1,6 @@
-# Connectors when you want them
+# Notes the next chat can find
 
-New in 1.3.7: in Codex, the plugin no longer brings Atlassian and Notion connectors, so there are no sign-in errors at the start of each session and no sign-in page when you install. Setup asks which tools you use and connects only those. The README also has install steps for the ChatGPT desktop app, with no terminal needed.
+New in 1.3.8: in the ChatGPT desktop app, setup makes sure your notes live in a Work chat's project folder, so every chat in that project finds them. A chat with no project works in a folder made just for it, and setup now sends you to a project chat before it makes anything. Also new this week (1.3.7): in Codex, the plugin no longer brings Atlassian and Notion connectors; setup connects only the tools you use.
 
 If you're new here: your intern reads everything you hand it, preps your meetings, keeps your follow-ups, and never asks for a reference letter.
 

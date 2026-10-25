@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.8
+
+- **In the ChatGPT desktop app, your notes stay where the next chat can find them.** A Work chat with no project works in a folder the app makes for that one chat, and the next chat gets a new one, so notes set up there were out of reach a chat later. Setup now sends you to a Work chat with a project on your notes folder first, and `brain.py init` won't set up in one of those per-chat folders.
+
 ## 1.3.7
 
 Connectors when you want them, not before.

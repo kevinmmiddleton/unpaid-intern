@@ -8,7 +8,7 @@ Fixes from a real Codex test: 21 turns of setup and everyday use on GPT-6.1 Sol,
 - **Your intern leaves its scripts' files alone.** The connection plan, the IT email, and the cheat sheet change only by re-running the script, and the check at the end of each task catches a hand edit. A hand-rewritten plan had lost its Codex steps, which also switched the cheat sheet back to slash commands.
 - **Labels like `[stated]` stay in your files.** Chat and the status table you paste say it in plain words.
 - **The status table is the one the script built,** with its notes on top, including any project whose status nobody has confirmed yet.
-- **"Explain this" adds new terms to your glossary** every time: defined ones as confirmed, the rest as guesses. A new `brain.py term` command writes every glossary row, so a term lands in the right table with the right columns, moves up when it's confirmed, and a different meaning never overwrites the one you have.
+- **"Explain this" adds new terms to your glossary** every time: defined ones as confirmed, the rest as guesses. A new `brain.py term` command writes every glossary row, so a term lands in the right table with the right columns, moves up when it's confirmed, and a different meaning never overwrites the one you have. Your intern names the terms it added, and leaves everyday words out.
 - **People and glossary tables stay tables.** The end-of-task check and the health check catch a row cut off by a blank line, or one with the wrong number of columns.
 - **A stray character after a `since:` date** no longer turns off the "waiting N days" count, and the end-of-task check flags a follow-up line the tools can't read.
 - **No guessed pronouns in chat** either, and no em dashes or HTML tags in replies.

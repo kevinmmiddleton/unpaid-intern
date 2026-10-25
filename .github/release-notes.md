@@ -1,8 +1,6 @@
-# Guardrail and Codex sign-in fixes
+# Codex test fixes
 
-New in 1.3.5: your intern pauses before it sends or shares anything about money, contracts, legal, HR, or security, instead of before it reads or files notes about them. And in Codex, the sign-in steps for a tool your admin set up come in the right order.
-
-New in 1.3.4, if you missed it: Codex fixes from a second field test. In Codex, your intern gives you its commands in words ("give me my briefing"), and your saved connection plan has Codex's own steps instead of Claude's.
+New in 1.3.6: fixes from a real Codex test of setup and everyday use. Setup asks your name, so your own promises are filed as yours. Your intern leaves its scripts' files alone and catches a hand edit, labels like [stated] stay out of chat, "explain this" fills in your glossary, people and glossary tables stay tables, and a few more spoken dates work. In Codex, the README says how to quiet the Atlassian and Notion sign-in errors. The no-install kit is tested in ChatGPT Projects.
 
 If you're new here: your intern reads everything you hand it, preps your meetings, keeps your follow-ups, and never asks for a reference letter.
 

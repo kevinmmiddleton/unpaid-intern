@@ -135,7 +135,7 @@ When the user doesn't paste or name a source, look in 1-Inbox before asking for 
    - one row in `Memory/meetings.md`
    - a source note in `4-Reference/sources/meetings/YYYY-MM-DD-title.md` when the meeting was substantive
    - new facts into the right knowledge page with `[stated]`, `[inferred]`, or `[confirmed]`
-   - new acronyms into the open list in `4-Reference/glossary.md`
+   - new acronyms onto the glossary's open list with `brain.py term "<Term>" --where "<meeting and date>"` (`--means` and `--source` when the meeting defined it)
    - new names into the "Still figuring out" list in `4-Reference/people.md`, then ask about every one of them in a single question at the end (see New names in SKILL.md)
 
    In every saved line (follow-ups, people.md, the source note) and in chat, write each person as their name or "they" unless a source gives a pronoun. Check each people.md "Where they came up" line against the transcript the way you check Attendees: name who asked whom ("asked by Alex for the SOC 2 report; said they'd check"), never a bare verb that can flip the speaker.
@@ -266,7 +266,7 @@ The beginner move, and the one people use most. Three forms:
 2. If a source defines it, use that and cite it. If not, give the common meaning labeled as a guess (or none, if there isn't one), and ask the user to confirm the internal meaning.
 3. For a document: one-sentence summary, what it asks of the reader, the three things that matter, terms decoded, and questions worth asking.
 4. For technical notes headed to a non-technical audience: rewrite for that audience and keep every caveat.
-5. **Keep the record, every time, before you reply.** For each term you decoded that the glossary doesn't have: one the text itself defines goes in the main table with that text as its Source; one it doesn't define goes on the open list, with where it came up and your guess, if any, in Best guess. A term already on the open list that the text now defines moves up to the main table. These small writes need no permission. End with one line naming what you added ("Added ELD and the herd to your glossary; ELD's meaning is my guess."), then run `brain.py check`.
+5. **Keep the record, every time, before you reply.** For each term you decoded, run `brain.py term` (it skips terms the glossary already has): one the text itself defines gets `brain.py term "<Term>" --means "<meaning>" --source "<the text>"`, which also moves it up if it was on the open list; ones it doesn't define get `brain.py term "<Term>" "<Term>" --where "<where it came up>"`, with `--guess "<your guess>"` for a term you guessed. Never edit the glossary's tables by hand. These small writes need no permission. End with one line naming what you added ("Added ELD and the herd to your glossary; ELD's meaning is my guess."), then run `brain.py check`.
 
 ### /bro
 
@@ -305,7 +305,7 @@ Plain-language triggers: "make me a 101 on...", "teach me this from zero", "help
 
    Each teaching slide stays under about 150 words: one idea, short sentences, no pep talk. Flip cards (`.cards` of `.card` buttons, short form on the front, plain meaning on the back) are for acronyms only.
 6. **Claims.** Every number, date, name, and status comes from a source. Quote a status row's next step and next checkpoint as separate facts, with the row's Updated date beside any status. Write dates as plain dates (2026-10-08) in the check-in and the lesson; add a weekday only when a script printed it. Name people, or say "their team"; never a guessed pronoun. Something you inferred gets a `<span class="guess">my guess</span>` beside it, or stays out. Restricted data never goes in the file: no customer records, account numbers, phone numbers, credentials, or HR details. Progress stays in the reader's browser.
-7. **Keep the record.** Add one line under Topics in `4-Reference/INDEX.md` (`- [<Topic> 101](learn/<slug>-101.html): the mix-up it stops`). Terms go in the glossary as confirmed only when a source or the user confirms them; a common expansion no source gives ("pen test" for penetration test) goes on the open list as a guess, the way `/explain` does it. New names go on the "Still figuring out" list.
+7. **Keep the record.** Add one line under Topics in `4-Reference/INDEX.md` (`- [<Topic> 101](learn/<slug>-101.html): the mix-up it stops`). Terms go in the glossary with `brain.py term`, as confirmed only when a source or the user confirms them; a common expansion no source gives ("pen test" for penetration test) goes on the open list with `--guess`, the way `/explain` does it. New names go on the "Still figuring out" list.
 8. **Check it before handing it over,** in a browser if you can: Next, Back, and the arrow keys move, and the sidebar jumps; each quiz item locks after one click, marks the right answer, and explains; the score total matches the number of questions; at phone width the sidebar hides and the buttons still move. Read the 30-second box on its own: if it needs the rest of the file to make sense, rewrite it. If you can't open a browser on this surface, say so in one line.
 9. **Hand it over.** Run `brain.py check` first: it lists the lesson and every other file you changed, and verifies any weekday in them. Then give the file's location and the 30-second version in chat. Offer `/study` on the same sources.
 

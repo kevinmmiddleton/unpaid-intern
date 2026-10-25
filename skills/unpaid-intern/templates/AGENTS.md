@@ -36,7 +36,8 @@ Keep the format shown at the top of each file. Tools parse them.
 - Follow-ups: `- [ ] YYYY-MM-DD | @me or @waiting:Name | deliverable #project-slug | source | accepted: true|false`. Add `since:YYYY-MM-DD` to the source only for waiting items. `accepted: true` only when the other person clearly agreed.
 - Projects: one row per project in the table in Memory/project-status.md.
 - Decisions: newest first, with Decision, Why, Who, Revisit if, and Provenance.
-- Tables (people, glossary, project status): add a row right under the last row. A blank line ends a table, so a row below one shows as loose text.
+- Tables (people, project status): add a row right under the last row, with one cell per column. A blank line ends a table, so a row below one shows as loose text.
+- Glossary: add terms with `brain.py term`, never by hand. Every time you explain or decode a term, record it that way before you reply.
 
 ## Leave it better
 

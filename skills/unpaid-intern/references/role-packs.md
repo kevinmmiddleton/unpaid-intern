@@ -26,7 +26,7 @@ During setup, ask the user's role and apply the matching pack:
 - **Briefing sections:** add them to the briefing line in `Setup/preferences.md`.
 - **Connect first:** the one or two tools to connect first, read-only.
 - **Most-used commands:** the three to teach in week one.
-- **Data cautions:** add them to the never list in `Setup/guardrail-profile.md`.
+- **Data cautions:** add them to the never list in `Setup/guardrail-profile.md`. "Company storage" means this workspace when setup recorded a company account and a folder that isn't a personal cloud (the Account and Folder lines in `Setup/setup-profile.md`), so write it that way ("stays in company storage, which includes this folder") and never stop a later debrief to ask. On a personal account, those items stay out of the workspace until the company approves the account; say so once at setup.
 
 Packs are starting points. The user's answers override everything here.
 
@@ -36,7 +36,7 @@ Packs are starting points. The user's answers override everything here.
 - **Briefing sections:** decisions due this week, launches inside two weeks, open questions blocking engineering, stakeholder asks.
 - **Connect first:** tracker (Jira, Linear, Asana), then mail or chat.
 - **Most-used commands:** `/prep`, `/debrief`, `/write-epic`. Then `/project-status` for one-on-ones and `/grill` before a big call.
-- **Data cautions:** unreleased roadmap and pricing stay in approved storage.
+- **Data cautions:** unreleased roadmap and pricing stay in company storage, never a personal account or personal cloud.
 
 ## Engineering manager
 
@@ -68,7 +68,7 @@ Packs are starting points. The user's answers override everything here.
 - **Briefing sections:** reviews and approvals waiting on the user, launch dates inside two weeks, performance changes worth a look.
 - **Connect first:** work-management tool, then analytics.
 - **Most-used commands:** `/draft`, `/redline`, `/project-status`.
-- **Data cautions:** unannounced launches and lead lists stay in approved storage.
+- **Data cautions:** unannounced launches and lead lists stay in company storage, never a personal account or personal cloud.
 
 ## Operations and program management
 

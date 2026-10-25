@@ -107,6 +107,7 @@ Never paint a row green to make the table look better.
 
 - **New project:** copy the four files in `2-Projects/_template/` to `2-Projects/<slug>/` (lowercase, hyphens), replace `<Project name>`, add a row to `Memory/project-status.md` (status `unconfirmed` unless they said how it's going, Updated today), and add a line under Projects in `4-Reference/INDEX.md`.
 - **New area:** copy `3-Areas/_template.md` to `3-Areas/<slug>.md`, replace `<Area name>`, and add a line under Areas in the index. For someone new to the job, copy `3-Areas/_ramp-up.md` to `3-Areas/ramping-up.md` instead and fill in the start date and a review-by date about 30 days out.
+- **Glossary term (`brain.py term`):** a meaning a source defines or the person confirmed goes in the first table (Term, Means, Status `stated` or `confirmed`, Source); an undefined term goes in the open list (Term, Where it showed up, Best guess). Add the row right under that table's last row, with one cell per column, and skip a term either table already has. When a term on the open list gets confirmed, move its row up.
 - **Archive:** only when no open follow-up line (well-formed or not) carries the project's `#slug`. Move the folder to `5-Archive/projects/`, set the row's status to `done` with today's date, and update the index link. Nothing is deleted.
 
 ## Checks and scans by hand

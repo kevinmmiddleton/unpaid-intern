@@ -425,6 +425,10 @@ def cmd_match(args) -> int:
     if m["unknown"]:
         print("Not in the catalog: " + ", ".join(m["unknown"]) +
               ". Check Claude's connector directory for it; if it is not there, use exports or the browser.")
+    heard = [tools[i]["name"] for i in m["ids"]] + list(m["unknown"])
+    if heard:
+        listed = heard[0] if len(heard) == 1 else ", ".join(heard[:-1]) + " and " + heard[-1]
+        print(f'Read the list back in the reply with the plan, ending: "So far that\'s {listed}. Anything missing?"')
     return 0
 
 
@@ -1569,6 +1573,10 @@ def cmd_selftest(args) -> int:
     check("match unknown", m["unknown"] == ["Totally Made Up Tool"])
     m = match_answers(cat, ["teams", "sharepoint", "MS Teams"])
     check("match aliases", m["ids"] == ["microsoft-365"])
+    with contextlib.redirect_stdout(io.StringIO()) as buf:
+        cmd_match(argparse.Namespace(answers=["Figma", "Zoom", "Totally Made Up Tool"], json=False))
+    check("match ends with the read-back and 'Anything missing?', unknown tools included",
+          buf.getvalue().strip().endswith('"So far that\'s Figma, Zoom and Totally Made Up Tool. Anything missing?"'))
     m = match_answers(cat, ["Gainsight"])
     check("fuzzy match never lands on a picker label", m["unknown"] == ["Gainsight"] and not m["followups"])
     m = match_answers(cat, ["Excel or Sheets only"])

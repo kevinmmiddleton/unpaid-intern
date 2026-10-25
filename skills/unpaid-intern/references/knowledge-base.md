@@ -51,6 +51,7 @@ Meetings and acronyms are abundant, and internal acronyms differ by company.
 - `4-Reference/glossary.md` has two tables: confirmed terms, and terms seen but not confirmed.
 - A meaning moves to the confirmed table only when a source defines it or the user confirms it.
 - When `/explain` meets an unknown internal acronym, give the common meaning labeled as a guess, add the term to the open table, and ask.
+- Add terms with `brain.py term`, never by hand: `--means` and `--source` (or `--confirmed`) for the main table, `--where` and an optional `--guess` for the open list. It puts each row in the right table with the right columns, and moves a term up when it gets confirmed.
 
 ## Conflicts
 

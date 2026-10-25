@@ -15,6 +15,8 @@ Usage:
   brain.py daylog                                create today's day log
   brain.py project "<Name>" [--slug s] [--role own]   new project folder plus its status row
   brain.py area "<Name>" [--ramp-up]             new page for an ongoing responsibility (or a 30-60-90 ramp-up page)
+  brain.py term "<Term>" --means M --source S   add a confirmed meaning to the glossary (or --confirmed)
+  brain.py term "<Term>" ... --where W [--guess G]   put undefined terms on the glossary's open list
   brain.py archive <slug> [--force]              move a finished project to 5-Archive (never deletes)
   brain.py check [--since ISO]                   what this session wrote or moved; weekdays verified
   brain.py lint                                  check formats, links, staleness
@@ -23,7 +25,7 @@ Usage:
   brain.py unpack <file.zip> <folder>            restore a packed workspace safely
   brain.py selftest                              run the built-in tests
 
-due, status, daylog, project, area, archive, lint, scan, and pack take --workspace <folder>
+due, status, daylog, project, area, term, archive, lint, scan, and pack take --workspace <folder>
 (default: current folder). due, status, daylog, and lint also take
 --today YYYY-MM-DD (default: today in the timezone set in preferences).
 
@@ -1061,6 +1063,100 @@ def cmd_area(args) -> int:
     return 0
 
 
+GLOSSARY = f"{REFERENCE}/glossary.md"
+
+
+def _glossary_tables(lines):
+    """{'main'|'open': (header index, [header names], end index)}: the confirmed table has a Means column, the open list a Best guess column."""
+    found = {}
+    for i, ln in enumerate(lines):
+        if not (ln.strip().startswith("|") and i + 1 < len(lines) and TABLE_SEP_RE.match(lines[i + 1])):
+            continue
+        header = [c.lower() for c in split_row(ln)]
+        kind = "main" if "means" in header else "open" if "best guess" in header else None
+        if kind and kind not in found:
+            end = i + 2
+            while end < len(lines) and lines[end].strip().startswith("|"):
+                end += 1
+            found[kind] = (i, header, end)
+    return found
+
+
+def _row(header, values):
+    return "| " + " | ".join(" ".join(values.get(h, "").split()).replace("|", "\\|") for h in header) + " |"
+
+
+def cmd_term(args) -> int:
+    ws = find_workspace(args.workspace)
+    today = get_today(ws, args.today)
+    path = ws / GLOSSARY
+    if escapes_root(ws, path):
+        sys.exit(f"Refusing {GLOSSARY}: it goes through a symlink or outside the workspace.")
+    if not path.exists():
+        write_lf(path, read_text(TEMPLATES / GLOSSARY))
+    if bool(args.means) == bool(args.where):
+        sys.exit("Give --means and --source for a meaning a source or the person confirmed, or --where for a term nobody has defined yet.")
+    terms = [" ".join(t.split()) for t in args.terms if t.strip()]
+    if args.means and len(terms) != 1:
+        sys.exit("--means takes one term at a time.")
+    if args.means and not (args.source or args.confirmed):
+        sys.exit("--means needs --source (where it's defined), or --confirmed if the person told you.")
+    lines = read_text(path).splitlines()
+    notes = []
+    for term in terms:
+        tables = _glossary_tables(lines)
+        if "main" not in tables or "open" not in tables:
+            sys.exit(f"{GLOSSARY} is missing its main table or its open list. Copy them from the template, then run this again.")
+        key = term.casefold()
+
+        def find(kind):
+            h, header, end = tables[kind]
+            return next((j for j in range(h + 2, end) if split_row(lines[j])[:1] and split_row(lines[j])[0].casefold() == key), None)
+
+        main_j, open_j = find("main"), find("open")
+        if args.where:
+            if main_j is not None:
+                notes.append(f"{term} is already in the glossary, so it stays off the open list.")
+            elif open_j is not None:
+                notes.append(f"{term} is already on the open list.")
+            else:
+                h, header, end = tables["open"]
+                lines.insert(end, _row(header, {"term": term, "where it showed up": args.where, "best guess": args.guess or ""}))
+                notes.append(f"Added {term} to the open list" + (f", with your guess '{args.guess}'." if args.guess else "."))
+            continue
+        h, header, end = tables["main"]
+        if len(split_row(lines[h + 1])) != len(header):
+            lines[h + 1] = "|" + "---|" * len(header)
+            notes.append("Fixed the main table's separator row, which had the wrong number of columns.")
+        status = "confirmed" if args.confirmed else "stated"
+        source = args.source or f"confirmed in chat, {today.isoformat()}"
+        row = _row(header, {"term": term, "means": args.means, "status": status, "source": source})
+        if main_j is not None:
+            old = split_row(lines[main_j])
+            if len(old) == len(header) and old[header.index("means")].casefold() == " ".join(args.means.split()).casefold():
+                notes.append(f"{term} is already in the glossary with that meaning.")
+            elif not args.replace:
+                print(f"{term} is already in the glossary as '{old[1] if len(old) > 1 else ''}'. Nothing changed. If the new source "
+                      "disagrees, ask the person which is right, or keep both and mark it [disputed] (see knowledge-base.md). "
+                      "Pass --replace once they confirm the new meaning.")
+                return 2
+            else:
+                lines[main_j] = row
+                notes.append(f"Updated {term} in the glossary: {args.means}.")
+        else:
+            lines.insert(end, row)
+            notes.append(f"Added {term} to the glossary: {args.means}.")
+            if open_j is not None and open_j >= end:
+                open_j += 1
+        if open_j is not None:
+            del lines[open_j]
+            notes.append(f"Moved {term} off the open list.")
+    write_lf(path, "\n".join(lines) + "\n")
+    for n in notes:
+        print(n)
+    return 0
+
+
 def cmd_archive(args) -> int:
     ws = find_workspace(args.workspace)
     today = get_today(ws, args.today)
@@ -1203,6 +1299,29 @@ def broken_tables(text: str):
             gap = in_table
         else:
             in_table, gap = False, False
+    return out
+
+
+def uneven_tables(text: str):
+    """[(line, cells, header cells)] for table rows, the separator included, whose cell count differs from their
+    header's. A short or long row shifts every cell after it, so values land under the wrong column."""
+    lines = text.splitlines()
+    out, want, fence = [], None, False
+    for i, ln in enumerate(lines):
+        s = ln.strip()
+        if s.startswith("```"):
+            fence, want = not fence, None
+            continue
+        if fence or not s.startswith("|"):
+            want = None
+            continue
+        if want is None:
+            if i + 1 < len(lines) and TABLE_SEP_RE.match(lines[i + 1]):
+                want = len(split_row(s))  # a header row starts a table
+            continue
+        got = len(split_row(s))
+        if got != want:
+            out.append((i + 1, got, want))
     return out
 
 
@@ -1355,8 +1474,12 @@ def cmd_check(args) -> int:
         fix += [f"  {FOLLOWUPS}:{it['line']}  owner '{it['owner']}' should be @me or @waiting:Name" for it in items if not OWNER_RE.match(it["owner"])]
     for rel in written:
         if rel.suffix.lower() == ".md" and rel.parts[:1] not in ((INBOX,), (ARCHIVE,)):
+            text = read_text(ws / rel)
             fix += [f"  {rel.as_posix()}:{n}  this table row sits below a blank line, so it's cut off from its table; remove the blank line"
-                    for n in broken_tables(read_text(ws / rel))]
+                    for n in broken_tables(text)]
+            fix += [f"  {rel.as_posix()}:{n}  this row has {got} columns but its table has {want}, so values sit under the wrong headings; "
+                    "rewrite the row with one cell per column" + (" (glossary terms: brain.py term)" if rel.as_posix() == GLOSSARY else "")
+                    for n, got, want in uneven_tables(text)]
     made = {}
     try:
         made = json.loads(read_text(ws / MADE_BY_SCRIPTS)) if (ws / MADE_BY_SCRIPTS).is_file() else {}
@@ -1461,6 +1584,8 @@ def lint_workspace(ws: Path, today: dt.date):
     for p in iter_md(ws):
         for n in broken_tables(read_text(p)):
             warnings.append(f"{p.relative_to(ws)} line {n}: this table row sits below a blank line, so it's cut off from its table. Remove the blank line.")
+        for n, got, want in uneven_tables(read_text(p)):
+            warnings.append(f"{p.relative_to(ws)} line {n}: this row has {got} columns but its table has {want}, so values sit under the wrong headings.")
         for n, line in live_lines(read_text(p)):
             for target in LINK_RE.findall(line):
                 if re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I) or target.startswith(("#", "<")):
@@ -2220,6 +2345,48 @@ def cmd_selftest(args) -> int:
         (cws / "AGENTS.md").write_text("# Workspace rules\n\n- Label knowledge claims as stated, inferred, or confirmed, using square brackets.\n", encoding="utf-8")
         check("lint notes an AGENTS.md from before 1.3.6", any("AGENTS.md is from before" in i for i in lint_workspace(cws, sat)[2]))
 
+    # The glossary: a script adds terms, and a row with the wrong number of cells gets caught.
+    corrupted = ("| Term | Means | Status | Source |\n|---|---|---|\n| ELD | Heard at work [confirmed] | |\n"
+                 "| LTv2 | Live Tracking v2 | confirmed | setup |\n")
+    check("uneven_tables flags a short separator and short rows, and leaves fenced and even tables alone",
+          uneven_tables(corrupted) == [(2, 3, 4), (3, 3, 4)]
+          and uneven_tables("```\n| A | B |\n|---|\n```\n| A | B |\n|---|---|\n| 1 | 2 |\n") == [])
+    with tempfile.TemporaryDirectory() as gl_tmp:
+        gws = Path(gl_tmp) / "ws"
+        with quiet:
+            cmd_init(argparse.Namespace(folder=str(gws), force=True, dry_run=False))
+
+        def term(*terms, **kw):
+            ns = dict(workspace=str(gws), today="2026-10-25", terms=list(terms), means=None, source=None,
+                      confirmed=False, replace=False, where=None, guess=None)
+            ns.update(kw)
+            with contextlib.redirect_stdout(io.StringIO()) as o:
+                rc = cmd_term(argparse.Namespace(**ns))
+            return rc, o.getvalue()
+        term("ELD", "the herd", where="standup notes")
+        term("ETA", where="LTv2 sync", guess="estimated time of arrival")
+        term("ELD", means="electronic logging device", source="kickoff notes")
+        term("LTv2", means="Live Tracking v2", confirmed=True)
+        rc_conflict, out_conflict = term("ELD", means="something else", source="a chat")
+        rc_dupe, _ = term("ETA", where="again")
+        g = read_text(gws / GLOSSARY)
+        main_part, open_part = g.split("## Open", 1)
+        check("term: confirmed meanings go in the main table, and moving one up takes it off the open list",
+              "| ELD | electronic logging device | stated | kickoff notes |" in main_part
+              and "| LTv2 | Live Tracking v2 | confirmed | confirmed in chat, 2026-10-25 |" in main_part and "ELD" not in open_part)
+        check("term: undefined terms go on the open list once, with a guess only when given",
+              "| the herd | standup notes |  |" in open_part and open_part.count("| ETA |") == 1
+              and "| ETA | LTv2 sync | estimated time of arrival |" in open_part and rc_dupe == 0)
+        check("term: a different meaning for a term already there changes nothing without --replace",
+              rc_conflict == 2 and "something else" not in g and "already in the glossary" in out_conflict)
+        check("term: the glossary it writes has no uneven or cut-off rows", uneven_tables(g) == [] and broken_tables(g) == [])
+        (gws / GLOSSARY).write_text("# Glossary\n\n" + corrupted + "\n## Open: seen but not confirmed\n\n| Term | Where it showed up | Best guess |\n|---|---|---|\n", encoding="utf-8")
+        with contextlib.redirect_stdout(io.StringIO()) as o:
+            rc = cmd_check(argparse.Namespace(workspace=str(gws), today="2026-10-25", since=None))
+        check("check flags the corrupted glossary from the Codex test", rc == 1 and "glossary.md:5  this row has 3 columns but its table has 4" in o.getvalue())
+        term("COI", means="certificate of insurance", source="kickoff notes")
+        check("term repairs a separator row with the wrong number of columns", read_text(gws / GLOSSARY).splitlines()[3] == "|---|---|---|---|")
+
     passed = sum(1 for _, ok in checks if ok)
     for name, ok in checks:
         if not ok:
@@ -2291,6 +2458,17 @@ def main(argv=None) -> int:
     p.add_argument("--started", help="start date for --ramp-up, YYYY-MM-DD")
     add_common(p, today=False)
     p.set_defaults(func=cmd_area)
+
+    p = sub.add_parser("term", help="add a term to the glossary: a confirmed meaning, or the open list")
+    p.add_argument("terms", nargs="+", help="the term (several only with --where)")
+    p.add_argument("--means", help="the meaning, only when a source defines it or the person confirmed it")
+    p.add_argument("--source", help="where the meaning is defined (a file, a meeting, a doc)")
+    p.add_argument("--confirmed", action="store_true", help="the person confirmed the meaning")
+    p.add_argument("--replace", action="store_true", help="replace a meaning already in the glossary, once the person confirms")
+    p.add_argument("--where", help="where an undefined term showed up; puts it on the open list")
+    p.add_argument("--guess", help="your best guess at an open term's meaning")
+    add_common(p)
+    p.set_defaults(func=cmd_term)
 
     p = sub.add_parser("archive", help="move a finished project to the archive (never deletes)")
     p.add_argument("slug")

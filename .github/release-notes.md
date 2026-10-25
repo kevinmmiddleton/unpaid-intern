@@ -1,6 +1,6 @@
 # Codex test fixes
 
-New in 1.3.6: fixes from a real Codex test of setup and everyday use. Setup asks your name, so your own promises are filed as yours. Your intern leaves its scripts' files alone and catches a hand edit, labels like [stated] stay out of chat, "explain this" fills in your glossary, people and glossary tables stay tables, and a few more spoken dates work. In Codex, the README says how to quiet the Atlassian and Notion sign-in errors. The no-install kit is tested in ChatGPT Projects.
+New in 1.3.6: fixes from a real Codex test of setup and everyday use. Setup asks your name, so your own promises are filed as yours. Your intern leaves its scripts' files alone and catches a hand edit, labels like [stated] stay out of chat, "explain this" fills in your glossary through a new script that keeps every row in the right table, people and glossary tables stay tables, and a few more spoken dates work. In Codex, the README says how to quiet the Atlassian and Notion sign-in errors. The no-install kit is tested in ChatGPT Projects.
 
 If you're new here: your intern reads everything you hand it, preps your meetings, keeps your follow-ups, and never asks for a reference letter.
 

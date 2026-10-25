@@ -39,12 +39,12 @@ Assume the person has never set up a connector, never opened a settings page the
 
 A long setup tempts skipping. Each step's beats, so none get dropped:
 
-1. **A home:** the folder, `brain.py init`, the inbox shortcut offer, the account check.
+1. **A home:** the folder, `brain.py init`, the inbox shortcut asked as a question, the account check.
 2. **About them:** their name, then the `about` screen; if they're new, the start date and the org chart offer.
 3. **Brain dump:** dates through `brain.py when`, the four piles shown back, "Anything wrong or missing?", then write.
-4. **A first win:** run it for real, then one line on what connecting adds and one line naming one other command.
+4. **A first win:** run it for real (a status table is the script's, as printed), then one line on what connecting adds and one line naming one other command.
 5. **Their tools (skippable):** the screens, the list read back with "Anything missing?", the plan, one tool at a time, the IT email.
-6. **The tour:** the cheat sheet, "which one to try now" (and run it), the `yours` screen, the daily brief offer, the weekly reset offer, the first-week list.
+6. **The tour:** the cheat sheet, "which one to try now" (and run it), the `yours` screen in the same reply as the try, the daily brief offer, then one closing message with the weekly reset offer and the first-week list.
 
 ## How to ask
 
@@ -85,7 +85,7 @@ Create the workspace: `brain.py init "<folder>"`. It never overwrites anything. 
 
 Then one or two lines on what just appeared: 1-Inbox is where they drop things, Projects and Areas are where their work lives, and everything else is the assistant's record, explained in `START-HERE.md`.
 
-Then offer the inbox shortcut, in one line, because it's what turns the inbox into a habit: a shortcut to 1-Inbox on their desktop, so saving a transcript, a PDF, or a screenshot for their intern is one drag. If they want it:
+Then offer the inbox shortcut as a question, because it's what turns the inbox into a habit: "Want a shortcut to 1-Inbox on your desktop? Then saving a transcript, a PDF, or a screenshot for me is one drag." A mention without the question doesn't count. If they want it:
 
 - **Mac:** in Finder, hold Option and Command and drag 1-Inbox onto the desktop. (Or right-click 1-Inbox, choose Make Alias, and drag the alias to the desktop.)
 - **Windows:** in File Explorer, right-click 1-Inbox, then Send to, then Desktop (create shortcut).
@@ -97,7 +97,7 @@ If you can run commands on their computer (Claude Code), offer to make it for th
 - **Yes, company account:** continue.
 - **No, it's my own, or Not sure:** keep going, but treat it as personal. Plan the tools, write the IT request, and hold off on connecting work systems until they confirm the company allows it. Connecting work mail or chat to a personal AI account is exactly the line most AI policies draw. Keep customer, confidential, and regulated data out. See "Policy check".
 
-Record the answer and today's date in `Setup/setup-profile.md`.
+Record the answer and today's date in `Setup/setup-profile.md`, and where the folder lives on its Folder line. Together they settle whether this folder counts as company storage, so later commands never have to ask.
 
 ### Step 2: About them
 
@@ -125,7 +125,7 @@ The fastest way to make the folders useful, and easier than a form.
    - **People**: who owns or decides what. Acronyms go on the glossary's open list, with the Best guess column left empty unless they offered one.
    - **From the role pack**: if it has data cautions or briefing sections, show the never-list line and the brief sections you'd add, so they confirm them with the rest.
 5. Ask: "Anything wrong or missing?" Fix it. Nothing they didn't say gets added.
-6. Write it: `brain.py project "<Name>" --role <own|support|watch>` for each project, up to five now (add `--status in-progress` only when they said it's under way), `brain.py area "<Name>"` for each area, follow-up lines in `Memory/followups.md` (with `since:` for waiting items and `accepted: false` unless they said the other person agreed), rows in `4-Reference/people.md`, and open acronyms in `4-Reference/glossary.md`.
+6. Write it: `brain.py project "<Name>" --role <own|support|watch>` for each project, up to five now (add `--status in-progress` only when they said it's under way), `brain.py area "<Name>"` for each area, follow-up lines in `Memory/followups.md` (with `since:` for waiting items and `accepted: false` unless they said the other person agreed), rows in `4-Reference/people.md`, and acronyms with `brain.py term "<Term>" "<Term>" --where "setup brain dump"` (add `--guess` only for a meaning they offered; a meaning they stated outright gets `--means "<meaning>" --confirmed` instead). Never type glossary rows by hand.
 7. Tell them where it all went in two lines, in folder names they can see: "Your projects are in 2-Projects, the ongoing stuff in 3-Areas, and what you owe in Memory/followups.md."
 
 If they'd rather not do a brain dump, ask the plain question instead: "Name up to five things you're working on. For each, do you own it, help with it, or keep an eye on it?"
@@ -140,7 +140,7 @@ Prove it works before asking for anything else.
 
 Don't spend a turn asking which command to try. In the same message that confirms the brain dump was written, run the best match for what they asked help with, on what they just told you:
 
-- Status updates, or nothing specific: `/project-status` on the projects from the brain dump.
+- Status updates, or nothing specific: `/project-status` on the projects from the brain dump. Run `brain.py status` and hand over its table exactly as printed, with any notes above it, never a table of your own.
 - Tracking follow-ups: what's due this week, from `brain.py due`.
 - Ramping up: `/who` on someone they named.
 - Meeting prep and notes: `/prep` for their next meeting (ask them to paste the invite), or `/debrief` if they have a transcript handy. If there's no invite to paste, don't stall: prep the recurring meeting from the brain dump with what's known (who's in it, open items both ways, the outcome to seek), then list the two or three things to paste that would fill it in, like the invite, the last notes, or the agenda. Or offer `/briefing` as the first win instead.
@@ -166,7 +166,7 @@ Installs, adds, and logins change Codex's own settings, outside the folder, so s
 2. `tracked`: tasks and tickets, the team wiki, design tools, customer tools.
 3. `role` with `--role "<their Role answer>"`: tools specific to their kind of work. If they typed their own role into Other, skip this screen; the "Anything missing?" in the read-back covers it.
 
-If they name their tools in their own words instead, run `connect.py match` on those words, then ask only the screens their list didn't cover (for example meetings and files). Run `connect.py match` on all the answers and ask any follow-ups it returns. Then go straight to the plan (5b) in the same turn: read the list back in one line and ask "Anything missing?" there, rather than in a turn of its own. Re-running the plan later keeps every status. Fill "Tools I actually use" in `Setup/preferences.md` from the answers.
+If they name their tools in their own words instead, run `connect.py match` on those words, then ask only the screens their list didn't cover (for example meetings and files). Run `connect.py match` on all the answers and ask any follow-ups it returns. Then go straight to the plan (5b) in the same turn: read the list back in one line and ask "Anything missing?" there, rather than in a turn of its own. `connect.py match` prints that line; use it even when they already said they can't connect anything yet. Re-running the plan later keeps every status. Fill "Tools I actually use" in `Setup/preferences.md` from the answers.
 
 **5b. Plan.** Run `connect.py plan --tools <ids from match> --surface <cowork|desktop|web|code|codex> --workspace "<folder>"`. It writes `Setup/connection-plan.md` with every tool in easiest-first order, plain steps for each, and a status column. Translate its summary into three lines at most: ready to connect now; needs an admin first ("I'll write the email to IT for you at the end"); no connector yet ("We'll use exports or the browser for these").
 
@@ -194,14 +194,14 @@ If the person is on a personal account (Step 1), skip connecting work systems: m
 
 This is the payoff, and it teaches them what they now have.
 
-1. Run `connect.py tour --workspace "<folder>" --write`. In Codex, add `--plain` (a Codex plan turns it on by itself) so the cheat sheet gives each command as words to say, not a slash to type. It writes `Setup/my-commands.md`, a personal cheat sheet built from what actually connected and what they asked for help with: four to start with, the rest of the core eight, and the extras kept out of the way.
+1. Run `connect.py tour --workspace "<folder>" --write`. After a Codex plan it gives each command as words to say, not a slash to type, on its own. It writes `Setup/my-commands.md`, a personal cheat sheet built from what actually connected and what they asked for help with: four to start with, the rest of the core eight, and the extras kept out of the way.
 2. Walk them through the "Start with these" section: four commands, one line each, naming what each one now reads for them ("`/prep` now pulls the invite and the last Teams thread"; in Codex, "prep me for a meeting now pulls..."), and say the full cheat sheet is in their folder at `Setup/my-commands.md`.
 3. End that same message by asking which one to try now, with the picker from `connect.py tour --workspace "<folder>" --json`, and run it for real.
-4. Right after that first try, ask the `yours` screen: brief length, what the brief always covers, when the day starts, and whether they want it every weekday morning. If a reply leaves one of the four unanswered, ask that one before writing. Write `Setup/preferences.md` (brief length as the word cap: Three lines is 60, Short is 150, Fuller is 300; always include; working hours from the day-start answer). Never skip this screen.
+4. In the same reply as that first try's result, ask the `yours` screen; don't wait for them to ask what's next: brief length, what the brief always covers, when the day starts, and whether they want it every weekday morning. If a reply leaves one of the four unanswered, ask that one before writing. Write `Setup/preferences.md` (brief length as the word cap: Three lines is 60, Short is 150, Fuller is 300; always include; working hours from the day-start answer). Never skip this screen.
 5. Close with two lines: plain words work as well as commands, and the cheat sheet lives at `Setup/my-commands.md`.
 6. If they said yes to a daily brief and the surface supports scheduled tasks, set up a weekday `/briefing` just before their day starts. Tell them in one line that a brief that reads their folder works only while the computer is awake and the Claude desktop app is open; pick a time it's usually on. Set it up from the desktop app, since a task made in Cowork on the web or phone can't use local folders. First make sure send, delete, and share tools are blocked or need approval in each connector. Then ask which connected tools the brief may read without asking, and mark only those as yes in the guardrail profile. A scheduled brief reads and briefs. It never sends or changes anything.
-7. Offer a weekly reset: Friday afternoon, `/week` for the week ahead, plus a short list of what's waiting in 1-Inbox and which projects look finished. It only proposes. Filing (`/sync-kb`) and archiving (`/tidy`) happen when the person says yes.
-8. Hand them the first week (below) as one short list, and offer the deeper setup next week: voice, partners, and exactly what the agent is allowed to do. Keep every guardrail on its default for now; don't invite them to loosen reads or writes on day one.
+7. In the closing message, offer a weekly reset: Friday afternoon, `/week` for the week ahead, plus a short list of what's waiting in 1-Inbox and which projects look finished. It only proposes. Filing (`/sync-kb`) and archiving (`/tidy`) happen when the person says yes.
+8. In that same closing message, hand them the first week (below) as five short lines, days 1 to 5, and offer the deeper setup next week: voice, partners, and exactly what the agent is allowed to do. Keep every guardrail on its default for now; don't invite them to loosen reads or writes on day one.
 
 ## Short on time
 

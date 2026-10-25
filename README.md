@@ -129,7 +129,7 @@ The first line adds this repo as a plugin source; the second opens Unpaid Intern
 
 **3. claude.ai or the Claude app, if you can upload skills.** Download `unpaid-intern.zip` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest) and upload it under Customize, then Skills. Code execution has to be on. The same commands work; type them or ask in plain words. These chats don't keep files between sessions, so at the end of each one your intern hands you your folder as a zip to upload next time. The ask-first hook is plugin-only, so your connector settings do that job here.
 
-**4. Any chat assistant, no installs or uploads.** For Microsoft Copilot, ChatGPT, Gemini, or Claude without uploads. Download `unpaid-intern-no-install-kit.zip` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest) and follow the README inside: a ready-made folder, instructions you paste into a project, and a single prompt for when chat is all you've got.
+**4. Any chat assistant, no installs or uploads.** For **Microsoft Copilot**, **ChatGPT**, **Gemini**, or **Claude** without uploads. Download `unpaid-intern-no-install-kit.zip` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest) and follow the README inside: a ready-made folder, instructions you paste into a project, and a single prompt for when chat is all you've got.
 
 **5. Codex** (the ChatGPT desktop app or the Codex CLI).
 
@@ -162,11 +162,11 @@ Checked on Codex CLI 0.160.0, on Windows with 0.160.1, and with GPT-6.1 Sol on 0
 
 ## FAQ
 
-**Is it really free?** Yes. It's free and MIT licensed. It runs inside an AI assistant you already use at work, like Claude, so you'll need access to one of those. It's the only intern who should be unpaid.
+**Is it really free?** Yes. It's free and MIT licensed. It runs inside an AI assistant you already use at work, like **Claude**, so you'll need access to one of those. It's the only intern who should be unpaid.
 
 **Do I have to connect anything?** No. Everything works from pasted text and dropped files. Connectors just save you the copying. When you're ready, setup asks which tools you use and connects only those, one at a time, each set to ask before it sends or deletes anything.
 
-It knows 77 work tools, including **Microsoft 365**, **Google Workspace**, **Slack**, **Zoom** and the popular meeting note-takers, **Jira** and **Confluence**, **Notion**, **Asana**, **Salesforce**, **HubSpot**, **Figma**, and **GitHub**. In Cowork, five come listed with the plugin (Gmail, Google Calendar, Slack, Jira and Confluence, and Notion), so connecting one is a sign-in. In Claude Code, Gmail and Google Calendar connect through claude.ai. In Codex, your intern adds each tool you pick, from Codex's plugin directory or by web address. Some tools need a one-time approval from whoever manages them at your company; your intern writes that request for you and keeps working from files until it comes through. Tool by tool: [CONNECTORS.md](CONNECTORS.md).
+It knows 77 work tools, including **Microsoft 365**, **Google Workspace**, **Slack**, **Zoom** and the popular meeting note-takers, **Jira** and **Confluence**, **Notion**, **Asana**, **Salesforce**, **HubSpot**, **Figma**, and **GitHub**. In **Cowork**, five come listed with the plugin (**Gmail**, **Google Calendar**, Slack, Jira and Confluence, and Notion), so connecting one is a sign-in. In **Claude Code**, Gmail and Google Calendar connect through claude.ai. In **Codex**, your intern adds each tool you pick, from Codex's plugin directory or by web address. Some tools need a one-time approval from whoever manages them at your company; your intern writes that request for you and keeps working from files until it comes through. Tool by tool: [CONNECTORS.md](CONNECTORS.md).
 
 **Will it send email for me?** Out of the box it drafts and you hit send. You can let it send from a connected tool by changing that tool's line in your intern's settings file. Even then, nothing goes out until you approve the exact message, recipients, and channel.
 
@@ -174,7 +174,7 @@ It knows 77 work tools, including **Microsoft 365**, **Google Workspace**, **Sla
 
 **Can my whole team use it?** Yes. Everyone gets their own intern and their own folder, and each one links to your team's wiki and tracker instead of copying them, so the team's source of truth stays where it is.
 
-**Where does my data go?** Your notes are markdown files in a folder you pick, and your AI assistant reads them the way it reads anything else you share with it. Connectors sign in as you and see only what you can already see. There's no Unpaid Intern server, and the script that keeps your notes never touches the network. The only part of Unpaid Intern's own code that goes online is an optional check, run only when you ask, that tests whether your network can reach a connector; it sends no account data. In Claude Code, the plugin also adds a hook that asks before connector tools that send, share, change, or delete.
+**Where does my data go?** Your notes are markdown files in a folder you pick, and your AI assistant reads them the way it reads anything else you share with it. Connectors sign in as you and see only what you can already see. There's no Unpaid Intern server, and the script that keeps your notes never touches the network. The only part of Unpaid Intern's own code that goes online is an optional check, run only when you ask, that tests whether your network can reach a connector; it sends no account data. In **Claude Code**, the plugin also adds a hook that asks before connector tools that send, share, change, or delete.
 
 **Does it work on the web, or in the Claude app without Cowork?** Yes. Those chats don't keep files between sessions, so at the end of a session your intern packs your folder into a zip for you to download. Upload it at the start of the next chat and it picks up where you left off.
 

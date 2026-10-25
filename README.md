@@ -116,7 +116,7 @@ It's built for people who have never connected anything, and it hands you someth
 
 It works with as much or as little as your company allows. Pick the line for the AI tool your company approved. Steps 1 to 4 run from the full plugin down to no installs at all; 5 and 6 are for other AI tools.
 
-**1. Cowork (the full kit).** Download `unpaid-intern.plugin` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest), open it, and click Install. Then say "set me up."
+**1. Cowork (the full kit).** Download `unpaid-intern.plugin` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest). In Claude, open Customize in the left sidebar, then the Plugins tab. Click + Add, choose Upload plugin, and pick the file. Then say "set me up."
 
 **2. Claude Code (the full kit).**
 

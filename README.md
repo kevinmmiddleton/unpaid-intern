@@ -131,17 +131,18 @@ The first line adds this repo as a plugin source; the second opens Unpaid Intern
 
 **4. Any chat assistant, no installs or uploads.** For Microsoft Copilot, ChatGPT, Gemini, or Claude without uploads. Download `unpaid-intern-no-install-kit.zip` from the [latest release](https://github.com/kevinmmiddleton/unpaid-intern/releases/latest) and follow the README inside: a ready-made folder, instructions you paste into a project, and a single prompt for when chat is all you've got.
 
-**5. Codex** (the ChatGPT desktop app or the Codex CLI). In a terminal (Terminal on a Mac, PowerShell on Windows), run:
+**5. Codex** (the ChatGPT desktop app or the Codex CLI).
+
+In the ChatGPT desktop app: open **Plugins** in the sidebar, click **Add**, then **Add a marketplace**, enter `kevinmmiddleton/unpaid-intern` as the Source, and click **Add marketplace**. Find Unpaid Intern on the Plugins page and click **+**. Then start a new chat, switch it to **Work** (the switch at the top), and under the message box choose **Choose project**, then **New project**, and add an empty folder for your notes. Use Work, not Chat: the plugin's **Try now** opens a Chat conversation, and the plugin doesn't load there.
+
+In the Codex CLI, run these in a terminal (Terminal on a Mac, PowerShell on Windows), then start Codex in an empty folder for your notes:
 
 ```
 codex plugin marketplace add kevinmmiddleton/unpaid-intern
 codex plugin add unpaid-intern@unpaid-intern
 ```
 
-**If it says `codex` isn't found,** you have the ChatGPT desktop app but not the Codex command. Install it with OpenAI's one-line installer, open a new terminal, and run the two commands again. Plugins you add this way show up in the desktop app too.
-
-- Mac: `curl -fsSL https://chatgpt.com/codex/install.sh | sh`
-- Windows, in PowerShell: `powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"`
+If your terminal says `codex` isn't found, use the app steps above (the app doesn't add the command), or install the CLI with [OpenAI's one-line installer](https://github.com/openai/codex#readme).
 
 The plugin brings Atlassian and Notion connectors, so until you sign in to them, Codex logs a sign-in error for each one when a session starts. That's harmless. Not using one? Turn it off in `~/.codex/config.toml`:
 
@@ -152,15 +153,15 @@ enabled = false
 
 (The same with `notion` for Notion.)
 
-Then start a new Codex chat in an empty folder for your notes (in the ChatGPT desktop app, File, then Open Folder) and say "set me up." Ask for things in words rather than typing the slash commands: Codex only takes its own, so `/briefing` gets "Unrecognized command" while "give me my briefing" works. The same goes for "prep me for my 2pm", "debrief my last meeting", and "file my inbox".
+Then say "set me up." Ask for things in words rather than typing the slash commands: Codex only takes its own, so `/briefing` gets "Unrecognized command" while "give me my briefing" works. The same goes for "prep me for my 2pm", "debrief my last meeting", and "file my inbox".
 
-Checked on Codex CLI 0.160.0, on Windows with 0.160.1, and with GPT-6.1 Sol on 0.164.0, where setup and daily use ran from pasted text with nothing connected. Setup walks you through connecting your tools with Codex's own plugins and `codex mcp` commands, and setting each one to ask before it changes anything. Using ChatGPT itself? Go with 4. This edition is new, so [tell me](https://github.com/kevinmmiddleton/unpaid-intern/issues/new/choose) how it goes.
+Checked on Codex CLI 0.160.0, on Windows with 0.160.1, and with GPT-6.1 Sol on 0.164.0, where setup and daily use ran from pasted text with nothing connected. Setup walks you through connecting your tools with Codex's own plugins and `codex mcp` commands, and setting each one to ask before it changes anything. Using ChatGPT's regular chat instead of Work? Go with 4. This edition is new, so [tell me](https://github.com/kevinmmiddleton/unpaid-intern/issues/new/choose) how it goes.
 
 **6. Another AI tool (Cursor, GitHub Copilot, Gemini CLI, and friends).** Run `npx skills add kevinmmiddleton/unpaid-intern` (it needs Node.js). It asks which of your tools to add the skill to; then say "set me up." The commands are written for Claude, so a few steps may read differently. Rather not use npx? Clone this repo and run `python3 skills/unpaid-intern/scripts/brain.py init ~/second-brain`. On Windows, use `py` instead of `python3`. Then open that folder; its `AGENTS.md` carries the rules.
 
 **No Python on your machine?** Your intern builds the same folders by hand and does each script's job step by step, then tells you the results weren't machine-checked.
 
-**Updating.** Plugin and skill updates never touch your folder. In Cowork, claude.ai, or the Claude app, install or upload the latest file again. In Claude Code, run `claude plugin update unpaid-intern@unpaid-intern` in your terminal, then restart. In Codex, `codex plugin marketplace upgrade`. Elsewhere, `npx skills update unpaid-intern`. With the no-install kit, paste the new `INSTRUCTIONS.md` into your project and keep your own folder; don't copy the new one over it.
+**Updating.** Plugin and skill updates never touch your folder. In Cowork, claude.ai, or the Claude app, install or upload the latest file again. In Claude Code, run `claude plugin update unpaid-intern@unpaid-intern` in your terminal, then restart. In Codex, `codex plugin marketplace upgrade`, or in the ChatGPT desktop app, Settings, then Plugins, then the Marketplace tab, then Upgrade. Elsewhere, `npx skills update unpaid-intern`. With the no-install kit, paste the new `INSTRUCTIONS.md` into your project and keep your own folder; don't copy the new one over it.
 
 The plugin pre-lists five connectors most offices use (Gmail, Google Calendar, Slack, Jira and Confluence, and Notion), so in Cowork you just sign in; in Claude Code, Gmail and Google Calendar connect through claude.ai instead. The rest come from Claude's connector directory, and most sign in with your normal work login. Some, like Slack and Jira, may need a one-time approval from whoever manages them at your company; your intern writes that request for you and works from pasted text and dropped files until it comes through. Details, tool by tool: [CONNECTORS.md](CONNECTORS.md).
 

@@ -75,6 +75,7 @@ PROJECT_TABLE = f"{MEMORY}/project-status.md"
 FOLLOWUPS = f"{MEMORY}/followups.md"
 SESSION_MARK = f"{MEMORY}/.session-start"  # written by `due --open`; `check` lists what changed after it
 TZ_MARK = f"{MEMORY}/.timezone-note"       # `now` says once per workspace that times come from this computer's clock
+TERMS_LOG = f"{MEMORY}/.glossary-adds"     # `term` logs what it adds; `check` names this session's terms for the reply
 TZ_NOTE = "Using this computer's clock for times. That's only a problem if you work in a different time zone."
 
 FOLLOWUP_RE = re.compile(
@@ -1102,7 +1103,7 @@ def cmd_term(args) -> int:
     if args.means and not (args.source or args.confirmed):
         sys.exit("--means needs --source (where it's defined), or --confirmed if the person told you.")
     lines = read_text(path).splitlines()
-    notes = []
+    notes, added = [], []
     for term in terms:
         tables = _glossary_tables(lines)
         if "main" not in tables or "open" not in tables:
@@ -1123,6 +1124,7 @@ def cmd_term(args) -> int:
                 h, header, end = tables["open"]
                 lines.insert(end, _row(header, {"term": term, "where it showed up": args.where, "best guess": args.guess or ""}))
                 notes.append(f"Added {term} to the open list" + (f", with your guess '{args.guess}'." if args.guess else "."))
+                added.append(("guess" if args.guess else "open", term))
             continue
         h, header, end = tables["main"]
         if len(split_row(lines[h + 1])) != len(header):
@@ -1143,18 +1145,47 @@ def cmd_term(args) -> int:
             else:
                 lines[main_j] = row
                 notes.append(f"Updated {term} in the glossary: {args.means}.")
+                added.append(("main", term))
         else:
             lines.insert(end, row)
             notes.append(f"Added {term} to the glossary: {args.means}.")
+            added.append(("main", term))
             if open_j is not None and open_j >= end:
                 open_j += 1
         if open_j is not None:
             del lines[open_j]
             notes.append(f"Moved {term} off the open list.")
     write_lf(path, "\n".join(lines) + "\n")
+    if added:
+        log = ws / TERMS_LOG
+        stamp = dt.datetime.now().astimezone().isoformat()
+        old = read_text(log).splitlines()[-200:] if log.is_file() else []
+        write_lf(log, "\n".join(old + [f"{stamp}\t{kind}\t{t}" for kind, t in added]) + "\n")
     for n in notes:
         print(n)
     return 0
+
+
+def glossary_adds(ws: Path, since: dt.datetime):
+    """{'main': [...], 'guess': [...], 'open': [...]}: terms `term` added after `since`, each listed once."""
+    out = {"main": [], "guess": [], "open": []}
+    log = ws / TERMS_LOG
+    for ln in (read_text(log).splitlines() if log.is_file() else []):
+        parts = ln.split("\t", 2)
+        try:
+            when = dt.datetime.fromisoformat(parts[0])
+        except (ValueError, IndexError):
+            continue
+        if len(parts) == 3 and parts[1] in out and when >= since:
+            for kind in out:
+                if parts[2] in out[kind]:
+                    out[kind].remove(parts[2])  # a term moved up is listed once, where it ended
+            out[parts[1]].append(parts[2])
+    return out
+
+
+def _and(items):
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " and " + items[-1]
 
 
 def cmd_archive(args) -> int:
@@ -1436,7 +1467,7 @@ def cmd_check(args) -> int:
     if written or moves:
         counts = [f"{len(written)} written"] if written else []
         counts += [f"{len(moves)} moved"] if moves else []
-        print(f"Changed {how}: {', '.join(counts)}. List these, exactly, as what you wrote or moved:")
+        print(f"Changed {how}: {', '.join(counts)}. List these, exactly, as a plain list (no collapsible block), as what you wrote or moved:")
         for rel in written:
             print(f"  {rel.as_posix()}")
         if moves:
@@ -1444,6 +1475,18 @@ def cmd_check(args) -> int:
             for src, dst in moves:
                 edited = now_inv.get(dst, before[src])[:2] != before[src][:2]  # size or time changed since the session started
                 print(f"  {src} -> {dst}" + (" (and edited)" if edited else ""))
+    if since is not None:
+        adds = glossary_adds(ws, since)
+        if any(adds.values()):
+            parts = []
+            if adds["main"]:
+                parts.append(f"Added {_and(adds['main'])} to your glossary")
+            if adds["guess"]:
+                parts.append(f"{_and(adds['guess'])} {'is' if len(adds['guess']) == 1 else 'are'} on the open list with my guess")
+            if adds["open"]:
+                parts.append(f"{_and(adds['open'])} {'is' if len(adds['open']) == 1 else 'are'} on the open list, meaning unknown")
+            line = "; ".join(parts)
+            print(f'Glossary: end your reply with this line, in your own words if you like: "{line[0].upper() + line[1:]}."')
     if from_setup:
         print(f"Created by setup ({len(from_setup)} file{'s' if len(from_setup) != 1 else ''}, unedited copies of the templates). "
               "Sum these up in one line, like \"set up your folder\", instead of listing them:")
@@ -2386,6 +2429,14 @@ def cmd_selftest(args) -> int:
         check("check flags the corrupted glossary from the Codex test", rc == 1 and "glossary.md:5  this row has 3 columns but its table has 4" in o.getvalue())
         term("COI", means="certificate of insurance", source="kickoff notes")
         check("term repairs a separator row with the wrong number of columns", read_text(gws / GLOSSARY).splitlines()[3] == "|---|---|---|---|")
+        with contextlib.redirect_stdout(io.StringIO()) as o:
+            cmd_check(argparse.Namespace(workspace=str(gws), today="2026-10-25", since=None))
+        check("check names this session's glossary terms once, where each ended up, for the reply",
+              'Added ELD, LTv2 and COI to your glossary; ETA is on the open list with my guess; the herd is on the open list, meaning unknown."' in o.getvalue()
+              and "no collapsible block" in o.getvalue())
+        with contextlib.redirect_stdout(io.StringIO()) as o:
+            cmd_check(argparse.Namespace(workspace=str(gws), today="2026-10-25", since=(dt.datetime.now().astimezone() + dt.timedelta(minutes=1)).isoformat()))
+        check("check leaves out terms added before the session started", "Glossary:" not in o.getvalue())
 
     passed = sum(1 for _, ok in checks if ok)
     for name, ok in checks:

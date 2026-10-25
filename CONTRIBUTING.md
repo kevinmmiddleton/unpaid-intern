@@ -35,4 +35,4 @@ Edit `skills/unpaid-intern/connectors/catalog.json`, then run `python3 tools/bui
 
 ## Cutting a release
 
-Bump `version` in `.claude-plugin/plugin.json` and in the `SKILL.md` frontmatter, add a `CHANGELOG.md` entry, update `.github/release-notes.md`, then push a tag that matches (`v1.3.1`). The release workflow builds and attaches the files.
+Bump `version` in `.claude-plugin/plugin.json` and in the `SKILL.md` frontmatter, add a `CHANGELOG.md` entry, update `.github/release-notes.md`, then push a tag that matches (`v1.3.1`). The release workflow builds the files, publishes them, and checks the downloads match. To try it without publishing, run it by hand from Actions (release, Run workflow). Recruiter BFF uses the same workflow file.

@@ -4,18 +4,18 @@ For companies that don't allow add-ons, plugins, skills, or scripts. If your com
 
 ## Pick the one that matches what you're allowed
 
-**1. You can make a Claude Project** (or your approved assistant lets you save instructions and upload files)
+**1. You can make a project** (Claude Projects, ChatGPT Projects, or any approved assistant that saves instructions and files)
 
 1. Unzip `Second Brain` somewhere your company lets you keep work files: your work OneDrive or Google Drive folder, or Documents.
-2. Make a new Project. Paste everything in `INSTRUCTIONS.md` into the Project's instructions.
-3. Upload these files from your `Second Brain` folder to the Project (skip the README and template files; the assistant doesn't need them):
+2. Make a new Project (in ChatGPT, choose Project-only memory, so your work notes stay in the project). Paste everything in `INSTRUCTIONS.md` into the Project's instructions.
+3. Upload these files from your `Second Brain` folder to the Project (skip the README and template files; the assistant doesn't need them). In ChatGPT, a project's files are called Sources: open the project, choose Sources, then Add sources.
    - `START-HERE.md`
    - `Memory/project-status.md`, `Memory/followups.md`, `Memory/decisions.md`, `Memory/meetings.md`, `Memory/lessons.md`
    - `4-Reference/people.md`, `4-Reference/glossary.md`
    - `Setup/preferences.md`
    - `lesson-101.html` from this kit (the template /learn fills in when you want a 101 lesson on a topic)
    - Later, each active project's `current.md`. If the Project won't take two files with the same name, rename them first, like `launch-v2-current.md`.
-4. Start a chat in the Project and say "set me up."
+4. Start a chat in the Project and say "set me up." If ChatGPT offers to continue in Work, choose Stay in Chat.
 5. At the end of each session, say "wrap up." It hands you each changed file with the folder it belongs in. Save each one over the old copy in your folder. In the Project, delete the old copy and upload the new one, so there's only ever one version.
 
 **2. You can only chat**

@@ -33,6 +33,18 @@ Assume the person has never set up a connector, never opened a settings page the
 - Set expectations without a stopwatch: "A few questions, a brain dump, and one real result before we connect anything. Connecting your tools comes after, and you can skip it. If your company has to approve a tool, that part can take a few days."
 - If they arrived with a real task, do the task first and offer setup after.
 - Write files from their answers only. Never fill a blank with a guess.
+- The files the scripts make are theirs: `Setup/connection-plan.md`, the IT email, and `Setup/my-commands.md`. To change one, re-run the script with its options; never rewrite it by hand. "Translate it" means what you say about a script's output, not the files. `brain.py check` flags a hand edit.
+
+## The beats, in order
+
+A long setup tempts skipping. Each step's beats, so none get dropped:
+
+1. **A home:** the folder, `brain.py init`, the inbox shortcut offer, the account check.
+2. **About them:** their name, then the `about` screen; if they're new, the start date and the org chart offer.
+3. **Brain dump:** dates through `brain.py when`, the four piles shown back, "Anything wrong or missing?", then write.
+4. **A first win:** run it for real, then one line on what connecting adds and one line naming one other command.
+5. **Their tools (skippable):** the screens, the list read back with "Anything missing?", the plan, one tool at a time, the IT email.
+6. **The tour:** the cheat sheet, "which one to try now" (and run it), the `yours` screen, the daily brief offer, the weekly reset offer, the first-week list.
 
 ## How to ask
 
@@ -89,7 +101,9 @@ Record the answer and today's date in `Setup/setup-profile.md`.
 
 ### Step 2: About them
 
-Ask the `about` screen: their role, what they want help with first, and whether they're new to the job. Write the role to `START-HERE.md` and `Setup/setup-profile.md`, and the help-with answers to the `help first:` line in `Setup/preferences.md`. The role picks the tool screen in Step 5 and the role pack in `references/role-packs.md` (apply its projects meaning, briefing sections, and data cautions in Step 3). The help-with answers drive the first win and the tour.
+First ask their name, in plain text since it isn't multiple choice: "What should I call you?" Write it to the `Owner:` line in `START-HERE.md` and the `name to use:` line in `Setup/preferences.md`. Debriefs use it to tell their own promises (`@me`) from other people's, and the IT email signs with it.
+
+Then ask the `about` screen: their role, what they want help with first, and whether they're new to the job. Write the role to `START-HERE.md` and `Setup/setup-profile.md`, and the help-with answers to the `help first:` line in `Setup/preferences.md`. The role picks the tool screen in Step 5 and the role pack in `references/role-packs.md` (apply its projects meaning, briefing sections, and data cautions in Step 3). The help-with answers drive the first win and the tour.
 
 **If they're new ("Yes, still ramping up"),** say one line about why this matters: ramping up means a flood of new names, acronyms, and projects, usually with an onboarding buddy who's too busy to help. Then:
 

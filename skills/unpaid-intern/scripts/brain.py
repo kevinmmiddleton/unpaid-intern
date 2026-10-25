@@ -36,6 +36,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import datetime as dt
+import hashlib
 import io
 import json
 import os
@@ -86,7 +87,9 @@ FOLLOWUP_RE = re.compile(
 LIST_MARKER_RE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s*")
 DATE_PIPE_RE = re.compile(r"\d{4}-\d{1,2}-\d{1,2}\s*\|")
 OWNER_RE = re.compile(r"^@(me|waiting:\s*\S.*)$", re.IGNORECASE)
-SINCE_RE = re.compile(r"since:(\S+)")
+SINCE_RE = re.compile(r"since:\s*(\d{4}-\d{1,2}-\d{1,2})(?!\d)")  # a date, even with punctuation right after it
+SINCE_ANY_RE = re.compile(r"since:")
+MADE_BY_SCRIPTS = f"{SETUP}/.made-by-scripts.json"  # connect.py records what it wrote, so `check` can spot a hand edit
 TAG_RE = re.compile(r"(?<![\w&])#(\w[\w-]*)")
 STATUS_VALUES = {"unconfirmed", "not-started", "in-progress", "on-track", "at-risk", "blocked", "paused", "done"}
 ROLE_ORDER = {"own": 0, "support": 1, "watch": 2}
@@ -321,6 +324,8 @@ def parse_followups(path: Path):
         if sm:
             since = parse_date(sm.group(1))
             since_bad = since is None
+        elif SINCE_ANY_RE.search(g["source"]):
+            since_bad = True
         low = owner.lower()
         waiting = owner.split(":", 1)[1].strip() if low.startswith("@waiting:") else None
         items.append({
@@ -459,6 +464,7 @@ def cmd_init(args) -> int:
     if "AGENTS.md" in skipped:
         print("Note: an existing AGENTS.md was kept. Compare it with the template in the skill's templates folder.")
     if not args.dry_run:
+        write_session_mark(dest)  # setup starts here: `check` lists what setup writes after this, without guessing
         print("Next: answer the setup questions, then run 'brain.py lint' to confirm the workspace is healthy.")
     return 0
 
@@ -516,12 +522,26 @@ def resolve_when(phrase: str, today: dt.date):
     return _resolve_when_core(phrase, today)
 
 
+TIME_OF_DAY_RE = re.compile(
+    r"\s+(?:(?:in the |first thing (?:in the )?)?(?:morning|afternoon|evening|night)|first thing|at noon|noon|"
+    r"(?:at|around) \d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)?|"  # "at 2", "at 2:30", "around 3pm"
+    r"\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)|\d{1,2}:\d{2})$"  # "2pm", "9:30 am", "14:00"; never a bare "9"
+)
+
+
 def _when_norm(phrase: str) -> str:
     p = " ".join(phrase.lower().replace(",", " ").split())
-    for lead in ("due ", "by ", "on ", "before ", "until ", "no later than "):
+    for lead in ("due ", "by ", "on ", "before ", "until ", "no later than ", "first thing "):
         if p.startswith(lead):
             p = p[len(lead):]
-    return p[4:] if p.startswith("the ") else p
+    p = p[4:] if p.startswith("the ") else p
+    if p.startswith("this coming "):
+        p = "this " + p[len("this coming "):]
+    elif p.startswith("coming "):
+        p = "this " + p[len("coming "):]
+    if re.search(r"[a-z]", TIME_OF_DAY_RE.sub("", p)):  # "monday morning" is monday; a bare "9am" stays as it was
+        p = TIME_OF_DAY_RE.sub("", p)
+    return p
 
 
 SPAN_LEAD_RE = re.compile(r"^(?:(?:sometime|some time|in|during|within|over)\s+)*(?:the\s+)?")
@@ -1163,6 +1183,29 @@ def check_weekdays(text: str, today: dt.date):
     return out
 
 
+TABLE_SEP_RE = re.compile(r"^\s*\|?\s*:?-{3,}")
+
+
+def broken_tables(text: str):
+    """Line numbers of table rows cut off from their table: a blank line after a table, then more rows with no
+    header of their own. Markdown ends a table at a blank line, so those rows show up as loose text."""
+    lines = text.splitlines()
+    out, in_table, gap = [], False, False
+    for i, ln in enumerate(lines):
+        s = ln.strip()
+        if s.startswith("|"):
+            if i + 1 < len(lines) and TABLE_SEP_RE.match(lines[i + 1]):
+                in_table, gap = True, False  # a header row starts a table
+            elif in_table and gap:
+                out.append(i + 1)
+                gap = False
+        elif not s:
+            gap = in_table
+        else:
+            in_table, gap = False, False
+    return out
+
+
 def _tracked_files(ws: Path):
     """Workspace files `check` watches: no symlinks, nothing hidden (the session mark and the clock note included)."""
     for p in sorted(ws.rglob("*")):
@@ -1304,6 +1347,29 @@ def cmd_check(args) -> int:
             for m in PRONOUN_RE.finditer(line):
                 a, b = max(0, m.start() - 30), min(len(line), m.end() + 30)
                 pronouns.append(f"  {rel.as_posix()}:{n}  ...{line[a:b].strip()}...")
+    fix = []
+    if Path(FOLLOWUPS) in written:
+        items, bad, unclosed = parse_followups(ws / FOLLOWUPS)
+        fix += [f"  {FOLLOWUPS}:{n}  doesn't match '- [ ] YYYY-MM-DD | @owner | deliverable | source | accepted: true|false'" for n, _ in bad]
+        fix += [f"  {FOLLOWUPS}:{it['line']}  the 'since:' date isn't YYYY-MM-DD, so stale tracking is off for it" for it in items if it["since_bad"]]
+        fix += [f"  {FOLLOWUPS}:{it['line']}  owner '{it['owner']}' should be @me or @waiting:Name" for it in items if not OWNER_RE.match(it["owner"])]
+    for rel in written:
+        if rel.suffix.lower() == ".md" and rel.parts[:1] not in ((INBOX,), (ARCHIVE,)):
+            fix += [f"  {rel.as_posix()}:{n}  this table row sits below a blank line, so it's cut off from its table; remove the blank line"
+                    for n in broken_tables(read_text(ws / rel))]
+    made = {}
+    try:
+        made = json.loads(read_text(ws / MADE_BY_SCRIPTS)) if (ws / MADE_BY_SCRIPTS).is_file() else {}
+    except (ValueError, OSError):
+        made = {}
+    for rel in written:
+        want = made.get(rel.as_posix())
+        if want and hashlib.sha256((ws / rel).read_bytes()).hexdigest() != want:
+            fix.append(f"  {rel.as_posix()}  was rewritten by hand, but connect.py made it and reads it back. Re-run the connect.py "
+                       "command that made it (with its options for the change), instead of editing the file")
+    if fix:
+        print("\nFix before you hand over:")
+        print("\n".join(fix))
     if wrong:
         print("\nFix before you hand over. These weekdays don't match their dates:")
         print("\n".join(wrong))
@@ -1312,7 +1378,7 @@ def cmd_check(args) -> int:
     if pronouns:
         print("\nPronouns to review. Keep one only if a source gives it; otherwise use the name or \"they\":")
         print("\n".join(pronouns[:12]) + (f"\n  ...and {len(pronouns) - 12} more" if len(pronouns) > 12 else ""))
-    return 1 if wrong else 0
+    return 1 if (wrong or fix) else 0
 
 
 def iter_md(ws: Path, skip_dirs=(INBOX, ARCHIVE)):
@@ -1388,7 +1454,13 @@ def lint_workspace(ws: Path, today: dt.date):
             if m:
                 warnings.append(f"{p.relative_to(ws)} line {n}: relative date '{m.group(0)}'. Write the absolute date.")
 
+    agents = ws / "AGENTS.md"
+    if agents.is_file() and "never rewrite it by hand" not in read_text(agents):
+        info.append("AGENTS.md is from before 1.3.6, so it's missing the newer rules (plain words in chat, no guessed pronouns, "
+                    "files the scripts make). Ask to update it from the template; it changes your standing rules, so it asks first.")
     for p in iter_md(ws):
+        for n in broken_tables(read_text(p)):
+            warnings.append(f"{p.relative_to(ws)} line {n}: this table row sits below a blank line, so it's cut off from its table. Remove the blank line.")
         for n, line in live_lines(read_text(p)):
             for target in LINK_RE.findall(line):
                 if re.match(r"^[a-z][a-z0-9+.-]*:", target, re.I) or target.startswith(("#", "<")):
@@ -2105,6 +2177,48 @@ def cmd_selftest(args) -> int:
     check("SKILL.md, scripts.md, and no-python.md try python3, then python, then py -3", in_order)
     check("SKILL.md says where the scripts are outside Claude, and warns about the Microsoft Store shortcut",
           all(s in read_text(SKILL_DIR / "SKILL.md") for s in ("next to this SKILL.md", "${CLAUDE_SKILL_DIR}/scripts/", "Microsoft Store")))
+
+    # Codex test fixes (1.3.6)
+    sat = dt.date(2026, 10, 24)
+    check("when: 'this coming Friday' and 'coming Monday' read like 'this Friday'",
+          resolve_when("this coming Friday", sat)[0] == dt.date(2026, 10, 30) and resolve_when("coming Monday", sat)[0] == dt.date(2026, 10, 26))
+    check("when: a time of day after the day is dropped ('Monday morning', 'Thursday at 2pm', 'first thing Tuesday')",
+          resolve_when("Monday morning", sat)[0] == dt.date(2026, 10, 26) and resolve_when("Thursday at 2pm", sat)[0] == dt.date(2026, 10, 29)
+          and resolve_when("first thing Tuesday", sat)[0] == dt.date(2026, 10, 27))
+    with tempfile.TemporaryDirectory() as fx_tmp:
+        fx = Path(fx_tmp) / "followups.md"
+        fx.write_text("- [ ] ~2026-10-27 | @waiting:Wen | dashboard access | brain dump since:2026-10-20; placeholder | accepted: false\n"
+                      "- [ ] ~2026-10-27 | @waiting:Wen | dashboard access | brain dump since:last week | accepted: false\n", encoding="utf-8")
+        its, _, _ = parse_followups(fx)
+        check("since: a date with punctuation right after it still counts; a non-date is still flagged",
+              its[0]["since"] == dt.date(2026, 10, 20) and not its[0]["since_bad"] and its[1]["since_bad"])
+    check("broken_tables finds rows cut off by a blank line, and leaves separate tables alone",
+          broken_tables("| A | B |\n|---|---|\n\n| 1 | 2 |\n\n| 3 | 4 |\n") == [4, 6]
+          and broken_tables("| A |\n|---|\n| 1 |\n\n## Next\n\n| C |\n|---|\n| 2 |\n") == [])
+    with tempfile.TemporaryDirectory() as ck_tmp:
+        cws = Path(ck_tmp) / "ws"
+        with quiet:
+            cmd_init(argparse.Namespace(folder=str(cws), force=True, dry_run=False))
+        check("init sets the session mark, so check knows when setup started", (cws / SESSION_MARK).is_file())
+        people = cws / "4-Reference" / "people.md"
+        people.write_text(read_text(people).replace("|---|---|---|---|---|---|---|\n",
+                          "|---|---|---|---|---|---|---|\n\n| Wen | Eng | Data | Ruth | dashboards | 2026-10-20 | brain dump |\n"), encoding="utf-8")
+        plan = cws / SETUP / "connection-plan.md"
+        plan.write_text("# Connection plan\n\nMade on 2026-10-24 for Codex.\n", encoding="utf-8")
+        (cws / MADE_BY_SCRIPTS).write_text(json.dumps({f"{SETUP}/connection-plan.md": hashlib.sha256(plan.read_bytes()).hexdigest()}), encoding="utf-8")
+        plan.write_text("# Connection plan\n\n[confirmed] Planned for Codex on 2026-10-24.\n", encoding="utf-8")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rc = cmd_check(argparse.Namespace(workspace=str(cws), today="2026-10-24", since=None))
+        text = out.getvalue()
+        check("check flags a table row cut off from its table, and a script-made file rewritten by hand",
+              rc == 1 and "people.md:" in text and "cut off from its table" in text and "rewritten by hand" in text)
+        lint_errors, lint_warnings, _ = lint_workspace(cws, sat)
+        check("lint flags a table row cut off from its table", any("cut off from its table" in w for w in lint_warnings))
+        check("a fresh workspace's AGENTS.md has the 1.3.6 rules, so lint says nothing about it",
+              not any("AGENTS.md is from before" in i for i in lint_workspace(cws, sat)[2]))
+        (cws / "AGENTS.md").write_text("# Workspace rules\n\n- Label knowledge claims as stated, inferred, or confirmed, using square brackets.\n", encoding="utf-8")
+        check("lint notes an AGENTS.md from before 1.3.6", any("AGENTS.md is from before" in i for i in lint_workspace(cws, sat)[2]))
 
     passed = sum(1 for _, ok in checks if ok)
     for name, ok in checks:

@@ -32,6 +32,7 @@ import contextlib
 import io
 import datetime as dt
 import difflib
+import hashlib
 import json
 import os
 import re
@@ -80,6 +81,20 @@ def write_lf(path, text: str) -> None:
     """Write UTF-8 text with Unix line endings on every platform, so files match across Mac, Windows, and Linux."""
     with open(path, "w", encoding="utf-8", newline="\n") as fh:
         fh.write(text)
+
+MADE_REL = Path(SETUP) / ".made-by-scripts.json"  # what this script wrote, so `brain.py check` can spot a hand edit
+
+
+def record_made(ws: Path, dest: Path) -> None:
+    """Note the file this script just wrote, by its contents, in Setup/.made-by-scripts.json."""
+    path = ws / MADE_REL
+    try:
+        data = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    except (ValueError, OSError):
+        data = {}
+    data[dest.relative_to(ws).as_posix()] = hashlib.sha256(dest.read_bytes()).hexdigest()
+    write_lf(path, json.dumps(data, indent=1, sort_keys=True) + "\n")
+
 
 def load_catalog(path: Path = CATALOG_PATH) -> dict:
     try:
@@ -511,7 +526,8 @@ def parse_plan(path: Path):
 def render_plan(cat: dict, ids: list[str], surface: str, statuses: dict, log: list[str], today: str) -> str:
     tools = tools_with_others(cat, ids)
     chosen = sorted((tools[i] for i in ids if i in tools), key=sort_key)
-    lines = ["# My connection plan", "",
+    lines = [f"<!-- Made by connect.py for {surface}. It reads this file back, so change it with connect.py, not by hand. -->",
+             "# My connection plan", "",
              f"Made on {today} for {SURFACE_NAME[surface]}. Easiest first. Connect them one at a time; stop whenever you like and pick it up later.",
              "Adding tools later keeps every status already set here.", "",
              "Status: to-do, connected, needs-admin, failed, using-fallback, or skipped.", "",
@@ -564,8 +580,14 @@ def render_plan(cat: dict, ids: list[str], surface: str, statuses: dict, log: li
 def plan_surface(path: Path) -> str | None:
     if not path.exists():
         return None
-    m = re.search(r"for (Cowork|Claude Desktop|claude\.ai|Claude Code|Codex)\.", path.read_text(encoding="utf-8-sig", errors="replace"))
-    return {v: k for k, v in SURFACE_NAME.items()}[m.group(1)] if m else None
+    text = path.read_text(encoding="utf-8-sig", errors="replace")
+    mark = re.search(r"<!-- Made by connect\.py for ([a-z.-]+)\.", text)
+    if mark and mark.group(1) in SURFACE_NAME:
+        return mark.group(1)
+    names = {v: k for k, v in SURFACE_NAME.items()}
+    m = re.search(r"for (Cowork|Claude Desktop|claude\.ai|Claude Code|Codex)\.", text) or \
+        re.search(r"\b(Cowork|Claude Desktop|claude\.ai|Claude Code|Codex)\b", text[:600])  # a header someone reworded
+    return names[m.group(1)] if m else None
 
 
 def workspace(arg: str) -> Path:
@@ -602,6 +624,7 @@ def cmd_plan(args) -> int:
         return 0
     path.parent.mkdir(parents=True, exist_ok=True)
     write_lf(path, text)
+    record_made(ws, path)
     tools = tools_with_others(cat, ids)
     groups: dict[str, list[str]] = {}
     for i in ids:
@@ -661,6 +684,7 @@ def cmd_mark(args) -> int:
     surface = plan_surface(path) or "cowork"
     made = re.search(r"^Made on (\d{4}-\d{2}-\d{2})", path.read_text(encoding="utf-8-sig", errors="replace"), flags=re.M)
     write_lf(path, render_plan(cat, list(statuses.keys()), surface, statuses, log, made.group(1) if made else day))
+    record_made(ws, path)
     done = sum(1 for s in statuses.values() if s in ("connected", "using-fallback", "skipped"))
     print(f"{tid}: {status}. {done} of {len(statuses)} settled.")
     nxt = [t for t, s in statuses.items() if s == "to-do"]
@@ -824,6 +848,7 @@ def cmd_tour(args) -> int:
         if dest.exists() and not dest.read_text(encoding="utf-8-sig", errors="replace").startswith(TOUR_MARK):
             dest = ws / SETUP / "my-commands-new.md"
         write_lf(dest, text)
+        record_made(ws, dest)
         print(f"Wrote {dest.relative_to(ws)}.")
         return 0
     print(text)
@@ -1174,6 +1199,7 @@ def cmd_it_request(args) -> int:
             dest = ws / SETUP / f"it-request-{day}-{k}.md"
             k += 1
         write_lf(dest, text)
+        record_made(ws, dest)
         print(f"Wrote {dest.relative_to(ws)}. Review the bracketed parts, then send it yourself.")
         return 0
     print(text)
@@ -1737,6 +1763,17 @@ def cmd_selftest(args) -> int:
             plans[surf] = (ws / PLAN_REL).read_text(encoding="utf-8")
         cx = plans["codex"]
         check("Codex plan header names Codex", "Made on 2026-10-09 for Codex." in cx and plan_surface(Path(tmp) / "codex" / PLAN_REL) == "codex")
+        cws = Path(tmp) / "codex"
+        made = json.loads((cws / MADE_REL).read_text(encoding="utf-8")) if (cws / MADE_REL).is_file() else {}
+        check("the plan carries a marker and is recorded as script-made, so a hand edit can be spotted",
+              cx.startswith("<!-- Made by connect.py for codex.") and
+              made.get(PLAN_REL.as_posix()) == hashlib.sha256((cws / PLAN_REL).read_bytes()).hexdigest())
+        reworded = Path(tmp) / "reworded-plan.md"
+        reworded.write_text(cx.replace("Made on 2026-10-09 for Codex.", "[confirmed] Planned for Codex on 2026-10-09."), encoding="utf-8")
+        nomark = Path(tmp) / "nomark-plan.md"
+        nomark.write_text(cx.split("\n", 1)[1].replace("Made on 2026-10-09 for Codex.", "[confirmed] Planned for Codex on 2026-10-09."), encoding="utf-8")
+        check("Codex is still found when someone rewords the plan's header, with or without the marker",
+              plan_surface(reworded) == "codex" and plan_surface(nomark) == "codex")
         check("Codex plan has no Claude-only instructions",
               "claude.ai" not in cx and "type /mcp" not in cx and "Customize" not in cx and "claude" not in cx.lower() and "anthropic" not in cx.lower())
         check("Codex plan keeps the same order and status column",

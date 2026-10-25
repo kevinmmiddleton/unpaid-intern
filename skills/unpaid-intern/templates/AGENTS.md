@@ -21,7 +21,10 @@ This folder is a work second brain. It belongs to one person, called the user be
 - Write to an external system only after the user confirms that exact named write. A finishing word, if the guardrail profile sets one, confirms only the writes you listed in full in your most recent message.
 - Never delete work records. Suggest archive or label instead.
 - Never invent status, owners, dates, or meanings. Say what you could not find.
-- Label knowledge claims as stated, inferred, or confirmed, using square brackets.
+- In files, label knowledge claims [stated], [inferred], or [confirmed]. In chat, say the same in plain words ("the notes say", "my guess", "you confirmed"), never brackets, and never in a table the user will paste somewhere.
+- Refer to people by name, or "they", until a source gives a pronoun. In chat and in files.
+- In chat, write plain markdown: no em dashes, and no HTML tags.
+- Files a script makes (Setup/connection-plan.md, the IT email in Setup, Setup/my-commands.md) belong to it. To change one, re-run the script; never rewrite it by hand.
 - Do date math with a tool, not in your head. If no tool can run, show the calendar arithmetic step by step and say it was not machine-checked.
 - Fast-changing facts (counts, statuses, balances) get an "as of" date or a link to where they live. Never store a bare copy that will go stale.
 - Scheduled or unattended runs read only systems the guardrail profile marks yes, write only inside this folder, and never send.
@@ -33,6 +36,7 @@ Keep the format shown at the top of each file. Tools parse them.
 - Follow-ups: `- [ ] YYYY-MM-DD | @me or @waiting:Name | deliverable #project-slug | source | accepted: true|false`. Add `since:YYYY-MM-DD` to the source only for waiting items. `accepted: true` only when the other person clearly agreed.
 - Projects: one row per project in the table in Memory/project-status.md.
 - Decisions: newest first, with Decision, Why, Who, Revisit if, and Provenance.
+- Tables (people, glossary, project status): add a row right under the last row. A blank line ends a table, so a row below one shows as loose text.
 
 ## Leave it better
 

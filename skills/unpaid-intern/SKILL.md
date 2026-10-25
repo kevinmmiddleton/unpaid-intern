@@ -32,7 +32,7 @@ Before the first script runs (this section and Session open both run them), sett
 - **Found:** follow Session open. If setup looks unfinished (`START-HERE.md` still says `Role: <your role>`, or `Setup/connection-plan.md` still has `to-do` or `needs-admin` tools), offer once, in one line, to pick up where they left off.
 - **Not found:** run the guided setup in `references/setup.md`. It is built for people who have never connected a tool, and it gets them a win before it asks them to connect anything:
   1. **A home.** A `Second Brain` folder in their company OneDrive or Google Drive, or Documents (never a personal cloud), then `brain.py init`, plus the account check: company account or personal.
-  2. **About them.** Role, what they want help with first, and whether they're new. New adds a 30-60-90 page, an ask for an org chart screenshot, and extra help with names and acronyms.
+  2. **About them.** Their name, role, what they want help with first, and whether they're new. New adds a 30-60-90 page, an ask for an org chart screenshot, and extra help with names and acronyms.
   3. **Brain dump.** Everything on their plate, sorted into projects, areas, follow-ups, and people, confirmed before anything is written.
   4. **A first win.** One command, run for real on their own brain dump, with nothing connected.
   5. **Their tools.** Multiple-choice screens, then one connection at a time, easiest first, each locked down and tested. Any error gets decoded; anything blocked goes into one email to IT. Skippable.
@@ -59,7 +59,7 @@ Second Brain/
   Setup/         preferences, guardrail-profile, connection-plan, my-commands
 ```
 
-Exact file formats live in `references/workspace.md`. The scripts parse those formats, so keep them.
+Exact file formats live in `references/workspace.md`. The scripts parse those formats, so keep them. Files a script makes (`Setup/connection-plan.md`, the IT email, `Setup/my-commands.md`, the status table) belong to it: change one by re-running the script with its options, never by rewriting it by hand.
 
 ## Session open
 
@@ -153,9 +153,10 @@ When a name shows up that isn't in `4-Reference/people.md` and the person said s
 
 ## How to work
 
-- Before handing back any task that wrote files, run `brain.py check`. List exactly the files it prints as what you wrote or moved (moves as source -> destination; files it labels as created by setup take one line), fix any weekday it marks wrong, and change any pronoun it flags to the name or "they" unless a source gives one.
+- Before handing back any task that wrote files, run `brain.py check`. List exactly the files it prints as what you wrote or moved (moves as source -> destination; files it labels as created by setup take one line), fix any weekday it marks wrong, fix everything it lists under "Fix before you hand over" (a follow-up line the tools can't read, a table row cut off from its table, a script-made file rewritten by hand), and change any pronoun it flags to the name or "they" unless a source gives one.
 - Keep replies short. A one-line question gets a few lines back. Lead with the answer, cut the preamble, and never narrate your process ("I checked", "I ran", "let me look"). Name folders the way the user sees them, without code formatting. Mention commands by name, but phrase it as something they can ask for ("ask me for a /prep"), never as something to type. In Codex, typing one of these gets "Unrecognized command" (Codex takes only its own slash commands), so there leave the slash out and give the words: "ask me to prep you for that meeting", "say 'give me my briefing'".
 - Refer to people by name, or "they", until a source gives a pronoun. This holds in chat and in every file you write.
+- In chat, write plain markdown: no em dashes, and no HTML tags (a terminal shows them as raw text).
 - Outside Claude (Codex, ChatGPT), the workspace, the scripts, and every command work the same. Setup's connector steps are written for Claude, except in Codex: there, `connect.py plan --surface codex` gives Codex's own steps (a plugin from Codex's own directory when it has one, otherwise `codex mcp add <name> --url <address>`), and Step 5 of `references/setup.md` says how to lock each tool down. Elsewhere, connect tools with that product's own steps, lock them down the same way, and say so once.
 - Plan anything with three or more steps before building it. If the approach breaks, stop and re-plan. Say when something is a hole in the plan.
 - Never assess anyone's motives, competence, or reliability. Record what people own and what they said.

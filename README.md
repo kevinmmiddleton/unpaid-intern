@@ -138,11 +138,18 @@ codex plugin marketplace add kevinmmiddleton/unpaid-intern
 codex plugin add unpaid-intern@unpaid-intern
 ```
 
-Codex may warn that Atlassian and Notion aren't signed in. That's fine; skip any you don't use.
+The plugin brings Atlassian and Notion connectors, so until you sign in to them, Codex logs a sign-in error for each one when a session starts. That's harmless. Not using one? Turn it off in `~/.codex/config.toml`:
+
+```
+[plugins."unpaid-intern@unpaid-intern".mcp_servers.atlassian]
+enabled = false
+```
+
+(The same with `notion` for Notion.)
 
 Then say "set me up." In Codex, ask for things in words rather than typing the slash commands: Codex only takes its own, so `/briefing` gets "Unrecognized command" while "give me my briefing" works. The same goes for "prep me for my 2pm", "debrief my last meeting", and "file my inbox".
 
-The same repo works there. The skill loads in Codex (checked on Codex CLI 0.160.0, and on Windows with 0.160.1). Setup walks you through connecting your tools with Codex's own plugins and `codex mcp` commands, and setting each one to ask before it changes anything. Using ChatGPT itself? Go with 4. This edition is new, so [tell me](https://github.com/kevinmmiddleton/unpaid-intern/issues/new/choose) how it goes.
+The same repo works there. The skill loads in Codex (checked on Codex CLI 0.160.0, on Windows with 0.160.1, and with GPT-6.1 Sol on 0.164.0, where 21 turns of setup and daily use ran from pasted text with nothing connected). Setup walks you through connecting your tools with Codex's own plugins and `codex mcp` commands, and setting each one to ask before it changes anything. Using ChatGPT itself? Go with 4. This edition is new, so [tell me](https://github.com/kevinmmiddleton/unpaid-intern/issues/new/choose) how it goes.
 
 **6. Another AI tool (Cursor, GitHub Copilot, Gemini CLI, and friends).** Run `npx skills add kevinmmiddleton/unpaid-intern` (it needs Node.js). It asks which of your tools to add the skill to; then say "set me up." The commands are written for Claude, so a few steps may read differently. Rather not use npx? Clone this repo and run `python3 skills/unpaid-intern/scripts/brain.py init ~/second-brain`. On Windows, use `py` instead of `python3`. Then open that folder; its `AGENTS.md` carries the rules.
 
@@ -164,7 +171,7 @@ The plugin pre-lists five connectors most offices use (Gmail, Google Calendar, S
 
 **Can my whole team use it?** Yes. Everyone gets their own intern and their own folder, and each one links to your team's wiki and tracker instead of copying them, so the team's source of truth stays where it is.
 
-**Where does my data go?** Your notes are markdown files in a folder you pick, and your AI assistant reads them the way it reads anything else you share with it. Connectors sign in as you and see only what you can already see. There's no Unpaid Intern server, and the script that keeps your notes never touches the network. The only part of Unpaid Intern that goes online is an optional check, run only when you ask, that tests whether your network can reach a connector; it sends no account data. In Claude Code, the plugin also adds a hook that asks before connector tools that send, share, change, or delete.
+**Where does my data go?** Your notes are markdown files in a folder you pick, and your AI assistant reads them the way it reads anything else you share with it. Connectors sign in as you and see only what you can already see. There's no Unpaid Intern server, and the script that keeps your notes never touches the network. The only part of Unpaid Intern's own code that goes online is an optional check, run only when you ask, that tests whether your network can reach a connector; it sends no account data. The connectors it brings are different: in Codex, the Atlassian and Notion ones reach their servers each time a session starts (and stop at sign-in until you sign in), unless you turn them off as the Codex install step shows. In Claude Code, the plugin also adds a hook that asks before connector tools that send, share, change, or delete.
 
 **Does it work on the web, or in the Claude app without Cowork?** Yes. Those chats don't keep files between sessions, so at the end of a session your intern packs your folder into a zip for you to download. Upload it at the start of the next chat and it picks up where you left off.
 

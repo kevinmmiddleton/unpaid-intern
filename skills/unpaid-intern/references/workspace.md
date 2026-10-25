@@ -170,7 +170,7 @@ One row per real correction: what went wrong, the fix, and where the fix now liv
 ## Projects, areas, and context clusters
 
 - `4-Reference/INDEX.md` lists every page in one line each.
-- `4-Reference/glossary.md` holds acronyms and internal terms. A meaning goes in only when a source defines it or the user confirmed it.
+- `4-Reference/glossary.md` holds acronyms and internal terms. A meaning goes in only when a source defines it or the user confirmed it. Add each row right under the table's last row: a blank line ends a markdown table, so a row below one shows as loose text (people.md works the same way).
 - Each project gets a context cluster in `2-Projects/<slug>/`, created with `brain.py project "<Name>"` (or copied from `2-Projects/_template/` by hand):
   - `current.md`: goal, decisions in force, open questions, next action, stop condition, and a `review-by: YYYY-MM-DD` line.
   - `decisions.md`: project-level decision history, append only.

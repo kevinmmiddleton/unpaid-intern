@@ -226,7 +226,7 @@ Meeting times that respect the user's rules.
 
 Sort an inbox or chat backlog so the user can decide fast. Never delete: work mail and chat can be under retention policies or legal holds.
 
-1. Read the requested window (default: unread from the last two days). Read-only.
+1. Read the requested window (default: unread from the last two days). Read-only: triage writes nothing, not even the day log or scratch file, until the user asks for something that writes.
 2. Group at the sender or thread level, then check messages inside mixed groups. A vendor's invoices and its marketing are different groups.
 3. Present numbered groups in this order, replies first:
 
@@ -263,10 +263,10 @@ The beginner move, and the one people use most. Three forms:
 - "Say it in plain English."
 
 1. Check `4-Reference/glossary.md` first. Internal acronyms differ by company; never guess one as if it were fact.
-2. If a source defines it, use that and cite it. If not, give the common meaning labeled as a guess (or none, if there isn't one), add the term to the glossary's open list with where it came up, and ask the user to confirm the internal meaning. That small write needs no permission.
+2. If a source defines it, use that and cite it. If not, give the common meaning labeled as a guess (or none, if there isn't one), and ask the user to confirm the internal meaning.
 3. For a document: one-sentence summary, what it asks of the reader, the three things that matter, terms decoded, and questions worth asking.
 4. For technical notes headed to a non-technical audience: rewrite for that audience and keep every caveat.
-5. Offer to add confirmed terms to the glossary.
+5. **Keep the record, every time, before you reply.** For each term you decoded that the glossary doesn't have: one the text itself defines goes in the main table with that text as its Source; one it doesn't define goes on the open list, with where it came up and your guess, if any, in Best guess. A term already on the open list that the text now defines moves up to the main table. These small writes need no permission. End with one line naming what you added ("Added ELD and the herd to your glossary; ELD's meaning is my guess."), then run `brain.py check`.
 
 ### /bro
 
@@ -318,9 +318,9 @@ To share the capability, people share the kit, never the lessons. A lesson holds
 A manager-ready table in minutes, built from the same files that hold the follow-ups.
 
 1. Run `brain.py status` (add `--all` to include watched projects, `--copy` to put it on the clipboard).
-2. Read the notes the script prints. Stale rows, projects marked done with open follow-ups, and missing next steps must be resolved or called out before the table goes anywhere.
+2. Read the notes the script prints. Stale rows, projects marked done with open follow-ups, missing next steps, and unconfirmed statuses must be resolved or called out before the table goes anywhere: put each note in plain words above the table, and ask about an unconfirmed status before anyone calls it on track.
 3. Never paint a row green because a draft exists. If status is unconfirmed, ask the user or mark it unknown.
-4. Hand over one table, ready to paste. Never maintain a second list by hand.
+4. Hand over the table the script printed, as printed: its columns, its rows, and no `[stated]` labels or other brackets added, since it goes somewhere the user pastes it. To change a row, change `Memory/project-status.md` and run `brain.py status` again. Never build a table of your own or keep a second list by hand.
 
 ### /gofer
 

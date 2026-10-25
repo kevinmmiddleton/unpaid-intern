@@ -79,10 +79,10 @@ def portable_manifest() -> str:
 
 
 def portable_mcp_json() -> str:
-    """Root mcp.json for Codex and ChatGPT: the pre-listed connectors that need no Claude-specific sign-in (fixed URL, no Claude OAuth client)."""
-    servers = json.loads(mcp_json())["mcpServers"]
-    keep = {n: {"type": "streamable-http", "url": e["url"]} for n, e in servers.items() if e.get("url") and "oauth" not in e}
-    return json.dumps({"$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json", "mcpServers": keep}, indent=2) + "\n"
+    """Root mcp.json for Codex and ChatGPT: no connectors. Codex starts every bundled server at each session and asks to sign in
+    at install, so setup adds the tools someone actually uses instead. An empty list (not a missing file) keeps Codex off
+    Claude's .mcp.json."""
+    return json.dumps({"$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json", "mcpServers": {}}, indent=2) + "\n"
 
 
 MARKETPLACE = "unpaid-intern"   # install as unpaid-intern@unpaid-intern, straight from this repo

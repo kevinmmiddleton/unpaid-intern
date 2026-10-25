@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.7
+
+Connectors when you want them, not before.
+
+- **In Codex, the plugin no longer brings Atlassian and Notion connectors.** Codex started both at every session, so anyone who doesn't use them got two sign-in errors each time, and installing in the ChatGPT app opened a sign-in page. Now setup asks which tools you use and connects only those, Atlassian and Notion included, the same way as every other tool. Cowork and Claude Code keep their five pre-listed connectors, which wait quietly until you sign in.
+- **Connected Atlassian or Notion through the plugin in Codex?** After you update, ask your intern to connect it again ("connect Jira"). It takes one command, and your notes don't change.
+- **Install steps for the ChatGPT desktop app:** Plugins, Add, Add a marketplace, then use the plugin in a Work chat. In a Chat conversation (where the plugin's Try now goes), the plugin doesn't load.
+
 ## 1.3.6
 
 Fixes from a real Codex test: 21 turns of setup and everyday use on GPT-6.1 Sol, with nothing connected. Then the same turns again on the fixes, and once more on what that second run still caught.

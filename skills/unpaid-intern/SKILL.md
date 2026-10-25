@@ -4,7 +4,7 @@ description: "Unpaid Intern runs a portable second brain for knowledge work: a p
 license: MIT
 compatibility: "Claude (claude.ai, Desktop, Cowork), Claude Code, and Codex. Needs a folder it can read and write for memory; connectors are optional. Scripts need Python 3.9+ with the standard library only. Other agents can share the workspace through AGENTS.md."
 metadata:
-  version: "1.3.6"
+  version: "1.3.7"
   author: "Kevin Middleton"
   homepage: "https://middleton.io"
 ---

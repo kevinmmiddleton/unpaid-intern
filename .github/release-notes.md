@@ -1,6 +1,6 @@
-# Codex test fixes
+# Connectors when you want them
 
-New in 1.3.6: fixes from a real Codex test of setup and everyday use. Setup asks your name, so your own promises are filed as yours. Your intern leaves its scripts' files alone and catches a hand edit, labels like [stated] stay out of chat, "explain this" fills in your glossary through a new script that keeps every row in the right table, people and glossary tables stay tables, and a few more spoken dates work. In Codex, the README says how to quiet the Atlassian and Notion sign-in errors. The no-install kit is tested in ChatGPT Projects.
+New in 1.3.7: in Codex, the plugin no longer brings Atlassian and Notion connectors, so there are no sign-in errors at the start of each session and no sign-in page when you install. Setup asks which tools you use and connects only those. The README also has install steps for the ChatGPT desktop app, with no terminal needed.
 
 If you're new here: your intern reads everything you hand it, preps your meetings, keeps your follow-ups, and never asks for a reference letter.
 
@@ -8,7 +8,8 @@ If you're new here: your intern reads everything you hand it, preps your meeting
 
 - **Cowork:** download `unpaid-intern.plugin`. In Claude, open Customize, then Plugins, click + Add, choose Upload plugin, and pick the file. Then say "set me up."
 - **Claude Code:** no download needed. Run `/plugin marketplace add kevinmmiddleton/unpaid-intern`, then `/plugin install unpaid-intern@unpaid-intern`.
-- **Codex:** run `codex plugin marketplace add kevinmmiddleton/unpaid-intern`, then `codex plugin add unpaid-intern@unpaid-intern`.
+- **Codex in the ChatGPT desktop app:** open Plugins, click Add, then Add a marketplace, enter `kevinmmiddleton/unpaid-intern`, and install Unpaid Intern. Use it in a Work chat.
+- **Codex CLI:** run `codex plugin marketplace add kevinmmiddleton/unpaid-intern`, then `codex plugin add unpaid-intern@unpaid-intern`.
 - **claude.ai or the Claude app:** download `unpaid-intern.zip` and upload it under Customize, then Skills. Code execution has to be on.
 - **Microsoft Copilot, ChatGPT, Gemini, or no installs allowed:** download `unpaid-intern-no-install-kit.zip` and follow the README inside.
 - **Cursor, GitHub Copilot, Gemini CLI, and other coding agents:** run `npx skills add kevinmmiddleton/unpaid-intern`.

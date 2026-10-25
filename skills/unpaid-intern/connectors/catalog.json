@@ -9,7 +9,6 @@
   "none": "No connector yet. Use the fallback."
  },
  "codex_routes": {
-  "with-plugin": "Comes with the Unpaid Intern plugin. Sign in with codex mcp login. Without the plugin, install it from Codex's plugin directory or add it by web address.",
   "plugin-or-address": "Install it from Codex's plugin directory (/plugins) if it's listed there. Otherwise add it by web address with codex mcp add, then sign in.",
   "plugin-only": "Only through Codex's plugin directory (/plugins). There's no web address Codex can add for it, so if it isn't listed, an admin turns the plugin on or shares a client ID."
  },

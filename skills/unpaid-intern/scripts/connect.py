@@ -69,8 +69,7 @@ ROUTE_SHORT = {"one-click": "One click", "add-by-url": "Add by web address", "ap
 CATEGORY_ORDER = ["suite", "chat", "meetings", "files", "tracker", "docs", "work-management", "crm", "support",
                   "sales", "design", "analytics", "dev", "data", "marketing", "hr", "finance", "automation"]
 SURFACE_NAME = {"cowork": "Cowork", "desktop": "Claude Desktop", "web": "claude.ai", "code": "Claude Code", "codex": "Codex"}
-CODEX_SHORT = {"with-plugin": "Comes with the plugin", "plugin-or-address": "Codex plugin or web address",
-               "plugin-only": "Codex plugin only"}
+CODEX_SHORT = {"plugin-or-address": "Codex plugin or web address", "plugin-only": "Codex plugin only"}
 CODEX_PLUGINS = "Codex's plugin directory (/plugins in the Codex terminal app, or Plugins in the ChatGPT desktop app)"
 
 
@@ -321,7 +320,7 @@ def codex_route(c: dict) -> str | None:
     if c["route"] in ("admin-project", "api-key", "none") or c["id"].startswith("other:"):
         return None
     if codex_address(c):
-        return "with-plugin" if c.get("bundled") else "plugin-or-address"
+        return "plugin-or-address"  # the Codex plugin bundles no connectors, so Atlassian and Notion connect like the rest
     return "plugin-only"
 
 
@@ -492,10 +491,7 @@ def codex_steps(c: dict, name: str) -> list[str]:
                "which has to be set before you start Codex.")
     else:
         add = f"If it isn't there, ask me to add it by address: `codex mcp add {tid} --url {url}`, then `codex mcp login {tid}` if the add didn't already open a sign-in."
-    if route == "with-plugin":
-        steps = [f"If you installed the Unpaid Intern plugin, {name} comes with it. Don't install a second copy: ask me to sign you in with `codex mcp login {tid}`.",
-                 f"Without the plugin, look for {name} in {CODEX_PLUGINS} and install it, or ask me to add it by address: `codex mcp add {tid} --url {url}`, then `codex mcp login {tid}`."]
-    elif route == "plugin-or-address":
+    if route == "plugin-or-address":
         steps = [look, add]
     else:
         steps = [look, f"If it isn't there, there's no address Codex can add for {name} yet. Use the fallback below, and ask me for the IT email: an admin can turn the plugin on or share a client ID."]
@@ -649,11 +645,10 @@ def cmd_plan(args) -> int:
               "admin-project": "Needs IT to set it up first", "none": "No connector yet (we'll use exports or the browser)",
               "other": "Not in this kit's catalog (we'll check Claude's directory, then fall back to exports)"}
     if surface == "codex":
-        labels.update({"with-plugin": "Comes with the plugin (sign in only)",
-                       "plugin-or-address": "Codex's plugin directory, or by web address",
+        labels.update({"plugin-or-address": "Codex's plugin directory, or by web address",
                        "plugin-only": "Codex's plugin directory only (an admin may need to turn it on)",
                        "other": "Not in this kit's catalog (we'll check Codex's plugins, then fall back to exports)"})
-    order = ["with-plugin", "one-click", "one-click-admin", "add-by-url", "plugin-or-address", "plugin-only",
+    order = ["one-click", "one-click-admin", "add-by-url", "plugin-or-address", "plugin-only",
              "api-key", "admin-project", "none", "other"]
     for r in sorted(groups, key=order.index):
         print(f"{labels[r]}: {', '.join(groups[r])}")
@@ -1789,8 +1784,9 @@ def cmd_selftest(args) -> int:
               and "| Order | Tool | Id | How it connects | Status |" in cx)
         check("Codex plan starts each tool at Codex's plugin directory and locks it down in Codex's config",
               "/plugins" in cx and "default_tools_approval_mode" in cx and "new Codex session" in cx)
-        check("Codex plan adds by address with codex mcp add, and only the plugin's own connectors just sign in",
-              "`codex mcp add linear --url https://mcp.linear.app/mcp/readonly`" in cx and "`codex mcp login atlassian`" in cx
+        check("Codex plan adds by address with codex mcp add, Atlassian included (the Codex plugin bundles no connectors)",
+              "`codex mcp add linear --url https://mcp.linear.app/mcp/readonly`" in cx and "`codex mcp add atlassian --url" in cx
+              and "comes with" not in cx.lower()
               and "codex mcp add slack" not in cx and "codex mcp add microsoft-365" not in cx and "--bearer-token-env-var GITHUB_PAT" in cx)
         wc = Path(tmp) / "codex"
         with contextlib.redirect_stdout(io.StringIO()):

@@ -13,7 +13,7 @@ The repo root is the plugin. Everything else hangs off it:
 | `hooks/hooks.json` | The ask-first hook (generated) |
 | `.mcp.json` | Plugin connector list (generated) |
 | `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json` | This repo as its own install source for Claude Code and Codex (generated). It's also listed in the [claude-plugins](https://github.com/kevinmmiddleton/claude-plugins) catalog |
-| `plugin.json`, `mcp.json` | The Codex and ChatGPT manifest and connector list (generated from `.claude-plugin/plugin.json` and the catalog) |
+| `plugin.json`, `mcp.json` | The Codex and ChatGPT manifest (generated from `.claude-plugin/plugin.json`) and an empty connector list, so Codex connects only the tools setup adds |
 | `evals/` | Behavior scenarios and the latest results |
 | `tools/` | The build script, the hook rules, and the brand image scripts |
 

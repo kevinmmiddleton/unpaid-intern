@@ -17,7 +17,7 @@ Some companies block Python, or the machine simply doesn't have it. The second b
 
 ## First, try the other names
 
-On Windows, `python3` is often missing while Python is installed under another name, or it's a Microsoft Store shortcut that prints "Python was not found" instead of running. Before falling back, try once each, in order: `python3 --version`, `python --version`, `py -3 --version`. Use the first that prints a Python 3 version, in place of `python3`, for the whole session (`references/scripts.md` also says where the scripts are on each host). If none does, or code execution is turned off, use this page.
+On Windows, `python3` is often missing while Python is installed under another name, or it's a Microsoft Store shortcut that prints "Python was not found" or fails with "The file cannot be accessed by the system" instead of running. Before falling back, try once each, in order: `python3 --version`, `python --version`, `py -3 --version`. Use the first that prints a Python 3 version, in place of `python3`, for the whole session (`references/scripts.md` also says where the scripts are on each host). If none does, or code execution is turned off, use this page.
 
 ## Build the folders by hand
 

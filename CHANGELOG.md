@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.9
+
+Fixes from a Windows test of 1.3.8 in the ChatGPT app's Codex.
+
+- **Windows Python:** the setup notes now name the error a Microsoft Store shortcut can give ("The file cannot be accessed by the system"), so your intern moves straight on to `py -3`, which worked.
+- **Your intern does the steps it can do itself** (opening a file, running a check) instead of handing them to you, and gives the full path when you do need to open or check a file.
+- **The self-test names any check it can't run on your computer.** On Windows, the symlink check needs admin rights or Developer Mode, so the count was one short with no explanation.
+
 ## 1.3.8
 
 - **In the ChatGPT desktop app, your notes stay where the next chat can find them.** A Work chat with no project works in a folder the app makes for that one chat, and the next chat gets a new one, so notes set up there were out of reach a chat later. Setup now sends you to a Work chat with a project on your notes folder first, and `brain.py init` won't set up in one of those per-chat folders.

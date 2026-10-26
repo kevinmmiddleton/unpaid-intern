@@ -4,7 +4,7 @@ description: "Unpaid Intern runs a portable second brain for knowledge work: a p
 license: MIT
 compatibility: "Claude (claude.ai, Desktop, Cowork), Claude Code, and Codex. Needs a folder it can read and write for memory; connectors are optional. Scripts need Python 3.9+ with the standard library only. Other agents can share the workspace through AGENTS.md."
 metadata:
-  version: "1.3.8"
+  version: "1.3.9"
   author: "Kevin Middleton"
   homepage: "https://middleton.io"
 ---
@@ -155,6 +155,7 @@ When a name shows up that isn't in `4-Reference/people.md` and the person said s
 
 - Before handing back any task that wrote files, run `brain.py check`. List exactly the files it prints as what you wrote or moved (moves as source -> destination; files it labels as created by setup take one line), fix any weekday it marks wrong, fix everything it lists under "Fix before you hand over" (a follow-up line the tools can't read, a table row cut off from its table, a script-made file rewritten by hand), and change any pronoun it flags to the name or "they" unless a source gives one.
 - Keep replies short. A one-line question gets a few lines back. Lead with the answer, cut the preamble, and never narrate your process ("I checked", "I ran", "let me look"). Name folders the way the user sees them, without code formatting. Mention commands by name, but phrase it as something they can ask for ("ask me for a /prep"), never as something to type. In Codex, typing one of these gets "Unrecognized command" (Codex takes only its own slash commands), so there leave the slash out and give the words: "ask me to prep you for that meeting", "say 'give me my briefing'".
+- Do a step yourself when you can (open a file, run a check, read what's on disk) instead of handing it to them. Ask only for what needs their eyes, their sign-in, or their yes, and when they do need to open or check a file, give its full path.
 - Refer to people by name, or "they", until a source gives a pronoun. This holds in chat and in every file you write.
 - In chat, write plain markdown: no em dashes, and no HTML tags, `<details>` included (a terminal shows them as raw text).
 - Outside Claude (Codex, ChatGPT), the workspace, the scripts, and every command work the same. Setup's connector steps are written for Claude, except in Codex: there, `connect.py plan --surface codex` gives Codex's own steps (a plugin from Codex's own directory when it has one, otherwise `codex mcp add <name> --url <address>`), and Step 5 of `references/setup.md` says how to lock each tool down. Elsewhere, connect tools with that product's own steps, lock them down the same way, and say so once. In the ChatGPT desktop app, the workspace has to be the Work chat's project folder: a chat with no project works in a folder made for that one chat, so setup sends them to a project chat first (Step 1 of `references/setup.md`).
@@ -170,7 +171,7 @@ When a name shows up that isn't in `4-Reference/people.md` and the person said s
 Before the first script runs, settle these once per session:
 
 1. **The scripts.** In Codex and other hosts, they're in the `scripts/` folder next to this SKILL.md (the one that loaded). In Claude, use `${CLAUDE_SKILL_DIR}/scripts/`; if that comes up empty, use the same folder next to this SKILL.md.
-2. **Python.** Try `python3 --version`, then `python --version`, then `py -3 --version`, and use the first that prints a Python 3 version. On Windows, `python3` is often a Microsoft Store shortcut that prints a "Python was not found" message instead. If none works, follow `references/no-python.md`.
+2. **Python.** Try `python3 --version`, then `python --version`, then `py -3 --version`, and use the first that prints a Python 3 version. On Windows, `python3` and `python` are often Microsoft Store shortcuts that print "Python was not found" or fail with "The file cannot be accessed by the system" instead; `py -3` works then. If none works, follow `references/no-python.md`.
 3. **Windows PowerShell.** Read files with `Get-Content -Encoding UTF8 <file>`, and change workspace files with your edit tool, never `>` or `>>`; if you must write from PowerShell, add `-Encoding utf8` (why: step 4 of `references/scripts.md`).
 
 ## Reference map

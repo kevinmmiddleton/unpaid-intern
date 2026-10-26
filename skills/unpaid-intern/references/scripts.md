@@ -7,7 +7,7 @@ Both scripts use only the Python standard library (3.9 or newer). Most commands 
 Work these out once per session, then reuse them:
 
 1. **Find the scripts.** In Codex and other hosts, they're in the `scripts/` folder next to the SKILL.md that loaded this skill; use its full path. In Claude, use `${CLAUDE_SKILL_DIR}/scripts/`, and if that comes up empty, the same folder next to SKILL.md.
-2. **Find Python.** Try `python3 --version`, then `python --version`, then `py -3 --version`, and use the first that prints a Python 3 version. On Windows, `python3` is often a Microsoft Store shortcut: it prints "Python was not found" (or opens the Store) instead of a version, so move on to the next name.
+2. **Find Python.** Try `python3 --version`, then `python --version`, then `py -3 --version`, and use the first that prints a Python 3 version. On Windows, `python3` is often a Microsoft Store shortcut: it prints "Python was not found", opens the Store, or fails with "The file cannot be accessed by the system" instead of printing a version, so move on to the next name (`py -3` usually works).
 3. **Run** `<python> "<scripts folder>/<script>" <command>`: for example `python3 "${CLAUDE_SKILL_DIR}/scripts/brain.py" due` in Claude, or `py -3 "<scripts folder>\brain.py" due` on Windows.
 4. **On Windows PowerShell,** read files with `Get-Content -Encoding UTF8 <file>`. If you write a workspace file from PowerShell instead of your edit tool, add `-Encoding utf8` (to `Set-Content`, `Add-Content`, or `Out-File`), and never use `>` or `>>`. Without it, Windows PowerShell reads and writes the ANSI code page or UTF-16, so text garbles and the scripts misread the file.
 

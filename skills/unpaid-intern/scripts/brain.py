@@ -1917,6 +1917,8 @@ def cmd_unpack(args) -> int:
 def cmd_selftest(args) -> int:
     checks = []
 
+    not_run = []  # checks this computer can't run, named so the count never looks short for no reason
+
     def check(name, cond):
         checks.append((name, bool(cond)))
 
@@ -2210,7 +2212,7 @@ def cmd_selftest(args) -> int:
                         pass
                 check("daylog refuses to write through a symlink", not any(outside.iterdir()))
             except OSError:
-                pass
+                not_run.append("daylog refuses to write through a symlink (this account can't make symlinks; Windows needs admin rights or Developer Mode)")
 
         fenced = Path(tmp) / "fenced.md"
         fenced.write_text("```\n- [ ] 2026-10-01 | @me | example inside a code fence | doc | accepted: true\n```\n"
@@ -2468,6 +2470,8 @@ def cmd_selftest(args) -> int:
         if not ok:
             print(f"FAIL  {name}")
     print(f"{passed}/{len(checks)} checks passed")
+    for name in not_run:
+        print(f"not run here: {name}")
     return 0 if passed == len(checks) else 1
 
 
